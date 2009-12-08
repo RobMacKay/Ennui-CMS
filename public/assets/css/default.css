@@ -1,0 +1,355 @@
+/**
+ * Determines base styles for the site
+ * 
+ * This stylesheet contains the overall font and layout rules for the site.
+ * Rules within this stylesheet should affect every page of the site. If a rule
+ * only applies to a particular page, it should probably go in the 
+ * page-specific stylesheet instead.
+ * 
+ * @author		Jason Lengstorf
+ * @copyright	2009 Ennui Design
+ * @license		http://www.opensource.org/licenses/mit-license.html MIT License
+ */
+
+/*
+ ******************************************************************************
+ * GENERAL RESET
+ ******************************************************************************
+ */
+html,body,div,h1,h2,h3,h4,h5,h6,p,ul,ol,li,span,a,form,fieldset,legend,input,
+textarea,select,img,object {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	text-align: left;
+	background: transparent;
+}
+
+ul,ol {
+	list-style: none;
+}
+
+/*
+ ******************************************************************************
+ * FONT SETTINGS
+ ******************************************************************************
+ */
+h1,h2,h3,h4,h5,h6,p,input,textarea,select,label,ul,li,a,span,legend {
+	font-family: helvetica, arial, sans-serif;
+	line-height: 15px;
+	letter-spacing: .04em;
+	color: #002539;	
+}
+
+h2,h3,h4,h5,h6,p {
+	margin-bottom: 15px;
+}
+
+p,input,textarea,select,label,li,a {
+	font-size: 12px;
+}
+
+h2,h2 a:link,h2 a:visited,h2 a:active,h2 a:hover,legend {
+	font-size: 24px;
+	line-height: 30px;
+	letter-spacing: -.06em;
+	color: #2B1A08;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+h3 {
+	font-size: 18px;
+	line-height: 30px;
+}
+
+h4 {
+	font-size: 14px;
+}
+
+h5 {
+	font-size: 12px;
+}
+
+h6 {
+	font-size: 11px;
+}
+
+a:link,a:visited,a:active,a:hover {
+	color: #004E79;
+}
+
+/*
+ ******************************************************************************
+ * GENERAL LAYOUT BOX MODEL
+ ******************************************************************************
+ */
+body {
+	background: #D8EEFA;
+}
+
+div {
+	display: block;
+	position: relative;
+}
+
+#master {
+	margin: 0 auto;
+	width: 990px;
+	background: #D8EEFA url(/images/cf_bg.jpg) top center repeat-y;
+}
+
+#header {
+	height: 70px;
+	background: #D8EEFA;
+}
+
+#header_title {
+	position: absolute;
+	top: 10px;
+	left: 70px;
+	width: 273px;
+	height: 41px;
+	background: url(/images/cf_logo.jpg) top left no-repeat;
+	overflow: hidden;
+}
+
+#header_title a {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-indent: -9999px;
+}
+
+#content {
+	padding: 60px 15px 0;
+	background: url(/images/cf_bg-top.jpg) top center no-repeat;
+}
+
+/*
+ ******************************************************************************
+ * MENU STYLE
+ ******************************************************************************
+ */
+#menu {
+	position: absolute;
+	top: 20px;
+	right: 60px;
+	height: 75px;
+	z-index: 2;
+}
+
+#menu li {
+	display: inline-block;
+	padding: 6px 8px;
+	text-transform: uppercase;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+}
+
+#menu li a {
+	color: #004E79;
+	font-size: 14px;
+	text-decoration: none;
+}
+
+#menu li.selected,#menu li.parent,#menu li:hover {
+	background: #004E79;
+	box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+	-moz-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+	-webkit-box-shadow: 1px 2px 6px rgba(0, 78, 121, .5);
+	-webkit-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+}
+
+#menu li:hover a,#menu li.selected a, #menu li.parent a {
+	color: #FFF;
+	text-decoration: none;
+}
+
+#menu .submenu {
+	display: none;
+}
+
+#menu li:hover .submenu,#menu li.selected .submenu,#menu li.parent .submenu {
+	display: block;
+	position: absolute;
+	top: 22px;
+	right: -6px;
+	width: 566px;
+	padding: 2px 0;
+	text-align: center;
+	background: #004E79;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+	-moz-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+	-webkit-box-shadow: 1px 2px 6px rgba(0, 78, 121, .5);
+	-webkit-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+}
+
+#menu li:hover {
+	background: #80A3B7;
+}
+
+#menu li:hover .submenu {
+	background: #80A3B7;
+}
+
+#menu .submenu li {
+	padding: 3px 4px 1px;
+	color: #FFF;
+}
+
+#menu .submenu li.selected,#menu .submenu li:hover {
+	background: #FFF;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+}
+
+#menu .submenu a {
+	color: #FFF;
+	font-size: 12px;
+	text-decoration: none;
+}
+
+#menu .submenu li.selected a,#menu .submenu li:hover a {
+	color: #004E79;
+}
+
+/*
+ ******************************************************************************
+ * CONTENT STYLE
+ ******************************************************************************
+ */
+.entrydisplay {
+	width: 560px;
+	padding: 0 50px;
+	float: left;
+}
+
+input,select,textarea {
+	border: 1px solid #000;
+	padding: 2px;
+	background: #FFF;
+}
+
+object {
+	text-align: center;
+	margin: 0 auto 15px;
+	display: block;
+}
+
+/*
+ ******************************************************************************
+ * SIDEBAR STYLE
+ ******************************************************************************
+ */
+#sidebar {
+	float: right;
+	width: 240px;
+	margin: 330px 15px 0 0;
+	padding: 20px;
+	background: #004E79;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	box-shadow: inset -1px -2px 10px rgba(0, 20, 40, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+	-moz-box-shadow: inset -1px -2px 10px 2px rgba(0, 20, 40, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+	-webkit-box-shadow: 1px 2px 6px rgba(0, 78, 121, .5);
+	-webkit-box-shadow: inset -1px -2px 10px rgba(0, 20, 40, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+}
+
+#sidebar h2 {
+	margin-bottom: 0;
+	font-size: 18px;
+	line-height: 30px;
+	color: #D8EEFA;
+	font-weight: normal;
+	letter-spacing: .04em;
+}
+
+#sidebar h3 {
+	color: #FFF;
+	font-size: 14px;
+	line-height: 30px;
+	margin-bottom: 0;
+	#font-weight: normal;
+	letter-spacing: -.02em;
+}
+
+#sidebar p {
+	color: #FFF;
+}
+
+#sidebar a {
+	color: #80A3B7;
+}
+
+#latest-blogs {
+	margin-bottom: 15px;
+}
+
+#latest-blogs li a {
+	text-decoration: none;
+	padding: 4px 8px;
+	display: block;
+	color: #FFF;
+}
+
+#latest-blogs li a:hover {
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	background: #80A3B7;
+	box-shadow: inset -1px -2px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 20, 40, .5);
+	-moz-box-shadow: inset -1px -2px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 20, 40, .5);
+	-webkit-box-shadow: 1px 2px 6px rgba(0, 20, 40, .5);
+	-webkit-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 20, 40, .5);
+}
+
+.entries-list>a {
+	display: block;
+	text-align: right;
+	font-size: 11px;
+	color: #FFF;
+}
+
+/*
+ ******************************************************************************
+ * FOOTER STYLE
+ ******************************************************************************
+ */
+#footer {
+	clear: both;
+	padding: 30px 315px 4px 15px;
+}
+
+.credits {
+	text-align: center;
+	font-size: 11px;
+	color: #000;
+}
+
+.credits a {
+	text-decoration: none;
+}

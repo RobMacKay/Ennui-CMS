@@ -1,0 +1,82 @@
+/**
+ * Page-specific styles for the contact form
+ * 
+ * @author		Jason Lengstorf
+ * @copyright	2009 Ennui Design
+ * @license		http://www.opensource.org/licenses/mit-license.html MIT License
+ */
+
+/*
+ ******************************************************************************
+ * CONTACT FORM
+ ******************************************************************************
+ */
+form#contact {
+	padding: 15px;
+	background: #D8EEFA;
+	background: rgba(216, 238, 250, .2);
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+	-moz-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+	-webkit-box-shadow: 1px 2px 6px rgba(0, 78, 121, .5);
+	-webkit-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+}
+
+form#contact label {
+	display: block;
+	font-size: 11px;
+	text-transform: uppercase;
+	font-weight: bold;
+}
+
+form#contact input[type=text],form#contact textarea {
+	display: block;
+	margin: 0 0 15px;
+	padding: 5px;
+	background: #FFF;
+	border: 1px solid #80A3B7;
+	color: #2B1A08;
+	box-shadow: inset 3px 4px 12px rgba(0, 78, 121, .3);
+	-moz-box-shadow: inset 3px 4px 12px rgba(0, 78, 121, .3);
+	-webkit-box-shadow: inset 3px 4px 12px rgba(0, 78, 121, .3);
+	border-radius: 0 6px 6px;
+	-moz-border-radius: 0 6px 6px;
+	-webkit-border-radius: 0 6px 6px;
+}
+
+form#contact input[type=textarea] {
+	width: 66%;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+form#contact textarea {
+	width: 97%;
+	font-size: 12px;
+}
+
+form#contact input[type=submit] {
+	width: auto;
+	margin-left: 2%;
+	padding: 4px 6px 3px;
+	font-size: 14px;
+	color: #FFF;
+	text-transform: uppercase;
+	background: #004E79;
+	border: 1px solid #004E79;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	box-shadow: inset -1px -2px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+	-moz-box-shadow: inset -1px -2px 10px 2px rgba(0, 20, 40, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+	-webkit-box-shadow: 1px 2px 6px rgba(0, 78, 121, .5);
+	-webkit-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+}

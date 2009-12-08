@@ -1,0 +1,37 @@
+/**
+ * Page-specific styles for the photo gallery
+ * 
+ * @author		Jason Lengstorf
+ * @copyright	2009 Ennui Design
+ * @license		http://www.opensource.org/licenses/mit-license.html MIT License
+ */
+
+/*
+ ******************************************************************************
+ * PHOTO THUMBNAIL DISPLAY
+ ******************************************************************************
+ */
+.thumbbox {
+	padding: 15px;
+	background: #D8EEFA;
+	background: rgba(216, 238, 250, .2);
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+	-moz-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+	-webkit-box-shadow: 1px 2px 6px rgba(0, 78, 121, .5);
+	-webkit-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
+		1px 2px 6px rgba(0, 78, 121, .5);
+	text-align: center;
+}
+
+.thumbbox li {
+	display: inline-block;
+}
+
+.thumbbox li img {
+	border: 1px solid #80A3B7;
+}

@@ -1,0 +1,10 @@
+<FilesMatch "\.(ico|pdf|flv|jpe?g|png|gif|js|css|swf)(\.gz)?$">
+Header set Expires "Thu, 15 Apr 2012 20:00:00 GMT"
+Header unset ETag
+FileETag None
+</FilesMatch>
+
+RewriteEngine on
+RewriteBase /
+Options -MultiViews +FollowSymLinks
+RewriteRule !\.(gif|jpe?g|png|css|ico|swf|js|pdf)$ index.php [NC]
