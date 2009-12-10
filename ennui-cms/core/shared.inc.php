@@ -85,6 +85,14 @@ $menu = Utilities::buildMenu($url_array, $menuPages);
 $menuPage = Utilities::getPageAttributes($menuPages, $url_array[0]);
 
 /*
+ * Check if the admin page is being accessed
+ */
+if ( $url_array[0]=='admin' )
+{
+	$menuPage = array('display'=>'Administrative Controls', 'type'=>'admin');
+}
+
+/*
  * If the supplied URL doesn't match any menu items, direct to the 404 page
  */
 if ( $menuPage===FALSE )
