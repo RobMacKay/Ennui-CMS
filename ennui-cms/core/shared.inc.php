@@ -109,16 +109,19 @@ if ( isset($menuPage['hide']) && $menuPage['hide']===TRUE )
 	exit;
 }
 
-$display = ($url_array[0]!='admin') ? $menuPage['display'] : 'Log In';
-$type = ($url_array[0]!='admin') ? $menuPage['type'] : 'admin';
-
 // Build the Page Content
-include_once '../ennui-cms/inc/class.'.$type.'.inc.php';
-$obj = new $type($mysqli, $url_array);
+include_once '../ennui-cms/inc/class.'.$menuPage['type'].'.inc.php';
+$obj = new $menuPage['type']($mysqli, $url_array);
 
 $entry = $obj->displayPublic($url_array);
 
+/*
+ * This builds the content for the title tag. This should probably be moved to 
+ * the Utilities class and cleaned up.
+ * 
+ * TODO Move to Utilities class
+ */
 $entrytitle = (isset($obj->url1)) ? ucfirst(urldecode($obj->url1)) . ' | ' : NULL;
-$title = $entrytitle . $display . ' | ' . SITE_TITLE;
+$title = $entrytitle . $menuPage['display'] . ' | ' . SITE_TITLE;
 
 ?>
