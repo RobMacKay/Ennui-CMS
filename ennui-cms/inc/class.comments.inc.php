@@ -108,11 +108,20 @@ COMMENTS;
 				 */
 				include_once 'class.gravatar.inc.php';
 				$email = stripslashes($c['email']);
-				$default = GRAVATAR_DEFAULT_IMG_URL;
+
+				/*
+				 * If no default gravatar was provided, uses the default
+				 */
+				$default = NULL;
+				if( GRAVATAR_DEFAULT_IMG_URL != "" )
+				{
+					$default = GRAVATAR_DEFAULT_IMG_URL;
+				}
+
 				$gravatar = new Gravatar($email, $default);
 				$gravatar->size = GRAVATAR_SIZE;
-				$gravatar->rating = "PG";
-				$gravatar->border = "3C1C11";
+				$gravatar->rating = GRAVATAR_RATING;
+				$gravatar->border = GRAVATAR_BORDER_COLOR;
 
 				/*
 				 * If the user is logged in, show comment editing links
