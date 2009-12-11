@@ -200,7 +200,7 @@ NO_COMMENT;
 	private function getEntryComments($id)
 	{
 		$sql = "SELECT id, bid, user, email, link, comment, timestamp, subscribe
-				FROM blogCmnt
+				FROM `".DB_NAME."`.`".DB_PREFIX."blogCmnt`
 				WHERE bid=?
 				ORDER BY timestamp ASC";
 		$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
@@ -469,14 +469,14 @@ ____________CMNT;
 		if($_SESSION['loggedIn']==1)
 		{
 			$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-			$sql = "DELETE FROM blogCmnt WHERE id=? LIMIT 1";
+			$sql = "DELETE FROM `".DB_NAME."`.`".DB_PREFIX."blogCmnt` WHERE id=? LIMIT 1";
 			if($stmt = $mysqli->prepare($sql))
 			{
 				$stmt->bind_param("i", $cmntid);
 				$stmt->execute();
 				$stmt->close();
 
-				$sql = "SELECT title FROM entryMgr WHERE id=?";
+				$sql = "SELECT title FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr` WHERE id=?";
 				if($stmt = $mysqli->prepare($sql))
 				{
 					$stmt->bind_param("i", $bid);
@@ -514,7 +514,8 @@ ____________CMNT;
 		 * Save the comment in the blogCmnt table
 		 */
 		$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-		$sql = "INSERT INTO blogCmnt (bid, user, email, link, comment, timestamp, subscribe)
+		$sql = "INSERT INTO `".DB_NAME."`.`".DB_PREFIX."blogCmnt`
+					(bid, user, email, link, comment, timestamp, subscribe)
 				VALUES (?, ?, ?, ?, ?, ?, ?)";
 		if($stmt = $mysqli->prepare($sql)) {
 			$stmt->bind_param("issssii", $p['cmnt_bid'], $p['cmnt_name'],
@@ -541,7 +542,7 @@ ____________CMNT;
 		$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 		$subscribers = array();
 		$sql = "SELECT user, email
-				FROM blogCmnt
+				FROM `".DB_NAME."`.`".DB_PREFIX."blogCmnt`
 				WHERE bid=?
 				AND subscribe=1
 				GROUP BY email";
@@ -567,7 +568,7 @@ ____________CMNT;
 		$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 		$info = NULL;
 		$sql = "SELECT title, author
-				FROM entryMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				WHERE id=?
 				LIMIT 1";
 		if($stmt = $mysqli->prepare($sql)) {
@@ -592,7 +593,7 @@ ____________CMNT;
 		$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 		$info = NULL;
 		$sql = "SELECT admin_e
-				FROM adminMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."adminMgr`
 				WHERE admin_u=?
 				LIMIT 1";
 		if($stmt = $mysqli->prepare($sql)) {
@@ -671,7 +672,7 @@ MESSAGE;
 				$email = "$name<$s[email]>";
 
 				// Generate an unsubscribe link
-				$u = "\nhttp://$siteName/comments/unsubscribe/$id/$s[email]";
+				$u = "\n$siteName/comments/unsubscribe/$id/$s[email]";
 			}
 			else
 			{
@@ -698,7 +699,7 @@ MESSAGE;
 			$bloginfo = $this->getEntryTitleAndAuthor($bid);
 			$blog_title = $bloginfo['title'];
 			$email = $this->url3;
-			$sql = "UPDATE blogCmnt
+			$sql = "UPDATE `".DB_NAME."`.`".DB_PREFIX."blogCmnt`
 					SET subscribe=0
 					WHERE email=?
 					AND bid=?";
@@ -748,7 +749,7 @@ ERROR_MSG;
 	static function getCommentCount($blog_id)
 	{
 		$sql = "SELECT COUNT(id) AS theCount
-				FROM blogCmnt
+				FROM `".DB_NAME."`.`".DB_PREFIX."blogCmnt`
 				WHERE bid=?";
 		$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 		$c = array();

@@ -29,7 +29,7 @@
 ________EOD;
 
     $sql = "SELECT title, img, imgcap, body
-    		FROM entryMgr
+    		FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
     		WHERE page='blog'
     		ORDER BY created DESC
     		LIMIT 15";

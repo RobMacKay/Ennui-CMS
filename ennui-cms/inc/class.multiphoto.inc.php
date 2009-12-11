@@ -178,7 +178,7 @@ class MultiPhoto extends Page
 
 		// Select the featured gallery titles
 		$sql = "SELECT id, page
-				FROM entryMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				WHERE data7='featured'";
 		$stmt = $this->mysqli->prepare($sql);
 		$stmt->execute();

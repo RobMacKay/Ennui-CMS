@@ -90,7 +90,7 @@ class Page extends AdminUtilities
 		$sql = "SELECT
 				id, page, title, subhead, body, img, imgcap, data1, data2,
 				data3, data4, data5, data6, data7, data8, author, created
-				FROM entryMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				WHERE id=?
 				LIMIT 1";
 		$stmt = $this->mysqli->prepare($sql);
@@ -108,7 +108,7 @@ class Page extends AdminUtilities
 		$sql = "SELECT
 				id, page, title, subhead, body, img, imgcap, data1, data2,
 				data3, data4, data5, data6, data7, data8, author, created
-				FROM entryMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				WHERE title LIKE ?
 				LIMIT 1";
 		$stmt = $this->mysqli->prepare($sql);
@@ -125,7 +125,7 @@ class Page extends AdminUtilities
 		$sql = "SELECT
 				id, page, title, subhead, body, img, imgcap, data1, data2,
 				data3, data4, data5, data6, data7, data8, author, created
-				FROM entryMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				WHERE data2 LIKE ?
 				ORDER BY created DESC
 				LIMIT $offset, $limit";
@@ -152,7 +152,7 @@ class Page extends AdminUtilities
 		$sql = "SELECT
 				id, page, title, subhead, body, img, imgcap, data1, data2,
 				data3, data4, data5, data6, data7, data8, author, created
-				FROM entryMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				WHERE page=?
 				ORDER BY $orderby
 				LIMIT $offset, $limit";
@@ -205,7 +205,7 @@ class Page extends AdminUtilities
 	protected function countEntries($page)
 	{
 		$sql = "SELECT COUNT(id) AS numRows
-				FROM entryMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				WHERE page=?";
 		if($stmt = $this->mysqli->prepare($sql)) {
 			$stmt->bind_param("s", $page);
@@ -241,7 +241,7 @@ class Page extends AdminUtilities
 
 		$sql = "SELECT COUNT(*)
 				AS theCount
-				FROM entryMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				WHERE page=?
 				AND data2 LIKE ?";
 		if($stmt = $this->mysqli->prepare($sql))
@@ -328,7 +328,7 @@ class Page extends AdminUtilities
 	public function reorderEntries($id, $pos, $direction)
 	{
 		$newpos = ($direction=="up") ? $pos-1 : $pos+1;
-		$sql = "UPDATE entryMgr
+		$sql = "UPDATE `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				SET data7=?
 				WHERE page=?
 				AND id=?
@@ -338,7 +338,7 @@ class Page extends AdminUtilities
 		$stmt->execute();
 		$stmt->close();
 
-		$sql = "UPDATE entryMgr
+		$sql = "UPDATE `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				SET data7=?
 				WHERE page=?
 				AND data7=?
@@ -406,9 +406,10 @@ class Page extends AdminUtilities
 		 * If the ID was passed, set up the query to update the entry
 		 */
 		if ( $id ) {
-			$sql = "UPDATE entryMgr SET title=?, subhead=?, body=?, img=?, imgcap=?
-					, data1=?, data2=?, data3=?, data4=?, data5=?, data6=?, data7=?
-					, data8=? WHERE id=? LIMIT 1";
+			$sql = "UPDATE `".DB_NAME."`.`".DB_PREFIX."entryMgr`
+					SET title=?, subhead=?, body=?, img=?, imgcap=?
+						, data1=?, data2=?, data3=?, data4=?, data5=?, data6=?, data7=?
+						, data8=? WHERE id=? LIMIT 1";
 			$stmt = $this->mysqli->prepare($sql);
 			$stmt->bind_param("sssssssssssssi",$title, $subhead, $body, $img, 
 					$imgcap, $data1, $data2, $data3, $data4, $data5, $data6, 
@@ -419,9 +420,10 @@ class Page extends AdminUtilities
 		 * Otherwise, save a new entry
 		 */
 		else {
-			$sql = "INSERT INTO entryMgr (page, title, subhead, body, img, imgcap,
-					data1, data2, data3, data4, data5, data6, data7, data8, author,
-					created) 
+			$sql = "INSERT INTO `".DB_NAME."`.`".DB_PREFIX."entryMgr`
+						(page, title, subhead, body, img, imgcap,
+						data1, data2, data3, data4, data5, data6, data7, data8, 
+						author, created) 
 					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 			$stmt = $this->mysqli->prepare($sql);
 			$stmt->bind_param("ssssssssssssssss", $page, $title, $subhead, $body, 
@@ -442,7 +444,7 @@ class Page extends AdminUtilities
 	 */
 	public function delete($id)
 	{
-		$sql = "DELETE FROM entryMgr WHERE id=? LIMIT 1";
+		$sql = "DELETE FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr` WHERE id=? LIMIT 1";
 		$stmt = $this->mysqli->prepare($sql);
 		$stmt->bind_param("i", $id);
 		if ($stmt->execute()) {
@@ -541,7 +543,8 @@ class Page extends AdminUtilities
 		$imageID = $_POST['image_id'];
 		$imageCap = htmlentities(trim($_POST['image_cap']), ENT_QUOTES);
 
-		$sql = "INSERT INTO imgCap (album_id, photo_id, photo_cap)
+		$sql = "INSERT INTO `".DB_NAME."`.`".DB_PREFIX."imgCap`
+					(album_id, photo_id, photo_cap)
 				VALUES (?, ?, ?)
 				ON DUPLICATE KEY UPDATE photo_cap=?";
 		$stmt = $this->mysqli->prepare($sql);
