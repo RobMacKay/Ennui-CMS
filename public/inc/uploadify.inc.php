@@ -23,8 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-include_once $_SERVER['DOCUMENT_ROOT'] . SERVER_PATH . '/vars/config.inc.php';
-
 if (!empty($_FILES)) {
 	$tempFile = $_FILES['Filedata']['tmp_name'];
 	$targetPath = $_SERVER['DOCUMENT_ROOT'] . SERVER_PATH . $_GET['folder'] . '/';
