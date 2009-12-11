@@ -7,7 +7,7 @@
 	/*
 	 * Initializes the core functionality of the CMS
 	 */
-	require_once '../ennui-cms/core/core.inc.php';
+	require_once '../ennui-cms/core/init.inc.php';
 
 	/*
 	 * Classes used in the sidebar or in widgets need to be included explicitly
