@@ -93,10 +93,10 @@ class MultiPhoto extends Page
 				// Entry options for the admin, if logged in
 				$admin_entry = $this->admin_gallery_options($this->url0, $e['id'], $n, $e['data7']);
 
-				$caption = "&lt;h3&gt;&lt;strong&gt;" . $e['title']
-					. "&lt;/strong&gt;&lt;/h3&gt;"
-					. htmlentities($e['body'], ENT_QUOTES);
-				$e['gallery'] = $this->getGalleryImages($e['id'], FALSE, $caption);
+				/*
+				 * Load the photos associated with this entry as HTML
+				 */
+				$e['gallery'] = $this->getGalleryImages($e['id'], FALSE, $e['title']);
 
 				$entry .= "\n\t\t\t\t<div class=\"multi\">\n\t\t\t\t\t"
 					. "<h2> $e[title] </h2>\n" . $e['gallery'] . $e['body'] . $admin_entry
