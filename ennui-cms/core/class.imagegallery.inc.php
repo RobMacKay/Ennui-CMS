@@ -219,7 +219,7 @@ class ImageGallery extends ImageControl
 		$stmt->execute();
 		$r = $stmt->fetch();
 		$stmt->closeCursor();
-		return isset($r['photo_cap']) ? $r['photo_cap'] : NULL;
+		return isset($r['photo_cap']) ? stripslashes($r['photo_cap']) : NULL;
 	}
 
 	/**
