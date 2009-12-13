@@ -172,9 +172,9 @@ class ImageGallery extends ImageControl
 			{
 				$title = $this->getImageCaption($img);
 			}
-			else
+			if ( !isset($title) )
 			{
-				$title = (isset($this->imgTitle)) ? " title=\"$this->imgTitle\"" : NULL;
+				$title = isset($this->imgTitle) ? $this->imgTitle : NULL;
 			}
 			$thumb = '<img src="/'.$this->dir."thumbs/".$img.'" alt="Gallery Image" />';
 			$display .= "\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t<a href=\"/$this->dir$img\" "
