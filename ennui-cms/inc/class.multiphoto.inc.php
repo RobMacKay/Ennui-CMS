@@ -129,7 +129,7 @@ class MultiPhoto extends Page
 			    $gal->max_dims = array(233, 136); // Maximum dimensions of the images (w, h)
 			    $gal->checkSize(); // Make sure the images are the right size
 		    }
-		    $gal->makeThumb(100); // Creates thumb if they don't exist
+		    $gal->makeThumb(IMG_THUMB_SIZE); // Creates thumb if they don't exist
 
 		    if($edit)
 		    {
