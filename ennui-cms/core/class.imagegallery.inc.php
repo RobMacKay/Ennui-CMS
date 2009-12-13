@@ -209,7 +209,7 @@ class ImageGallery extends ImageControl
 	{
 		$db = new PDO("mysql:host=".DB_HOST.";dbname=".DB_NAME, DB_USER, DB_PASS);
 		$sql = "SELECT photo_cap
-				FROM imgCap
+				FROM `".DB_NAME."`.`".DB_PREFIX."imgCap`
 				WHERE album_id=:album
 				AND photo_id=:photo
 				LIMIT 1";
