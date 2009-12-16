@@ -27,7 +27,7 @@ class MultiPhoto extends Page
 		$markup = $form['start'];
 		$markup .= $this->createFormInput('title', 'Album Title', $id);
 		$markup .= $this->createFormInput('body', 'Additional Info', $id);
-		$sql = "SELECT data7 FROM entryMgr WHERE id=? LIMIT 1";
+		$sql = "SELECT data7 FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr` WHERE id=? LIMIT 1";
 		$stmt = $this->mysqli->prepare($sql);
 		$stmt->bind_param("i", $id);
 		$stmt->execute();
