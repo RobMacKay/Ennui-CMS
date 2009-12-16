@@ -161,7 +161,7 @@ EMAIL;
 		$admin_v = $p['admin_v'];
 
 		if($newpass==$verpass) {
-			$sql = "UPDATE adminMgr
+			$sql = "UPDATE `".DB_NAME."`.`".DB_PREFIX."adminMgr`
 					SET admin_p=?
 					WHERE admin_v=?
 					LIMIT 1";
@@ -188,7 +188,7 @@ EMAIL;
 	private function checkLogin($user, $pass)
 	{
 		$sql = "SELECT admin_e, admin_p
-				FROM adminMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."adminMgr`
 				WHERE admin_u=?
 				LIMIT 1";
 		if($stmt = $this->mysqli->prepare($sql)) {

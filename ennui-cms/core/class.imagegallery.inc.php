@@ -172,9 +172,9 @@ class ImageGallery extends ImageControl
 			{
 				$title = $this->getImageCaption($img);
 			}
-			else
+			if ( !isset($title) )
 			{
-				$title = (isset($this->imgTitle)) ? " title=\"$this->imgTitle\"" : NULL;
+				$title = isset($this->imgTitle) ? $this->imgTitle : NULL;
 			}
 			$thumb = '<img src="/'.$this->dir."thumbs/".$img.'" alt="Gallery Image" />';
 			$display .= "\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t<a href=\"/$this->dir$img\" "
@@ -209,7 +209,7 @@ class ImageGallery extends ImageControl
 	{
 		$db = new PDO("mysql:host=".DB_HOST.";dbname=".DB_NAME, DB_USER, DB_PASS);
 		$sql = "SELECT photo_cap
-				FROM imgCap
+				FROM `".DB_NAME."`.`".DB_PREFIX."imgCap`
 				WHERE album_id=:album
 				AND photo_id=:photo
 				LIMIT 1";
@@ -219,7 +219,7 @@ class ImageGallery extends ImageControl
 		$stmt->execute();
 		$r = $stmt->fetch();
 		$stmt->closeCursor();
-		return isset($r['photo_cap']) ? $r['photo_cap'] : NULL;
+		return isset($r['photo_cap']) ? stripslashes($r['photo_cap']) : NULL;
 	}
 
 	/**

@@ -310,7 +310,7 @@ class blog extends Page
 		$db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 		$sql = "SELECT data2
-				FROM entryMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				WHERE page='blog'";
 		if($stmt = $db->prepare($sql))
 		{
@@ -342,7 +342,11 @@ class blog extends Page
 	static function displayRecentPosts($num=8, $page='blog')
 	{
 		$db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-		$sql = "SELECT title FROM entryMgr WHERE page='$page' ORDER BY created DESC LIMIT $num";
+		$sql = "SELECT title
+				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
+				WHERE page='$page'
+				ORDER BY created DESC
+				LIMIT $num";
 		if($stmt = $db->prepare($sql))
 		{
 			$list = NULL;

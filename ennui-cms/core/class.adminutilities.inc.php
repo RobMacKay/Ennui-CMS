@@ -349,88 +349,90 @@ ADMIN_OPTIONS;
 		$admin_e = DEV_EMAIL;
 		$admin_p = DEV_PASS;
 
-		$sql = "CREATE TABLE IF NOT EXISTS entryMgr
+		$sql = "CREATE DATABASE IF NOT EXISTS `".DB_NAME."`
+				DEFAULT CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";
+				CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				(
-				id		INT(4) PRIMARY KEY auto_increment,
-				page	VARCHAR(30),
-				title	VARCHAR(60) UNIQUE,
-				subhead	VARCHAR(75) DEFAULT NULL,
-				body	TEXT,
-				img		VARCHAR(150) DEFAULT NULL,
-				imgcap	VARCHAR(75) DEFAULT NULL,
-				data1	VARCHAR(150) DEFAULT NULL,
-				data2	VARCHAR(150) DEFAULT NULL,
-				data3	VARCHAR(150) DEFAULT NULL,
-				data4	VARCHAR(150) DEFAULT NULL,
-				data5	VARCHAR(150) DEFAULT NULL,
-				data6	VARCHAR(150) DEFAULT NULL,
-				data7	VARCHAR(150) DEFAULT NULL,
-				data8	VARCHAR(150) DEFAULT NULL,
-				author	VARCHAR(150),
-				created	VARCHAR(12),
-				INDEX(page),
-				INDEX(created),
-				INDEX(title)
-				);
-			CREATE TABLE IF NOT EXISTS imgCap
+					`id`		INT UNSIGNED NOT NULL PRIMARY KEY auto_increment,
+					`page`		VARCHAR(30) NOT NULL,
+					`title`		VARCHAR(75) DEFAULT NULL,
+					`subhead`	VARCHAR(75) DEFAULT NULL,
+					`body`		TEXT DEFAULT NULL,
+					`img`		VARCHAR(75) DEFAULT NULL,
+					`imgcap`	VARCHAR(75) DEFAULT NULL,
+					`data1`		VARCHAR(150) DEFAULT NULL,
+					`data2`		VARCHAR(150) DEFAULT NULL,
+					`data3`		VARCHAR(150) DEFAULT NULL,
+					`data4`		VARCHAR(150) DEFAULT NULL,
+					`data5`		VARCHAR(150) DEFAULT NULL,
+					`data6`		VARCHAR(150) DEFAULT NULL,
+					`data7`		VARCHAR(150) DEFAULT NULL,
+					`data8`		VARCHAR(150) DEFAULT NULL,
+					`author`	VARCHAR(40) DEFAULT '".SITE_CONTACT_NAME."',
+					`created`	INT(12),
+					INDEX(page),
+					INDEX(created),
+					INDEX(title)
+				) ENGINE=MYISAM CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";
+				CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`".DB_PREFIX."imgCap`
 				(
-				photo_id VARCHAR(20) UNIQUE NOT NULL,
-				album_id INT NOT NULL,
-				photo_cap VARCHAR(150),
-				INDEX(album_id)
-				);
-			CREATE TABLE IF NOT EXISTS adminMgr
+					`photo_id`	VARCHAR(20) UNIQUE NOT NULL,
+					`album_id`	INT NOT NULL,
+					`photo_cap`	VARCHAR(150) DEFAULT NULL,
+					INDEX(album_id)
+				) ENGINE=MYISAM CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";
+				CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`".DB_PREFIX."adminMgr`
 				(
-				id			INT(4) PRIMARY KEY auto_increment,
-				admin_u		VARCHAR(60) UNIQUE,
-				admin_e		VARCHAR(150) UNIQUE,
-				admin_p		VARCHAR(150),
-				admin_v		VARCHAR(150),
-				is_admin	TINYINT(1) DEFAULT '0',
-				INDEX(admin_u),
-				INDEX(admin_e),
-				INDEX(admin_v)
-				);
-			INSERT INTO adminMgr (admin_u, admin_e, admin_p)
-			VALUES ('$admin_u', '$admin_e', '$admin_p');";
+					`id`		INT UNSIGNED NOT NULL PRIMARY KEY auto_increment,
+					`admin_u`	VARCHAR(60) UNIQUE,
+					`admin_e`	VARCHAR(100) UNIQUE,
+					`admin_p`	VARCHAR(150) DEFAULT NULL,
+					`admin_v`	VARCHAR(150) NOT NULL,
+					`is_admin`	TINYINT(1) DEFAULT '0',
+					INDEX(admin_v)
+				) ENGINE=MYISAM CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";
+				INSERT INTO `".DB_NAME."`.`".DB_PREFIX."adminMgr`
+					(admin_u, admin_e, admin_p, admin_v, is_admin)
+				VALUES
+					('$admin_u', '$admin_e', '$admin_p', '".sha1(time())."', '1');";
 
 		if(array_key_exists('blog', $menuPages))
 		{
 			$sql .= "
-			CREATE TABLE IF NOT EXISTS blogCmnt
+				CREATE TABLE IF NOT EXISTS blogCmnt
 				(
-				id			INT(5) PRIMARY KEY auto_increment,
-				bid			INT(5),
-				user		VARCHAR(150),
-				email		VARCHAR(150),
-				link		VARCHAR(150),
-				comment		TEXT,
-				timestamp	VARCHAR(150),
-				subscribe	TINYINT(1) DEFAULT '0',
-				INDEX(bid),
-				INDEX(timestamp),
-				INDEX(subscribe)
-				);";
+					`id`		INT(5) PRIMARY KEY auto_increment,
+					`bid`		INT(5),
+					`user`		VARCHAR(60),
+					`email`		VARCHAR(100),
+					`link`		VARCHAR(100),
+					`comment`	TEXT,
+					`timestamp`	INT(12),
+					`subscribe`	TINYINT(1) DEFAULT '0',
+					INDEX(bid),
+					INDEX(timestamp),
+					INDEX(subscribe)
+				) ENGINE=MYISAM CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";";
 		}
 
 		if(array_key_exists('newsletter', $menuPages))
 		{
 			$sql .= "
-			CREATE TABLE IF NOT EXISTS nlMgr
+				CREATE TABLE IF NOT EXISTS nlMgr
 				(
-				email_id	INT PRIMARY KEY AUTO_INCREMENT,
-				name		VARCHAR(150) DEFAULT NULL,
-				email		VARCHAR(150) UNIQUE NOT NULL,
-				cat1		TINYINT DEFAULT 0,
-				cat2		TINYINT DEFAULT 0,
-				cat3		TINYINT DEFAULT 0,
-				cat4		TINYINT DEFAULT 0,
-				INDEX(cat1),
-				INDEX(cat2),
-				INDEX(cat3),
-				INDEX(cat4),
-				INDEX(email)
-				);";
+					`email_id`	INT PRIMARY KEY AUTO_INCREMENT,
+					`name`		VARCHAR(150) DEFAULT NULL,
+					`email`		VARCHAR(150) UNIQUE NOT NULL,
+					`cat1`		TINYINT DEFAULT 0,
+					`cat2`		TINYINT DEFAULT 0,
+					`cat3`		TINYINT DEFAULT 0,
+					`cat4`		TINYINT DEFAULT 0,
+					INDEX(cat1),
+					INDEX(cat2),
+					INDEX(cat3),
+					INDEX(cat4),
+					INDEX(email)
+				) ENGINE=MYISAM CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";";
 		}
 
 		if($mysqli->multi_query($sql))

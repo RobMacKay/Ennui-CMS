@@ -142,7 +142,7 @@ ADMIN_OPTIONS;
 	private function loadSubs()
 	{
 		$sql = "SELECT name, email, cat1, cat2, cat3, cat4
-				FROM nlMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."nlMgr`
 				GROUP BY email
 				ORDER BY email_id";
 		$stmt = $this->mysqli->prepare($sql);
@@ -406,9 +406,11 @@ HTML_EMAIL;
 		 * If the ID was passed, set up the query to update the entry
 		 */
 		if ( $id ) {
-			$sql = "UPDATE entryMgr SET title=?, subhead=?, body=?, img=?, imgcap=?
-					, data1=?, data2=?, data3=?, data4=?, data5=?, data6=?, data7=?
-					, data8=? WHERE id=? LIMIT 1";
+			$sql = "UPDATE `".DB_NAME."`.`".DB_PREFIX."entryMgr`
+					SET title=?, subhead=?, body=?, img=?, imgcap=?
+						, data1=?, data2=?, data3=?, data4=?, data5=?, data6=?, data7=?
+						, data8=? WHERE id=?
+					LIMIT 1";
 			$stmt = $this->mysqli->prepare($sql);
 			$stmt->bind_param("sssssssssssssi",$title, $subhead, $body, $img, 
 					$imgcap, $data1, $data2, $data3, $data4, $data5, $data6, 
@@ -423,9 +425,10 @@ HTML_EMAIL;
 			{
 				throw new Exception('Sending the newsletter failed.');
 			}
-			$sql = "INSERT INTO entryMgr (page, title, subhead, body, img, imgcap,
-					data1, data2, data3, data4, data5, data6, data7, data8, author,
-					created) 
+			$sql = "INSERT INTO `".DB_NAME."`.`".DB_PREFIX."entryMgr`
+						(page, title, subhead, body, img, imgcap,
+						data1, data2, data3, data4, data5, data6, data7, data8,
+						author, created) 
 					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 			$stmt = $this->mysqli->prepare($sql);
 			$stmt->bind_param("ssssssssssssssss", $page, $title, $subhead, $body, 
@@ -457,7 +460,8 @@ HTML_EMAIL;
 		}
 		else
 		{
-			$sql = "INSERT INTO nlMgr (name, email, cat1, cat2, cat3, cat4)
+			$sql = "INSERT INTO `".DB_NAME."`.`".DB_PREFIX."nlMgr`
+						(name, email, cat1, cat2, cat3, cat4)
 					VALUES (?, ?, ?, ?, ?, ?)";
 			if($stmt = $this->mysqli->prepare($sql))
 			{
@@ -490,7 +494,7 @@ HTML_EMAIL;
 	private function loadSubscribers()
 	{
 		$sql = "SELECT email
-				FROM nlMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."nlMgr`
 				GROUP BY email";
 		$emails = NULL;
 		if($stmt = $this->mysqli->prepare($sql))
@@ -509,7 +513,7 @@ HTML_EMAIL;
 	private function unsubscribe() {
 		if ( $this->url1 == 'unsubscribe' ) {
 			$email = $this->url2;
-			$sql = "DELETE FROM nlMgr
+			$sql = "DELETE FROM `".DB_NAME."`.`".DB_PREFIX."nlMgr`
 					WHERE email=?
 					LIMIT 1";
 			if($stmt = $this->mysqli->prepare($sql))

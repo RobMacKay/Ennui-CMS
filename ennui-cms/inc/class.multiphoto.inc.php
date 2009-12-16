@@ -93,10 +93,10 @@ class MultiPhoto extends Page
 				// Entry options for the admin, if logged in
 				$admin_entry = $this->admin_gallery_options($this->url0, $e['id'], $n, $e['data7']);
 
-				$caption = "&lt;h3&gt;&lt;strong&gt;" . $e['title']
-					. "&lt;/strong&gt;&lt;/h3&gt;"
-					. htmlentities($e['body'], ENT_QUOTES);
-				$e['gallery'] = $this->getGalleryImages($e['id'], FALSE, $caption);
+				/*
+				 * Load the photos associated with this entry as HTML
+				 */
+				$e['gallery'] = $this->getGalleryImages($e['id'], FALSE, $e['title']);
 
 				$entry .= "\n\t\t\t\t<div class=\"multi\">\n\t\t\t\t\t"
 					. "<h2> $e[title] </h2>\n" . $e['gallery'] . $e['body'] . $admin_entry
@@ -129,7 +129,7 @@ class MultiPhoto extends Page
 			    $gal->max_dims = array(233, 136); // Maximum dimensions of the images (w, h)
 			    $gal->checkSize(); // Make sure the images are the right size
 		    }
-		    $gal->makeThumb(100); // Creates thumb if they don't exist
+		    $gal->makeThumb(IMG_THUMB_SIZE); // Creates thumb if they don't exist
 
 		    if($edit)
 		    {
@@ -178,7 +178,7 @@ class MultiPhoto extends Page
 
 		// Select the featured gallery titles
 		$sql = "SELECT id, page
-				FROM entryMgr
+				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				WHERE data7='featured'";
 		$stmt = $this->mysqli->prepare($sql);
 		$stmt->execute();

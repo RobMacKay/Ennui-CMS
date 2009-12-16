@@ -58,7 +58,7 @@ $_CONSTANTS['SITE_CONTACT_EMAIL'] = 'john.doe@example.com';
  * Information to be displayed in the site's title tag. The name of the page 
  * will be displayed first.
  */
-$_CONSTANTS['SITE_TITLE'] = 'Example Site &raquo; Ennui CMS';
+$_CONSTANTS['SITE_TITLE'] = "Example Site &raquo; Ennui CMS";
 
 /*
  * This is the confirmation email that will be sent to users that submit a 
@@ -78,8 +78,10 @@ $_CONSTANTS['SITE_CREATED_YEAR'] = '2009';
 
 /*
  * The site's Google Analytics username for stats tracking
+ * 
+ * EXAMPLE: UA-1234567-89
  */
-$_CONSTANTS['GOOGLE_ANALYTICS_USER'] = 'UA-XXXXXXX-X';
+$_CONSTANTS['GOOGLE_ANALYTICS_USER'] = '';
 
 /*
  ******************************************************************************
@@ -99,7 +101,7 @@ $_CONSTANTS['GETRESPONSE_SUBMIT'] = "Send Me Updates";
 
 /*
  ******************************************************************************
- * Image sizing info
+ * Image handling info
  ******************************************************************************
  */
 $_CONSTANTS['IMG_SAVE_DIR'] = 'images/userPics/';
@@ -122,15 +124,37 @@ $_CONSTANTS['MAX_ENTRIES_PER_PAGE'] = 20;
  */
 $_CONSTANTS['BLOG_PREVIEW_NUM'] = 4;
 
-// Dimensions for embedded videos
+/* 
+ * Dimensions for embedded videos
+ */
 $_CONSTANTS['PAGE_OBJ_WIDTH'] = 480;
 $_CONSTANTS['PAGE_OBJ_HEIGHT'] = 270;
 
-// Gravatar default image
-$_CONSTANTS['GRAVATAR_DEFAULT_IMG_URL'] = $_CONSTANTS['SITE_NAME']
-	. "/images/gravatar.jpg";
+/*
+ * Gravatar default image. See http://en.gravatar.com for details.
+ * 
+ * NOTE: If left blank, the gravatar.com default is used
+ */
+$_CONSTANTS['GRAVATAR_DEFAULT_IMG_URL'] = "";
 
+/*
+ * Define the square size of gravatars (in pixels)
+ * 
+ * NOTE: Gravatar default is 80
+ */
 $_CONSTANTS['GRAVATAR_SIZE'] = 80;
+
+/*
+ * Define the rating of gravatars
+ * 
+ * OPTIONS: G, PG, R, X
+ */
+$_CONSTANTS['GRAVATAR_RATING'] = "PG";
+
+/*
+ * Define a border color for gravatar images
+ */
+$_CONSTANTS['GRAVATAR_BORDER_COLOR'] = "222222";
 
 /*
  * Tags to allow in user-posted comments
