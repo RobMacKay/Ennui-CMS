@@ -10,8 +10,15 @@ $_CONSTANTS['SITE_URL'] = "localhost";
 /*
  * If $_SERVER['DOCUMENT_ROOT'] does not contain the full path to the web root,
  * finish the path here. Leave blank otherwise.
+ *
+ * NOTE: This is the path to the public folder. In a default installation, the
+ * path points to /public
+ *
+ * WARNING: DO NOT include a trailing slash in this path
+ *	CORRECT:	"/path/to/public"
+ *	INCORRECT:	"/path/to/public/"
  */
-$_CONSTANTS['SERVER_PATH'] = "";
+$_CONSTANTS['SERVER_PATH'] = "/public";
 
 /*
  * Site name (i.e. "Debbie's Donuts" or "John Doe, DDS")

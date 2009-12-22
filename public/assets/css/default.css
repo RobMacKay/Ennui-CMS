@@ -1,14 +1,14 @@
 /**
  * Determines base styles for the site
- * 
+ *
  * This stylesheet contains the overall font and layout rules for the site.
  * Rules within this stylesheet should affect every page of the site. If a rule
- * only applies to a particular page, it should probably go in the 
+ * only applies to a particular page, it should probably go in the
  * page-specific stylesheet instead.
- * 
- * @author		Jason Lengstorf
+ *
+ * @author	Jason Lengstorf
  * @copyright	2009 Ennui Design
- * @license		http://www.opensource.org/licenses/mit-license.html MIT License
+ * @license	http://www.opensource.org/licenses/mit-license.html MIT License
  */
 
 /*
@@ -36,13 +36,18 @@ ul,ol {
  */
 h1,h2,h3,h4,h5,h6,p,input,textarea,select,label,ul,li,a,span,legend {
 	font-family: helvetica, arial, sans-serif;
-	line-height: 15px;
+	line-height: 18px;
 	letter-spacing: .04em;
-	color: #002539;	
+	color: #111;
 }
 
 h2,h3,h4,h5,h6,p {
-	margin-bottom: 15px;
+	margin-bottom: 18px;
+}
+
+h2,h3,h4,h5,h6 {
+	margin: 18px 0 9px;
+	text-shadow: 1px 2px 3px rgba(0,0,0,.2);
 }
 
 p,input,textarea,select,label,li,a {
@@ -50,33 +55,34 @@ p,input,textarea,select,label,li,a {
 }
 
 h2,h2 a:link,h2 a:visited,h2 a:active,h2 a:hover,legend {
-	font-size: 24px;
-	line-height: 30px;
+	font-size: 30px;
+	line-height: 36px;
 	letter-spacing: -.06em;
-	color: #2B1A08;
+	color: #111;
 	text-decoration: none;
 	font-weight: bold;
 }
 
 h3 {
-	font-size: 18px;
-	line-height: 30px;
+	font-size: 24px;
+	line-height: 36px;
 }
 
 h4 {
-	font-size: 14px;
+	font-size: 18px;
+	line-height: 36px;
 }
 
 h5 {
-	font-size: 12px;
+	font-size: 14px;
 }
 
 h6 {
-	font-size: 11px;
+	font-size: 12px;
 }
 
 a:link,a:visited,a:active,a:hover {
-	color: #004E79;
+	color: #00F;
 }
 
 /*
@@ -85,7 +91,7 @@ a:link,a:visited,a:active,a:hover {
  ******************************************************************************
  */
 body {
-	background: #D8EEFA;
+	background: #DDD;
 }
 
 div {
@@ -96,12 +102,10 @@ div {
 #master {
 	margin: 0 auto;
 	width: 990px;
-	background: #D8EEFA url(/images/cf_bg.jpg) top center repeat-y;
 }
 
 #header {
 	height: 70px;
-	background: #D8EEFA;
 }
 
 #header_title {
@@ -110,7 +114,6 @@ div {
 	left: 70px;
 	width: 273px;
 	height: 41px;
-	background: url(/images/cf_logo.jpg) top left no-repeat;
 	overflow: hidden;
 }
 
@@ -120,12 +123,26 @@ div {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	text-indent: -9999px;
+	font-size: 36px;
+	line-height: 45px;
+	text-decoration: none;
+	color: #111;
 }
 
 #content {
 	padding: 60px 15px 0;
-	background: url(/images/cf_bg-top.jpg) top center no-repeat;
+	background-color: #FFF;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	-moz-box-shadow: inset -2px -3px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
+	/* Safari doesn't support inset */
+	-webkit-box-shadow: 1px 2px 6px rgba(0, 0, 0, .5);
+	-webkit-box-shadow: inset -1px -2px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
+	box-shadow: inset -1px -2px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
 }
 
 /*
@@ -145,26 +162,27 @@ div {
 	display: inline-block;
 	padding: 6px 8px;
 	text-transform: uppercase;
-	border-radius: 6px;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
+	border-radius: 6px;
 }
 
 #menu li a {
-	color: #004E79;
+	color: #111;
 	font-size: 14px;
 	text-decoration: none;
 }
 
 #menu li.selected,#menu li.parent,#menu li:hover {
-	background: #004E79;
-	box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
-		1px 2px 6px rgba(0, 78, 121, .5);
-	-moz-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
-		1px 2px 6px rgba(0, 78, 121, .5);
-	-webkit-box-shadow: 1px 2px 6px rgba(0, 78, 121, .5);
-	-webkit-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
-		1px 2px 6px rgba(0, 78, 121, .5);
+	background: #AAA;
+	-moz-box-shadow: inset -2px -3px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
+	/* Safari doesn't support inset */
+	-webkit-box-shadow: 1px 2px 6px rgba(0, 0, 0, .5);
+	-webkit-box-shadow: inset -1px -2px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
+	box-shadow: inset -1px -2px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
 }
 
 #menu li:hover a,#menu li.selected a, #menu li.parent a {
@@ -184,25 +202,26 @@ div {
 	width: 566px;
 	padding: 2px 0;
 	text-align: center;
-	background: #004E79;
-	border-radius: 6px;
+	background: #000;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
-	box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
-		1px 2px 6px rgba(0, 78, 121, .5);
-	-moz-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
-		1px 2px 6px rgba(0, 78, 121, .5);
-	-webkit-box-shadow: 1px 2px 6px rgba(0, 78, 121, .5);
-	-webkit-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
-		1px 2px 6px rgba(0, 78, 121, .5);
+	border-radius: 6px;
+	-moz-box-shadow: inset -2px -3px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
+	/* Safari doesn't support inset */
+	-webkit-box-shadow: 1px 2px 6px rgba(0, 0, 0, .5);
+	-webkit-box-shadow: inset -1px -2px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
+	box-shadow: inset -1px -2px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
 }
 
 #menu li:hover {
-	background: #80A3B7;
+	background: #888;
 }
 
 #menu li:hover .submenu {
-	background: #80A3B7;
+	background: #888;
 }
 
 #menu .submenu li {
@@ -227,7 +246,7 @@ div {
 }
 
 #menu .submenu li.selected a,#menu .submenu li:hover a {
-	color: #004E79;
+	color: #FFF;
 }
 
 /*
@@ -237,8 +256,39 @@ div {
  */
 .entrydisplay {
 	width: 560px;
-	padding: 0 50px;
+	padding: 0 50px 50px;
 	float: left;
+}
+
+.entrydisplay ul,.entrydisplay ol {
+	margin: 0 40px 18px;
+}
+
+.entrydisplay ul {
+	list-style: disc;
+}
+
+.entrydisplay ol {
+	list-style: decimal;
+}
+
+.entrydisplay li {
+	margin-bottom: 9px;
+	margin-left: 18px;
+}
+
+blockquote {
+	margin: 0 40px 18px;
+	padding: 15px 15px 1px;
+	background-color: #AAA;
+	border: 1px solid #111;
+	border-left: 8px solid #111;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	-moz-box-shadow: 1px 2px 6px rgba(0, 0, 0, .5);
+	-webkit-box-shadow: 1px 2px 6px rgba(0, 0, 0, .5);
+	box-shadow: 1px 2px 6px rgba(0, 0, 0, .5);
 }
 
 input,select,textarea {
@@ -247,10 +297,9 @@ input,select,textarea {
 	background: #FFF;
 }
 
-object {
-	text-align: center;
-	margin: 0 auto 15px;
+.clearfix {
 	display: block;
+	clear: both;
 }
 
 /*
@@ -261,77 +310,45 @@ object {
 #sidebar {
 	float: right;
 	width: 240px;
-	margin: 330px 15px 0 0;
+	margin: 0 15px 50px 0;
 	padding: 20px;
-	background: #004E79;
-	border-radius: 6px;
+	background: #AAA;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
-	box-shadow: inset -1px -2px 10px rgba(0, 20, 40, .5),
-		1px 2px 6px rgba(0, 78, 121, .5);
-	-moz-box-shadow: inset -1px -2px 10px 2px rgba(0, 20, 40, .5),
-		1px 2px 6px rgba(0, 78, 121, .5);
+	border-radius: 6px;
+	-moz-box-shadow: inset -1px -2px 10px 2px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
+	/* Safari doesn't support inset */
 	-webkit-box-shadow: 1px 2px 6px rgba(0, 78, 121, .5);
-	-webkit-box-shadow: inset -1px -2px 10px rgba(0, 20, 40, .5),
-		1px 2px 6px rgba(0, 78, 121, .5);
+	-webkit-box-shadow: inset -1px -2px 10px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
+	box-shadow: inset -1px -2px 10px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
 }
 
 #sidebar h2 {
 	margin-bottom: 0;
 	font-size: 18px;
 	line-height: 30px;
-	color: #D8EEFA;
+	color: #222;
 	font-weight: normal;
 	letter-spacing: .04em;
 }
 
 #sidebar h3 {
-	color: #FFF;
+	color: #222;
 	font-size: 14px;
 	line-height: 30px;
 	margin-bottom: 0;
-	#font-weight: normal;
 	letter-spacing: -.02em;
 }
 
 #sidebar p {
-	color: #FFF;
+	color: #111;
 }
 
 #sidebar a {
-	color: #80A3B7;
-}
-
-#latest-blogs {
-	margin-bottom: 15px;
-}
-
-#latest-blogs li a {
-	text-decoration: none;
-	padding: 4px 8px;
-	display: block;
-	color: #FFF;
-}
-
-#latest-blogs li a:hover {
-	border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	background: #80A3B7;
-	box-shadow: inset -1px -2px 6px rgba(0, 78, 121, .5),
-		1px 2px 6px rgba(0, 20, 40, .5);
-	-moz-box-shadow: inset -1px -2px 6px rgba(0, 78, 121, .5),
-		1px 2px 6px rgba(0, 20, 40, .5);
-	-webkit-box-shadow: 1px 2px 6px rgba(0, 20, 40, .5);
-	-webkit-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
-		1px 2px 6px rgba(0, 20, 40, .5);
-}
-
-.entries-list>a {
-	display: block;
-	text-align: right;
-	font-size: 11px;
-	color: #FFF;
+	color: #00F;
 }
 
 /*
@@ -341,7 +358,7 @@ object {
  */
 #footer {
 	clear: both;
-	padding: 30px 315px 4px 15px;
+	padding: 30px 15px 4px 15px;
 }
 
 .credits {

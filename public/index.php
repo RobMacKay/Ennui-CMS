@@ -1,4 +1,5 @@
 <?php
+
 	/*
 	 * Starts output buffering and enables GZIP compression
 	 */
@@ -79,20 +80,16 @@
 				<div id="<?php echo $minibio->url0 ?>"><?php echo $minibio->displayPublic(); ?>
 
 				</div><!-- end #minibio -->
-				<div class="entries-list">
-					<h2> Most Recent Entries </h2>
-<?php echo blog::displayRecentPosts() ?>
-					<a href="/blog/category/recent/3/">See More Entries</a>
-				</div><!-- end .entries-list -->
 			</div><!-- end #sidebar -->
-			<div id="footer">
-				<p class="credits">
-					All content &copy; <?php echo Utilities::copyrightYear(SITE_CREATED_YEAR), ' ', SITE_NAME; ?> |
-					<a href="<?php echo SITE_URL ?>/contact">Contact Us</a> |
-					<a href="http://ennuidesign.com" rel="external">Website by Ennui Design</a>
-				</p>
-			</div><!-- end #footer -->
+			<div class="clearfix"></div><!-- end .clearfix -->
 		</div><!-- end #content -->
+		<div id="footer">
+			<p class="credits">
+				All content &copy; <?php echo Utilities::copyrightYear(SITE_CREATED_YEAR), ' ', SITE_NAME; ?> |
+				<a href="<?php echo SITE_URL ?>/contact">Contact Us</a> |
+				<a href="http://ennuidesign.com" rel="external">Website by Ennui Design</a>
+			</p>
+		</div><!-- end #footer -->
 	</div><!-- end #master -->
 
 	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
