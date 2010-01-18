@@ -131,7 +131,17 @@ class ImageControl
 	 */
 	public function processStoredImage($image, $thumb=FALSE, $rename=FALSE)
 	{
-		$type = exif_imagetype($image);
+		/*
+		 * exif_imagetype() not available on all platforms but is much quicker.
+		 * This check prevents possible errors. 
+		 */
+		if(function_exists('exif_imagetype'))
+		{
+			$type = exif_imagetype($image);
+		} else {
+			$info = getimagesize($image);
+			$type = $info[2];
+		}
 		$imgInfo = $this->getImageInfo($type);
 
 		/*
