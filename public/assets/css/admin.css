@@ -1,7 +1,7 @@
 /**
- * Page-specific styles for the admin styles. These apply when a site 
+ * Page-specific styles for the admin styles. These apply when a site
  * administrator has logged in.
- * 
+ *
  * @author		Jason Lengstorf
  * @copyright	2009 Ennui Design
  * @license		http://www.opensource.org/licenses/mit-license.html MIT License
@@ -42,14 +42,14 @@
 	margin: 0 0 15px;
 	padding: 5px;
 	background: #FFF;
-	border: 1px solid #80A3B7;
-	color: #2B1A08;
-	box-shadow: inset 3px 4px 12px rgba(0, 78, 121, .3);
-	-moz-box-shadow: inset 3px 4px 12px rgba(0, 78, 121, .3);
-	-webkit-box-shadow: inset 3px 4px 12px rgba(0, 78, 121, .3);
-	border-radius: 0 6px 6px;
+	border: 1px solid #222;
+	color: #111;
+	-moz-box-shadow: inset 3px 4px 12px rgba(0, 0, 0, .3);
+	-webkit-box-shadow: inset 3px 4px 12px rgba(0, 0, 0, .3);
+	box-shadow: inset 3px 4px 12px rgba(0, 0, 0, .3);
 	-moz-border-radius: 0 6px 6px;
 	-webkit-border-radius: 0 6px 6px;
+	border-radius: 0 6px 6px;
 }
 
 .ennui_form input[type=submit] {
@@ -59,18 +59,19 @@
 	font-size: 14px;
 	color: #FFF;
 	text-transform: uppercase;
-	background: #004E79;
-	border: 1px solid #004E79;
-	border-radius: 6px;
+	background: #AAA;
+	border: 1px solid #888;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
-	box-shadow: inset -1px -2px 6px rgba(0, 78, 121, .5),
-		1px 2px 6px rgba(0, 78, 121, .5);
-	-moz-box-shadow: inset -1px -2px 10px 2px rgba(0, 20, 40, .5),
-		1px 2px 6px rgba(0, 78, 121, .5);
-	-webkit-box-shadow: 1px 2px 6px rgba(0, 78, 121, .5);
-	-webkit-box-shadow: inset -2px -3px 6px rgba(0, 78, 121, .5),
-		1px 2px 6px rgba(0, 78, 121, .5);
+	border-radius: 6px;
+	-moz-box-shadow: inset -2px -3px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
+	/* Safari doesn't support inset */
+	-webkit-box-shadow: 1px 2px 6px rgba(0, 0, 0, .5);
+	-webkit-box-shadow: inset -1px -2px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
+	box-shadow: inset -1px -2px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
 }
 
 .ennui_form textarea {
@@ -88,11 +89,14 @@
 	display: block;
 	text-align: center;
 	font-size: 11px;
-	padding: 10px 0;
-	color: #999;
+	margin: 0;
+	padding: 10px 0 0;
+	color: #444;
 }
 
 .admintopopts p {
+	margin: 0;
+	padding: 0;
 	font-size: 11px;
 	text-align: center;
 }

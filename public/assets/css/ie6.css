@@ -1,12 +1,3 @@
-.entrydisplay {
-	height: 1980px;
-}
-
-.date span {
-	font-size: 35px;
-	line-height: 35px;
-}
-
 /* Comment Display Fix */
 .commentdisp0,.commentdisp1 {
 	height: 150px;
@@ -57,56 +48,4 @@
 
 #menu li#rss img {
 	top: -14px;
-}
-
-.thumbbox-overlay {
-	height: expression(document.body.scrollHeight + "px");
-}
-
-.thumbbox-main-thumbs-wrapper ul {
-	margin: 0 auto;
-	padding: 0;
-}
-
-.thumbbox-main-thumbs-wrapper ul li {
-	display: block;
-	float: left;
-}
-
-.thumbbox-main-img-caption {
-	width: 624px;
-}
-
-.thumbbox-main-img-caption h3,.thumbbox-main-img-caption p {
-	padding: 0 20px;
-	margin: 0;
-}
-
-.thumbbox-main-img img {
-	margin: 0 auto;
-	border: 1px solid #000;
-}
-
-.thumbbox-main-thumbs-wrapper>ul {
-	display: block;
-	height: 100%;
-	width: 10000px;
-	list-style: none;
-	text-align: left;
-}
-
-.thumbbox-main-thumbs-wrapper ul li {
-	display: inline-block;
-	vertical-align: middle;
-	margin: 0 -1px 0 0;
-	padding: 0;
-	background: #FFF;
-	border: 1px solid #000;
-	overflow: hidden;
-}
-
-.thumbbox-main-thumbs-wrapper ul li img {
-	margin: 0;
-	padding: 0;
-	opacity: .75;
 }
