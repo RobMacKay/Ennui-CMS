@@ -72,6 +72,54 @@ ________________EOD;
 			
 			return $photodisp . "\n\t</ul>\n<a href=\"$link\">View on Flickr</a>";
 	}
+	
+	/**
+	  * Returns a shortened bit.ly link given a "long" anchor. 
+	  * Attempts to use cURL before file_get_contents for performance reasons, see results here:
+	  * http://stackoverflow.com/questions/555523/file-get-contents-vs-curl-what-has-better-performance
+	  *
+	  * @author - Drew Douglass
+	  * @param str $username - The bitly username to use.
+	  * @param str $key - The api key attached to the username. 
+	  * @param str $link - The link to shorten, no HTML (i.e. http://google.com)
+	  * @param [optional] int $timeout - The time in seconds until timeout, if performance is a major concern stick with 2 or less. 
+	  * 
+	  * Example usage: <?php echo Media::bitlyShorten("yourBitlyUsername","YOURAPIKEY","http://google.com"); ?>
+	  */
+	  public static function bitlyShorten($username, $key, $link, $timeout = 2)
+	  {
+	  		//Attempt to use cURL first as it is very fast. 
+	  		if ( in_array("curl", get_loaded_extensions()) )
+	  		{
+	  			$ch = curl_init("http://api.bit.ly/shorten?version=2.0.1&login=$username&apiKey=$key&longUrl=$link");
+	  			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+	  			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	  			$short_link = json_decode(curl_exec($ch),true);
+	  
+	  			if ($short_link["errorCode"] === 0) {
+	  				return $short_link["results"][$link]["shortUrl"];
+	  			}
+	  			//Else an error was present when using the API 
+	  			return false;
+	  		}
+	  		
+	  		//cURL not available, try file_get_contents with a slight performance hit.
+	  		elseif ( function_exists("file_get_contents") )
+	  		{
+	  			$short_link = file_get_contents("http://api.bit.ly/shorten?version=2.0.1&login=$username&apiKey=$key&longUrl=$link");
+	  			$short_link = json_decode($short_link,true);
+	  			if ($short_link["errorCode"] === 0) {
+	  				return $short_link["results"][$link]["shortUrl"];
+	  			}
+	  			//Else an error was present when using the API 
+	  			return false;
+	  		}
+	  		
+	  		else 
+	  		{
+	  			return false;
+	  		}
+	  }
 }
 
 ?>
