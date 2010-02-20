@@ -1,5 +1,8 @@
 <?php
-
+/**
+  * @author Jason Lengstorf
+  * @author Drew Douglass
+  */
 class comments
 {
 	public $url0;
@@ -752,7 +755,7 @@ ERROR_MSG;
 				FROM `".DB_NAME."`.`".DB_PREFIX."blogCmnt`
 				WHERE bid=?";
 		$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-		$c = array();
+		$c = 0;
 		if($stmt = $mysqli->prepare($sql)) {
 			$stmt->bind_param("i", $blog_id);
 			$stmt->execute();
@@ -766,7 +769,7 @@ ERROR_MSG;
 			$stmt->close();
 		}
 		$mysqli->close();
-		return $count;
+		return $c;
 	}
 }
 
