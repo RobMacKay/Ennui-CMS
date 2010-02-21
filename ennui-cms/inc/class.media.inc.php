@@ -41,6 +41,7 @@ class Media
 	  * 	@param $settings["autoplay"] - Toggles auto play on or off, defaults to 0. 
 	  * 	@param $settings["start"] -Number of seconds into the video to start at, defaults to 0.
 	  *		@param $settings["hd"] -Enable HD if available, defaults to 0.
+	  * @return str (containing markup) | bool (on failure)
 	  *
 	  * NOTE: The width and height are set in the config/config.inc.php file!
 	  *
