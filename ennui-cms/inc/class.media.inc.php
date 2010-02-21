@@ -82,16 +82,21 @@ ________________EOD;
 	  * @param str $username - The bitly username to use.
 	  * @param str $key - The api key attached to the username. 
 	  * @param str $link - The link to shorten, no HTML (i.e. http://google.com)
-	  * @param [optional] int $timeout - The time in seconds until timeout, if performance is a major concern stick with 2 or less. 
+	  * @param [optional] int $timeout - The time in seconds until timeout, if performance is a major concern stick with 2 or less.
+	  * @return str The shortened link
 	  * 
 	  * Example usage: <?php echo Media::bitlyShorten("yourBitlyUsername","YOURAPIKEY","http://google.com"); ?>
 	  */
-	  public static function bitlyShorten($username, $key, $link, $timeout = 2)
-	  {
-	  		//Attempt to use cURL first as it is very fast. 
+	public static function bitlyShorten($username, $key, $link, $timeout = 2)
+	{
+		// Generate the URL to send to the bit.ly API
+		$url = "http://api.bit.ly/shorten?version=2.0.1&login=$username"
+			. "&apiKey=$key&longUrl=$link";
+
+			//Attempt to use cURL first as it is very fast.
 	  		if ( in_array("curl", get_loaded_extensions()) )
 	  		{
-	  			$ch = curl_init("http://api.bit.ly/shorten?version=2.0.1&login=$username&apiKey=$key&longUrl=$link");
+	  			$ch = curl_init($url);
 	  			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
 	  			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	  			$short_link = json_decode(curl_exec($ch),true);
@@ -103,10 +108,10 @@ ________________EOD;
 	  			return false;
 	  		}
 	  		
-	  		//cURL not available, try file_get_contents with a slight performance hit.
+	  		//cURL not available, try file_get_contents (slight performance hit)
 	  		elseif ( function_exists("file_get_contents") )
 	  		{
-	  			$short_link = file_get_contents("http://api.bit.ly/shorten?version=2.0.1&login=$username&apiKey=$key&longUrl=$link");
+	  			$short_link = file_get_contents($url);
 	  			$short_link = json_decode($short_link,true);
 	  			if ($short_link["errorCode"] === 0) {
 	  				return $short_link["results"][$link]["shortUrl"];
