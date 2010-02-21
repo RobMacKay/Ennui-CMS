@@ -2,11 +2,13 @@
 
 /*
  * ***************************************************
- * This is the RSS feed for The Nate Green Experience
+ * RSS Feed Class 
+ * @author Jason Lengstorf 
+ * @author Drew Douglass
  * ***************************************************
  */
   // DB Info
-  	include_once '../vars/config.inc.php';
+  	include_once '../ennui-cms/config/config.inc.php';
     $db = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASS);
 
   // Set the site name
