@@ -22,28 +22,121 @@ class Media
 				</object>\n";
 	}
 
-	static function latestYouTube($username)
+	/**
+	  * Rewrite of original latestYouTube method to allow multiple videos and more flexibility.
+	  *
+	  * @author Jason Lengstorf (original author, kudos to the might bearded one)
+	  * @author Drew Douglass (rewrite)
+	  * @param array $settings - Array with keys and values for options.
+	  * 	@param $settings["username"] - YouTube username - required! This is the only required array key.
+	  * 	@param $settings["class"] -The div class to wrap each video in, default is "youtube".
+	  * 	@param $settings["rel"] - Toggle on or off related videos when video ends, defaults to 0.
+	  * 	@param $settings["count"] - Amount of videos to include, defaults to 1.
+	  *		@param $settings["color1"] - Color one setting, defaults to 0x000000
+	  *		@param $settings["color2"] - Color two setting, defaults to 0x0000FF
+	  * 	@param $settings["border"] - The border int setting, defaults to 0.
+	  *		@param $settings["showsearch"] - Show or hide search, defaults to 0.
+	  *		@param $settings["showinfo"] - Show or hide info, defaults to 0.
+	  *		@param $settings["fs"] - Fullscreen toggle, defaults to 0.
+	  * 	@param $settings["autoplay"] - Toggles auto play on or off, defaults to 0. 
+	  * 	@param $settings["start"] -Number of seconds into the video to start at, defaults to 0.
+	  *		@param $settings["hd"] -Enable HD if available, defaults to 0.
+	  *
+	  * NOTE: The width and height are set in the config/config.inc.php file!
+	  *
+	  * "Basic" Usage Example: 
+	 	 <?php 
+			$video_opts = array("username" => "BritneySpearsVEVO");
+			echo Media::latestYouTube($video_opts);
+		 ?>
+	  *
+	  *
+	  *
+	  *
+	  * "Advanced" Usage Example:
+	  	 <?php 
+	  		$video_opts = array(
+							"username" => "BritneySpearsVEVO",
+							"count" => 5,
+							"rel" => 1,
+							"fs" => 1,
+							"class" => "my-videos"
+							);
+			echo Media::latestYouTube($video_opts);
+		 ?>
+	  *
+	  *
+	  * 
+	  */
+	public static function latestYouTube($settings = array())
 	{
-		// Load the RSS feed
-		$xml = simplexml_load_file("http://www.youtube.com/rss/user/$username/videos.rss");
+		//Check to ensure username was passed. 
+		if ( array_key_exists("username", $settings) )
+		{
+			//Set defaults as variables
+			//We're setting them individually here as to easily overwrite them below in one loop.
+			$class = "youtube";
+			$rel = 0;
+			$count = 1;
+			$color1 = "0x000000";
+			$color2 = "0x0000FF";
+			$border = 0;
+			$showsearch = 0;
+			$showinfo = 0;
+			$fs = 0;
+			$autoplay = 0;
+			$start = 0;
+			$hd = 0;
+			
+			//Loop through and set any keys passed as variables, overwriting defaults only as needed.
+			foreach ($settings as $key => $value)
+			{
+				$$key = $value;
+			}
+			
+			//Ensure count is greater than 0. 
+			$count = ((int)$count) <= 0 ? 1 : $count;
+			
+			// Load the RSS feed
+			$xml = simplexml_load_file("http://www.youtube.com/rss/user/$username/videos.rss");
+			
+			//Variable holding final markup
+			$videos = "";
+			//Increment counter 
+			$i = 0;
+			
+			//Pull out each link and snip off the arguments 
+			//Create the markup with user options
+			foreach($xml->channel->item as $key => $value)
+			{
+				//Check to see if we reached our count limit 
+				if($i >= $count){break;}
 
-		// Get the first video's ID
-		$movie = (string) $xml->channel->item[0]->link[0];
-		$id = str_replace('http://www.youtube.com/watch?v=', '', $movie);
-
-		// Set embedded player options
-		$o = "?rel=0&hd=1&color1=0x000000&color2=0x0000FF&border=0&showsearch=0&showinfo=0&fs=1";
-
-		// Output valid XHTML
-		return "
-				<object width=\"600\" height=\"338\" 
+				//Grab the video argument string and discard the rest.
+				$id = str_replace("http://www.youtube.com/watch?v=", "", $value->link);
+				$url_args = "?rel=$rel&count=$count&color1=$color1&color2=$color2&border=$border&showsearch=$showsearch"
+				."&showinfo=$showinfo&fs=$fs&autoplay=$autoplay&start=$start&hd=$hd";
+				
+				//Build markup 
+				$videos .= "<div class=".$class.">"
+				. "<object width=".PAGE_OBJ_WIDTH." height=".PAGE_OBJ_HEIGHT." 
 					type=\"application/x-shockwave-flash\" 
-					data=\"http://www.youtube.com/v/$id$o\">
-					<param name=\"allowfullscreen\" value=\"true\" />
+					data=\"http://www.youtube.com/v/$id$url_args\">
+					<param name=\"allowfullscreen\" value=".($fs = 1 ? "true" : "false")." />
 					<param name=\"allowscriptaccess\" value=\"always\" />
 					<param name=\"movie\" 
-						value=\"http://www.youtube.com/v/$id$o\" />
-				</object>\n";
+						value=\"http://www.youtube.com/v/$id$url_args\" />
+				</object>\n"
+				."</div><!--End".$class."-->";
+				
+				//Increment the counter 
+				$i++;
+			}
+			return $videos;
+			
+		}
+		//No username passed, we're done here.
+		return false;
 	}
 
 	static function loadFlickr($username, $class=NULL)
