@@ -230,9 +230,6 @@ class Utilities
 		$request = $uri[0];
 		$script = $_SERVER['SCRIPT_NAME'];
 
-FB::info($request, "Requested file.");
-FB::info($root.$request, "Full file path.");
-
 		if(file_exists($root.$request)
 				&& ($script != $root.$request)
 				&& ($request!="/")) {
