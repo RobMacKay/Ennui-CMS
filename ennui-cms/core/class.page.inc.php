@@ -88,8 +88,8 @@ class Page extends AdminUtilities
 		 * Prepare the query and execute it
 		 */
 		$sql = "SELECT
-				id, page, title, subhead, body, img, imgcap, data1, data2,
-				data3, data4, data5, data6, data7, data8, author, created
+					`entry_id`, `entry_page`, `entry_title`, `entry_text`,
+					`entry_customfields`, `entry_author`, `entry_created`
 				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				WHERE id=?
 				LIMIT 1";

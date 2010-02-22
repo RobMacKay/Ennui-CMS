@@ -6,12 +6,17 @@
 session_start();
 
 /*
+ * Define the CMS path as a constant
+ */
+define('CMS_PATH', $cms_path);
+
+/*
  * Includes configuration files
  */
-include_once '../ennui-cms/config/config.inc.php';
-include_once '../ennui-cms/config/database.inc.php';
-include_once '../ennui-cms/config/menu.inc.php';
-include_once '../ennui-cms/config/admin.inc.php';
+include_once CMS_PATH . 'config/config.inc.php';
+include_once CMS_PATH . 'config/database.inc.php';
+include_once CMS_PATH . 'config/menu.inc.php';
+include_once CMS_PATH . 'config/admin.inc.php';
 
 /*
  * Define site-wide constants
@@ -24,7 +29,7 @@ foreach($_CONSTANTS as $key=>$value)
 /*
  * Include the FirePHP class for debugging
  */
-include_once '../ennui-cms/debug/fb.php';
+include_once CMS_PATH . 'debug/fb.php';
 
 /*
  * Handles debugging. If set to TRUE, displays all errors and enables logging 
@@ -42,21 +47,15 @@ else
 	ini_set("display_errors",0);
 	error_reporting(0);
 	FB::setEnabled(FALSE);
-	echo "Debug mode is off. ".ACTIVATE_DEBUG_MODE;
 }
 
 /*
  * Includes core classes
  */
-include_once '../ennui-cms/core/class.utilities.inc.php';
-include_once '../ennui-cms/core/class.adminutilities.inc.php';
-include_once '../ennui-cms/core/class.imagecontrol.inc.php';
-include_once '../ennui-cms/core/class.page.inc.php';
-
-/*
- * Creates a database object
- */
-$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+include_once CMS_PATH . 'core/class.utilities.inc.php';
+include_once CMS_PATH . 'core/class.adminutilities.inc.php';
+include_once CMS_PATH . 'core/class.imagecontrol.inc.php';
+include_once CMS_PATH . 'core/class.page.inc.php';
 
 /*
  * Checks if the user is logged in
@@ -76,7 +75,9 @@ if(CREATE_DB === TRUE)
  */
 $url_array = Utilities::readUrl();
 
-// Build the Menu
+/*
+ * Build the Menu
+ */
 $menu = Utilities::buildMenu($url_array, $menuPages);
 
 /*
@@ -105,15 +106,13 @@ if ( $menuPage===FALSE )
  */
 if ( isset($menuPage['hide']) && $menuPage['hide']===TRUE )
 {
-	header("Location: /".DEFAULT_PAGE);
+	header("Location: /" . DEFAULT_PAGE);
 	exit;
 }
 
 // Build the Page Content
-include_once '../ennui-cms/inc/class.'.$menuPage['type'].'.inc.php';
+include_once CMS_PATH . 'inc/class.'.$menuPage['type'].'.inc.php';
 $obj = new $menuPage['type']($mysqli, $url_array);
-
-$entry = $obj->displayPublic($url_array);
 
 /*
  * This builds the content for the title tag. This should probably be moved to 
@@ -123,5 +122,17 @@ $entry = $obj->displayPublic($url_array);
  */
 $entrytitle = (isset($obj->url1)) ? ucfirst(urldecode($obj->url1)) . ' | ' : NULL;
 $title = $entrytitle . $menuPage['display'] . ' | ' . SITE_TITLE;
+
+/*
+ * Set up an autoload function for classes
+ */
+function __autoload($classname)
+{
+	$path = CMS_PATH . 'inc/class.' . $classname . '.inc.php';
+	if ( file_exists($path) )
+	{
+		require_once $path;
+	}
+}
 
 ?>

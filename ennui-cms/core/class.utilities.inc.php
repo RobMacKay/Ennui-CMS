@@ -66,7 +66,12 @@ class Utilities
 		else return NULL;
 	}
 
-	static function buildMenu($url_array, $menu_array, $is_sub=FALSE, $subid=NULL)
+	public static function generateTitleText($entry, $divider)
+	{
+
+	}
+
+	public static function buildMenu($url_array, $menu_array, $is_sub=FALSE, $subid=NULL)
 	{
 		$attr = !$is_sub ? ' id="menu"' : ' class="submenu '. $subid . '"';
 

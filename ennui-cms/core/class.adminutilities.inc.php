@@ -1,6 +1,6 @@
 <?php
 
-class AdminUtilities
+class AdminUtilities extends DB_Connect
 {
 	/**
 	 * Creates the opening and closing pieces of a form
@@ -19,22 +19,18 @@ class AdminUtilities
 		 * that they are updating an entry. Otherwise, tell them that they're
 		 * creating a new entry.
 		 */
-		$default_caption = (is_null($id)) ? "Create a New Entry" : "Update This Entry";
+		$default_caption = is_null($id) ? "Create a New Entry" : "Update This Entry";
 
 		/*
 		 * If a custom caption is supplied, update the variable
 		 */
-		$form_cap = (is_null($caption)) ? $default_caption : $caption;
+		$form_cap = is_null($caption) ? $default_caption : $caption;
 
 		/*
 		 * If the $showcap variable is set to true, display the form within
 		 * header tags.
 		 */
-		if($showcap!==false) {
-			$form_header = $form_cap;
-		} else {
-			$form_header = NULL;
-		}
+		$form_header = $showcap===TRUE ? $form_cap : NULL;
 
 		/*
 		 * Instantiate the $form variable and load two array elements
@@ -43,23 +39,28 @@ class AdminUtilities
 		$form = array();
 		$form['start'] = <<<FORM_START
 
-<!-- BEGIN FORM DISPLAY -->
+
 <form action="/inc/update.inc.php"
-		method="post"
-		enctype="multipart/form-data">
+	  method="post"
+	  enctype="multipart/form-data">
 	<fieldset class="ennui_form">
 		<legend>$form_header</legend>
 FORM_START;
 
 		$form['end'] = <<<FORM_END
 
-		<input type="hidden" name="page" value="{$this->url0}" />
-		<input type="hidden" name="action" value="$action" />
-		<input type="hidden" name="id" value="$id" />
+		<input type="hidden" name="page"
+			  value="{$this->url0}" />
+		<input type="hidden" name="action"
+			  value="$action" />
+		<input type="hidden" name="id"
+			  value="$id" />
+		<input type="hidden" name="token"
+			  value="$_SESSION[token]" />
 		<input type="submit" name="confirm" value="$form_cap" />
 	</fieldset>
 </form>
-<!-- END FORM DISPLAY -->
+
 FORM_END;
 
 		return $form;
@@ -80,10 +81,13 @@ FORM_END;
 		 * If an entry ID is supplied, load the entry and grab the element
 		 * needed to populate the input
 		 */
-		if($id!='') {
+		if ( $id!='' )
+		{
 			$entry = Page::getEntryById($id);
 			$data = $entry[0][$name];
-		} else {
+		}
+		else
+		{
 			$entry = NULL;
 			$data = NULL;
 		}
@@ -339,6 +343,9 @@ ADMIN_OPTIONS;
 		return sha1($val);
 	}
 
+	/*
+	 * TODO Add URL field
+	 */
 	static function buildDB($menuPages) {
 		$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 		if($mysqli->connect_errno) {
@@ -351,28 +358,21 @@ ADMIN_OPTIONS;
 
 		$sql = "CREATE DATABASE IF NOT EXISTS `".DB_NAME."`
 				DEFAULT CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";
-				CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`".DB_PREFIX."entryMgr`
+				CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`".DB_PREFIX."entries`
 				(
-					`id`		INT UNSIGNED NOT NULL PRIMARY KEY auto_increment,
-					`page`		VARCHAR(30) NOT NULL,
-					`title`		VARCHAR(75) DEFAULT NULL,
-					`subhead`	VARCHAR(75) DEFAULT NULL,
-					`body`		TEXT DEFAULT NULL,
-					`img`		VARCHAR(75) DEFAULT NULL,
-					`imgcap`	VARCHAR(75) DEFAULT NULL,
-					`data1`		VARCHAR(150) DEFAULT NULL,
-					`data2`		VARCHAR(150) DEFAULT NULL,
-					`data3`		VARCHAR(150) DEFAULT NULL,
-					`data4`		VARCHAR(150) DEFAULT NULL,
-					`data5`		VARCHAR(150) DEFAULT NULL,
-					`data6`		VARCHAR(150) DEFAULT NULL,
-					`data7`		VARCHAR(150) DEFAULT NULL,
-					`data8`		VARCHAR(150) DEFAULT NULL,
-					`author`	VARCHAR(40) DEFAULT '".SITE_CONTACT_NAME."',
-					`created`	INT(12),
-					INDEX(page),
-					INDEX(created),
-					INDEX(title)
+				  `entry_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+				  `entry_page` varchar(32) COLLATE ".DEFAULT_COLLATION." NOT NULL,
+				  `entry_title` varchar(128) COLLATE ".DEFAULT_COLLATION." DEFAULT NULL,
+				  `entry_text` text COLLATE ".DEFAULT_COLLATION.",
+				  `entry_customfields` text COLLATE ".DEFAULT_COLLATION.",
+				  `entry_author` varchar(128) COLLATE ".DEFAULT_COLLATION." NOT NULL,
+				  `entry_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+				  PRIMARY KEY (`entry_id`),
+				  KEY `entry_title` (`entry_title`),
+				  KEY `entry_author` (`entry_author`),
+				  KEY `entry_created` (`entry_created`),
+				  KEY `entry_page` (`entry_page`),
+				  FULLTEXT KEY `entry_text` (`entry_text`)
 				) ENGINE=MYISAM CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";
 				CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`".DB_PREFIX."imgCap`
 				(
@@ -395,12 +395,12 @@ ADMIN_OPTIONS;
 					(`admin_u`, `admin_e`, `admin_p`, `admin_v`, `is_admin`)
 				VALUES
 					('$admin_u', '$admin_e', '$admin_p', '".sha1(time())."', '1');
-				INSERT INTO `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-					(`id`, `page`, `title`, `subhead`, `body`, `img`, `imgcap`,
-						`data1`, `data2`, `data3`, `data4`, `data5`, `data6`,
-						`data7`, `data8`, `author`, `created`)
+				INSERT INTO `".DB_NAME."`.`".DB_PREFIX."entries`
+				(
+					`entry_page`, `entry_title`, `entry_text`, `entry_author`
+				)
 				VALUES
-					(1, '".DEFAULT_PAGE."', 'Welcome to the Ennui CMS!', NULL,
+					('".DEFAULT_PAGE."', 'Welcome to the Ennui CMS!',
 						'<p>You have successfully installed the Ennui CMS.</p>"
 						. "\r\n<p>To get started:</p>\r\n<ul>\r\n<li>"
 						. "<a href=\"/admin\">Log in</a> using the username "
@@ -433,9 +433,7 @@ ADMIN_OPTIONS;
 						. "duis qui.</p>\r\n<h6>H6 Element</h6>\r\n<p>Mazim ut "
 						. "euismod formas amet in. Ex blandit nulla tincidunt "
 						. "wisi consequat. Typi illum ad luptatum "
-						. "Investigationes legentis.</p>', NULL, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-						'Jason Lengstorf', 1261511658);";
+						. "Investigationes legentis.</p>', 'Jason Lengstorf');";
 
 		if(array_key_exists('blog', $menuPages))
 		{

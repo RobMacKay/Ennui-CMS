@@ -6,15 +6,14 @@
 	ob_start("ob_gzhandler");
 
 	/*
-	 * Initializes the core functionality of the CMS
+	 * Defines the path to the core of the CMS
 	 */
-	require_once '../ennui-cms/core/init.inc.php';
+	$cms_path = '../ennui-cms/';
 
 	/*
-	 * Classes used in the sidebar or in widgets need to be included explicitly
+	 * Initializes the core functionality of the CMS
 	 */
-	require_once '../ennui-cms/inc/class.single.inc.php';
-	require_once '../ennui-cms/inc/class.blog.inc.php';
+	require_once $cms_path . 'core/init.inc.php';
 
 	/*
 	 * Initialize classes used in the sidebar or in widgets
