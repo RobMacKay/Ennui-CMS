@@ -220,7 +220,7 @@ EMAIL;
 		unset($_SESSION['loggedIn']);
 		unset($_SESSION['admin_u']);
 		unset($_SESSION['admin_e']);
-
+		session_destroy();
 		return true;
 	}
 }
