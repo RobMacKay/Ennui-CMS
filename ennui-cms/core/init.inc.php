@@ -100,9 +100,9 @@ if ( $menuPage===FALSE )
 }
 
 /*
- * If the menu item has an index called "hide" that's TRUE, use the default
+ * If the menu item has an index called "showFull" that's TRUE, use the default
  */
-if ( isset($menuPage['hide']) && $menuPage['hide']===TRUE )
+if ( isset($menuPage['showFull']) && $menuPage['showFull']===FALSE )
 {
 	header("Location: /".DEFAULT_PAGE);
 	exit;

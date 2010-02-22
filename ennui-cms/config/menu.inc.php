@@ -15,6 +15,9 @@ $_CONSTANTS['DEFAULT_PAGE'] = 'home';
  *  - type (required): The class type the page uses to display information
  *  - sub (optional): If a sub-menu exists, this contains an array of sub items
  *  - hide (optional): If TRUE, hides the item from the menu display
+ *  - showFull (optional): If FALSE, page can't be viewed directly. Ideal for
+ *			sidebar sections, footers, etc.. The user will be redirected to the
+ *			default page if attempting to access a page with this set to FALSE.
  *  - url (optional): If set, overrides the array key as URL
  *  - class (optional): If set, adds a class attribute to the 
  *  
@@ -45,7 +48,12 @@ $_CONSTANTS['DEFAULT_PAGE'] = 'home';
  * 			'display' => 'Legal Notices',
  * 			'type' => 'single',
  * 			'hide' => TRUE
- * 		)
+ * 		),
+ *		'sidebar-info' => array(
+ *			'display' => 'Featured Work',
+ *			'type' => 'single',
+ *			'hide' => TRUE,
+ *			'showFull' => FALSE
  * 	);
  * 
  * Above outputs:
@@ -79,7 +87,8 @@ $menuPages = array(
 	'minibio' => array(
 		'display' => 'Mini Bio',
 		'type' => 'single',
-		'hide' => TRUE
+		'hide' => TRUE,
+		'showFull' => FALSE
 	)
 );
 
