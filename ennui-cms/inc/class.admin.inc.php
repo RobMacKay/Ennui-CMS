@@ -45,9 +45,10 @@ class admin extends Page
 
 	public function createUser($user, $email)
 	{
-		$sql = "INSERT INTO adminMgr (admin_u, admin_e, admin_v)
+		$sql = "INSERT INTO `".DB_NAME."`.`".DB_PREFIX."adminMgr`
+					(admin_u, admin_e, admin_v)
 				VALUES (?, ?, ?)";
-		if($stmt = $this->mysqli->prepare($sql)) {
+		if(FALSE !== $stmt = $this->mysqli->prepare($sql)) {
 			$ver = sha1(time());
 			$stmt->bind_param("sss", $user, $email, $ver);
 			$stmt->execute();
