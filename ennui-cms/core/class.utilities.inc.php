@@ -163,8 +163,8 @@ class Utilities
 	{
 		foreach($m as $p => $attr)
 		{
-			if($p===$u) return $m[$u]['type'];
-			elseif(isset($m[$p]['sub'][$u])) return $m[$p]['sub'][$u]['type'];
+			if(strtolower($p)===$u) return $m[$u]['type'];
+			elseif(strtolower(isset($m[$p]['sub'][$u]))) return $m[$p]['sub'][$u]['type'];
 		}
 		return DEFAULT_PAGE;
 	}
