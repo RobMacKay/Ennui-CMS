@@ -1,20 +1,24 @@
 <?php
 
 	/*
+	 * Start a timer
+	 */
+	 $start_time = microtime(TRUE);
+
+	/*
 	 * Starts output buffering and enables GZIP compression
 	 */
 	ob_start("ob_gzhandler");
 
 	/*
-	 * Initializes the core functionality of the CMS
+	 * Define a path for loading the CMS. Default is ../ennui-cms/
 	 */
-	require_once '../ennui-cms/core/init.inc.php';
+	define('CMS_PATH', '../ennui-cms/');
 
 	/*
-	 * Classes used in the sidebar or in widgets need to be included explicitly
+	 * Initializes the core functionality of the CMS
 	 */
-	require_once '../ennui-cms/inc/class.single.inc.php';
-	require_once '../ennui-cms/inc/class.blog.inc.php';
+	require_once CMS_PATH . 'core/init.inc.php';
 
 	/*
 	 * Initialize classes used in the sidebar or in widgets
@@ -40,8 +44,7 @@
 	/*
 	 * If the user is logged in, load stylesheets for the admin controls
 	 */
-	if($obj->url0=="admin"
-		|| isset($_SESSION['loggedIn'])
+	if(isset($_SESSION['loggedIn'])
 		&& $_SESSION['loggedIn']==1):
 ?>
 	<link rel="stylesheet" type="text/css" media="screen,projection"
@@ -70,7 +73,7 @@
 	<div id="master">
 		<div id="header">
 			<h1 id="header_title"> <a href="/"><?php echo SITE_NAME; ?></a> </h1>
-<?php echo Utilities::buildMenu($url_array, $menuPages) ?>
+<?php echo Utilities::buildMenu($url_array, $menuPages); ?>
 		</div><!-- end #header -->
 		<div id="content">
 			<div class="entrydisplay" id="<?php echo $obj->url0 ?>">
@@ -128,6 +131,8 @@
 
 </html>
 <?php
-  $mysqli->close();
-  ob_end_flush();
+	echo "<!-- Page rendered by Ennui CMS in ",
+		round((microtime(TRUE)-$start_time)*1000), " milliseconds -->";
+	$mysqli->close();
+	ob_end_flush();
 ?>

@@ -68,7 +68,7 @@ class Utilities
 
 	static function buildMenu($url_array, $menu_array, $is_sub=FALSE, $subid=NULL)
 	{
-		$attr = !$is_sub ? ' id="menu"' : ' class="submenu '. $subid . '"';
+		$attr = !$is_sub ? ' id="menu"' : ' class="submenu ' . $subid . '"';
 
 		$menu = "\n\t\t\t<ul$attr>\n";
 
@@ -131,7 +131,7 @@ class Utilities
 			 */
 			$sel = ($url == $url_array[0]) ? ' class="selected '.$class.'"' : ' class="'.$class.'"';
 
-			if(!isset($hide) || $hide!==TRUE)
+			if ( !isset($showFull) || $showFull===TRUE )
 			{
 				/*
 				 * Check if additional attributes are present
@@ -153,7 +153,7 @@ class Utilities
 			 * Destroy the variables to ensure they're reset 
 			 * on each iteration
 			 */
-			unset($url, $display, $sub, $class, $hide, $inline);
+			unset($url, $display, $sub, $class, $hide, $showFull, $inline);
 		}
 
 		return $menu . "\t\t\t</ul><!-- end menu -->\n";
@@ -252,6 +252,12 @@ class Utilities
 		}
 	
 		return $url_array;
+	}
+
+	public static function generatePageTitle($page, $title=NULL)
+	{
+		$sep = SITE_TITLE_SEPARATOR;
+		$title = SITE_TITLE;
 	}
 }
 

@@ -80,6 +80,10 @@ $menuPages = array(
 		'display' => 'Photos',
 		'type' => 'multiphoto'
 	),
+	'podcast' => array(
+		'display' => 'Radio Show',
+		'type' => 'podcast'
+	),
 	'contact' => array(
 		'display' => 'Contact Us',
 		'type' => 'contact'

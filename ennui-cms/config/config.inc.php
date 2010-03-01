@@ -5,7 +5,7 @@
  * Basic site information
  ******************************************************************************
  */
-$_CONSTANTS['SITE_URL'] = "localhost";
+$_CONSTANTS['SITE_URL'] = "http://localhost";
 
 /*
  * If $_SERVER['DOCUMENT_ROOT'] does not contain the full path to the web root,
@@ -66,6 +66,11 @@ $_CONSTANTS['SITE_CONTACT_EMAIL'] = 'john.doe@example.com';
  * will be displayed first.
  */
 $_CONSTANTS['SITE_TITLE'] = "Example Site &raquo; Ennui CMS";
+
+/*
+ * A separator to use between site title data
+ */
+$_CONSTANTS['SITE_TITLE_SEPARATOR'] = "&raquo;";
 
 /*
  * This is the confirmation email that will be sent to users that submit a 
