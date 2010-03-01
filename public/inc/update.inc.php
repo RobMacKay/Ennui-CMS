@@ -1,9 +1,9 @@
 <?php
 
-	include_once '../ennui-cms/config/config.inc.php';
-	include_once '../ennui-cms/config/database.inc.php';
-	include_once '../ennui-cms/config/menu.inc.php';
-	include_once '../ennui-cms/core/class.page.inc.php';
+	include_once CMS_PATH . 'config/config.inc.php';
+	include_once CMS_PATH . 'config/database.inc.php';
+	include_once CMS_PATH . 'config/menu.inc.php';
+	include_once CMS_PATH . 'core/class.page.inc.php';
 
 	$menu = $GLOBALS['menuPages'];
 
@@ -33,7 +33,7 @@
 			exit;
 		}
 
-		include_once '../ennui-cms/inc/class.'.$class.'.inc.php';
+		include_once CMS_PATH . 'inc/class.'.$class.'.inc.php';
 		$obj = new $class(NULL, array(strtolower($_POST['page'])));
 
 		/*
@@ -152,13 +152,13 @@
 	 * Comment handlers.
 	 */
 	else if ( $_POST['action'] == 'cmnt_post' ) {
-		require_once '../ennui-cms/inc/class.comments.inc.php';
+		require_once CMS_PATH . 'inc/class.comments.inc.php';
 		$cmnt = new comments();
 		$header = $cmnt->postComment($_POST);
 	}
 
 	else if ( $_GET['action'] == 'cmnt_delete' ) {
-		require_once '../ennui-cms/inc/class.comments.inc.php';
+		require_once CMS_PATH . 'inc/class.comments.inc.php';
 		$cmnt = new comments();
 		$header = $cmnt->deleteComment($_GET['bid'],$_GET['cmntid']);
 	}
@@ -168,7 +168,7 @@
 	 */
 	else if($_GET['action'] == 'nl_cookie')
 	{
-		require_once '../ennui-cms/inc/class.newsletter.inc.php';
+		require_once CMS_PATH . 'inc/class.newsletter.inc.php';
 		Newsletter::removeCookies();
 		$header = "Location: ../" . htmlentities(strip_tags($_GET['page'])) . '/';
 	}
@@ -177,11 +177,13 @@
 	 * Log out the user
 	 */
 	else if ( $_GET['action'] == 'logout' ) {
-		include '../ennui-cms/inc/class.admin.inc.php';
+		include CMS_PATH . 'inc/class.admin.inc.php';
 		$admin = new admin();
 		$check = $admin->logout();
 		$header =  $check === true ? 'Location: ../': 'Location: ../admin/error/';
 	}
+
+	else { $header = "Location: ../"; }
 
 	header($header);
 ?>
