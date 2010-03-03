@@ -7,4 +7,4 @@ FileETag None
 RewriteEngine on
 RewriteBase /
 Options -MultiViews +FollowSymLinks
-RewriteRule !\.(gif|jpe?g|png|css|ico|swf|js|pdf)$ index.php [NC]
+RewriteRule !\.(gif|jpe?g|png|css|ico|swf|js|pdf|mp3|mp4)$ index.php [NC]
