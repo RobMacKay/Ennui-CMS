@@ -97,7 +97,7 @@ if ( $menuPage===FALSE )
 }
 
 /*
- * If the menu item has an index called "showFull" that's TRUE, use the default
+ * If the menu item has an index called "showFull" that's FALSE, use the default
  */
 if ( isset($menuPage['showFull']) && $menuPage['showFull']===FALSE )
 {
