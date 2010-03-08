@@ -116,7 +116,7 @@ $entry = $obj->displayPublic($url_array);
  */
 function __autoload($classname)
 {
-	$file = CMS_PATH . 'inc/class.' . $classname . '.inc.php';
+	$file = CMS_PATH . 'inc/class.' . strtolower($classname) . '.inc.php';
 	if ( file_exists($file) )
 	{
 		require_once $file;
