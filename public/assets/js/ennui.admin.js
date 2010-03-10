@@ -125,12 +125,12 @@ function textEdit() {
 	$('textarea#body').tinymce({
 		script_url : '/assets/js/tiny_mce/tiny_mce.js',
 		theme : "advanced",
-		plugins : "safari,iespell,inlinepopups,spellchecker,preview,paste,advimage",
+		plugins : "safari,iespell,inlinepopups,spellchecker,paste,advimage,media",
 		theme_advanced_toolbar_location : "top",
 		theme_advanced_toolbar_align : "left",
 		theme_advanced_buttons1 : "pasteword,|,bold,italic,underline,blockquote,|,"
 			+ "justifyleft,justifycenter,justifyright,|,"
-			+ "bullist,numlist,outdent,indent,|,link,unlink,image,code,preview",
+			+ "bullist,numlist,outdent,indent,|,link,unlink,image,media,code",
 		theme_advanced_buttons2 : "",
 		theme_advanced_buttons3 : "",
 		relative_urls : false
