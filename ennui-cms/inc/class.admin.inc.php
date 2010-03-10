@@ -1,5 +1,8 @@
 <?php
 
+/*
+ * TODO Comment this file
+ */
 class admin extends Page
 {
 	public $displayName="Admin";
