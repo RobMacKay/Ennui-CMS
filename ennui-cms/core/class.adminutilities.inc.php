@@ -440,7 +440,7 @@ ADMIN_OPTIONS;
 		if(array_key_exists('blog', $menuPages))
 		{
 			$sql .= "
-				CREATE TABLE IF NOT EXISTS blogCmnt
+				CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`".DB_PREFIX."blogCmnt`
 				(
 					`id`		INT(5) PRIMARY KEY auto_increment,
 					`bid`		INT(5),
@@ -453,26 +453,6 @@ ADMIN_OPTIONS;
 					INDEX(bid),
 					INDEX(timestamp),
 					INDEX(subscribe)
-				) ENGINE=MYISAM CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";";
-		}
-
-		if(array_key_exists('newsletter', $menuPages))
-		{
-			$sql .= "
-				CREATE TABLE IF NOT EXISTS nlMgr
-				(
-					`email_id`	INT PRIMARY KEY AUTO_INCREMENT,
-					`name`		VARCHAR(150) DEFAULT NULL,
-					`email`		VARCHAR(150) UNIQUE NOT NULL,
-					`cat1`		TINYINT DEFAULT 0,
-					`cat2`		TINYINT DEFAULT 0,
-					`cat3`		TINYINT DEFAULT 0,
-					`cat4`		TINYINT DEFAULT 0,
-					INDEX(cat1),
-					INDEX(cat2),
-					INDEX(cat3),
-					INDEX(cat4),
-					INDEX(email)
 				) ENGINE=MYISAM CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";";
 		}
 
