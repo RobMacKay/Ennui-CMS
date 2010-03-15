@@ -267,7 +267,7 @@ class Utilities
 	 * @author Drew Douglass, refactored original code by Jason Lengstorf
 	 * @param float $start_time - The start time, use microtime 
 	 * @param float $end_time - The end time, use microtime 
-	 * @return str - returns page load in milliseconds.
+	 * @return str - returns page load in milliseconds via an HTML comment
 	 */
 	 public static function getTimerResults($start_time,$end_time)
 	 {
