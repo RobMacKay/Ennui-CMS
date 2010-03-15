@@ -259,6 +259,20 @@ class Utilities
 		$sep = SITE_TITLE_SEPARATOR;
 		$title = SITE_TITLE;
 	}
+	
+	/*
+	 * Takes a starting time and end time and returns stats about page rendering time. 
+	 * Call this method at the bottom of your page.
+	 *
+	 * @author Drew Douglass, refactored original code by Jason Lengstorf
+	 * @param float $start_time - The start time, use microtime 
+	 * @param float $end_time - The end time, use microtime 
+	 * @return str - returns page load in milliseconds.
+	 */
+	 public static function getTimerResults($start_time,$end_time)
+	 {
+	 	return ((float)$start_time && (float)$end_time) ? "<!-- Page rendered by Ennui CMS in ".round(($end_time-$start_time)*1000)." milliseconds -->" : false;
+	 }
 }
 
 ?>
