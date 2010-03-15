@@ -49,6 +49,8 @@
 ?>
 	<link rel="stylesheet" type="text/css" media="screen,projection"
 		href="/assets/css/admin.css" />
+	<link rel="stylesheet" type="text/css" media="screen"
+		href="/assets/js/fancybox/jquery.fancybox-1.3.1.css" />
 	<link rel="stylesheet" type="text/css" media="screen,projection"
 		href="/assets/css/uploadify.css" />
 <?php endif ?>
@@ -107,6 +109,8 @@
 	if($obj->url0=="admin" || isset($_SESSION['loggedIn']) && $_SESSION['loggedIn']==1):
 ?>
 	<script type="text/javascript" src="/assets/js/tiny_mce/jquery.tinymce.js"></script>
+	<script type="text/javascript" src="/assets/js/jquery.easing.js"></script>
+	<script type="text/javascript" src="/assets/js/fancybox/jquery.fancybox-1.3.1.pack.js"></script>
 	<script type="text/javascript" src="/assets/js/ennui.admin.js"></script>
 	<script type="text/javascript" src="/assets/js/jquery.uploadify.js"></script>
 <?php endif ?>
