@@ -26,11 +26,22 @@ class Single extends Page
 		$id = isset($entries[0]['id']) ? $entries[0]['id'] : NULL;
 		$admin = $this->admin_entry_options($this->url0, $id, false);
 
-		if(isset($entries[0]['title'])) {
-			$e = $entries[0];
-			return "\n$admin<h2>$e[title] </h2>\n$e[body]\n";
-		} else {
-			return "\n$admin<h2> No Entry Found </h2>\n<p>Log in to create this entry.</p>\n";
+		if( isset($entries[0]['title']) )
+		{
+			/*
+			 * Load the template into a variable
+			 */
+			$template = file_get_contents(CMS_PATH.'template/'.$this->url0.'.inc');
+
+			/*
+			 * Return the entry as formatted by the template
+			 */
+			return UTILITIES::parseTemplate($entries, $template);
+		}
+		else
+		{
+			return "\n$admin<h2> No Entry Found </h2>"
+				. "\n<p>This page has not been created yet.</p>\n";
 		}
 	}
 

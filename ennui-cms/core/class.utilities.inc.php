@@ -188,6 +188,49 @@ class Utilities
 		return FALSE;
 	}
 
+	public static function parseTemplate($replace, $template)
+	{
+		$params = preg_replace('/.*\{loop\s\[(.*?)\]\}.*/is', "$1", $template);
+		$entry_template = preg_replace('/.*\{loop.*?\}(.*?)\{\/loop\}.*/is', "$1", $template);
+
+		/*
+		 * Define the template tag matching regex and curry the function that
+		 * will replace the tags with entry data
+		 */
+		$pattern = "/\{(\w+?)\}/i"; // Matches any template tag
+		$callback = Utilities::curry('Utilities::replaceTags', 2);
+
+		/*
+		 * Extract the header and footer from the template if they exist
+		 */
+		$header = preg_replace('/^(.*)?\{loop.*/is', "$1", $template);
+		$footer = preg_replace('/^.*?\{\/loop\}(.*)/is', "$1", $template);
+		if ( $header==$template )
+		{
+			$header = NULL;
+		}
+
+		if ( $footer==$template )
+		{
+			$footer = NULL;
+		}
+
+		/*
+		 * Loop through each passed entry and insert its values into the
+		 * layout defined in the looped section of the template
+		 */
+		$markup = NULL;
+		foreach ( $replace as $e )
+		{
+			$markup .= preg_replace_callback($pattern, $callback($e), $entry_template);
+		}
+
+		/*
+		 * Return the formatted data and append the footer if a match is made
+		 */
+		return $header . $markup . $footer;
+	}
+
 	public static function curry($func, $arity) {
 		return create_function('', "
 			\$args = func_get_args();
@@ -223,8 +266,8 @@ class Utilities
 
 	static function readUrl()
 	{
-		$root = $_SERVER['DOCUMENT_ROOT'];
-		$root .= SERVER_PATH;
+		// TODO: Make sure this works in all situations before pushing to master
+		$root = dirname($_SERVER['SCRIPT_FILENAME']);
 		$uri = $_SERVER['REQUEST_URI'];
 		$uri = explode('?',$uri);
 		$request = $uri[0];
@@ -252,6 +295,17 @@ class Utilities
 		}
 	
 		return $url_array;
+	}
+
+	public static function makeUrl($string)
+	{
+		if ( !empty($string) )
+		{
+			$pattern = array('/[^\w\s]+/', '/\s+/');
+			$replace = array('', '-');
+			return preg_replace($pattern, $replace, trim(strtolower($string)));
+		}
+		else { return NULL; }
 	}
 
 	public static function generatePageTitle($page, $title=NULL)

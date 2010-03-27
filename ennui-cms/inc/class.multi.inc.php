@@ -40,39 +40,35 @@ class Multi extends Page
 
 	private function displayPreview($entries)
 	{
-		if($_SESSION['loggedIn']==1) {
-			$id = (isset($entries[0]['id'])) ? $entries[0]['id'] : NULL;
-			$admin = $this->admin_general_options($this->url0, $id, false);
-		} else {
-			$admin = NULL;
-		}
+		$id = isset($entries[0]['id']) ? $entries[0]['id'] : NULL;
+		$admin = $this->admin_general_options($this->url0, $id, false);
 
 		$entry = $admin;
 
 		if(isset($entries[0]['title'])) {
+			$entry_array = array();
 			foreach($entries as $e) {
 				// Entry options for the admin, if logged in
-				if($_SESSION['loggedIn']==1)
-				{
-					$admin_entry = $this->admin_simple_options($this->url0, $e['id']);
-				}
-				else
-				{
-					$admin_entry = NULL;
-				}
-				if(isset($e['img']))
-				{
-					$e['image'] = Utilities::formatImageSimple($e);
-				}
-				else
-				{
-					$e['image'] = NULL;
-				}
+				$e['admin'] = $this->admin_simple_options($this->url0, $e['id']);
 
-				$entry .= "
-					<h2> $e[title] </h2>
-					$e[image]$e[body]$admin_entry\n\n";
+				// Rename the URL for use in the template
+				$e['url'] = empty($e['data6']) ? urlencode($e['title']) : $e['data6'];
+
+				$e['image'] = isset($e['img']) ? Utilities::formatImageSimple($e) : NULL;
+
+				$e['preview'] = UTILITIES::textPreview($e['body'], 45);
+
+				$entry_array[] = $e;
 			}
+			if ( file_exists(CMS_PATH.'template/'.$this->url0.'-preview.inc') )
+			{
+				$template = file_get_contents(CMS_PATH.'template/'.$this->url0.'-preview.inc');
+			}
+			else
+			{
+				$template = file_get_contents(CMS_PATH.'template/'.DEFAULT_TEMPLATE);
+			}
+			$entry .= UTILITIES::parseTemplate($entry_array, $template);
 		} else {
 			$entry .= "
 					<h2> No Entry Found </h2>
@@ -94,41 +90,25 @@ class Multi extends Page
 		}
 
 		$entry = $admin;
-		foreach($entries as $e)
-		{
-			$e['image'] = Utilities::formatImage($e);
-			$entry .= "
-					<p><a href=\"/$this->url0/\">&#171; Back to All Entries</a></p>
-					$e[image]
-					<p class=\"prop_cat\">Location</p>
-					<div class=\"prop_text\">
-						<p>$e[data1]</p>
-					</div>
-					<p class=\"prop_cat\">Description</p>
-					<div class=\"prop_text\">
-						<p>$e[body]</p>
-					</div>
-					<p class=\"prop_cat\">Lot Size</p>
-					<div class=\"prop_text\">
-						<p>$e[data2]</p>
-					</div>
-					<p class=\"prop_cat\">Square Feet</p>
-					<div class=\"prop_text\">
-						<p>$e[data3]</p>
-					</div>
-					<p class=\"prop_cat\">Bedrooms/Bathrooms</p>
-					<div class=\"prop_text\">
-						<p>$e[data4]</p>
-					</div>
-					<p class=\"prop_cat\">MLS #</p>
-					<div class=\"prop_text\">
-						<p>$e[data5]</p>
-					</div>
-					<p class=\"prop_cat\">Price</p>
-					<div class=\"prop_text\">
-						<p>$e[data6]</p>
-					</div>\n\n";
+		$entry_array = array();
+		foreach($entries as $e) {
+			// Entry options for the admin, if logged in
+			$e['admin'] = $this->admin_simple_options($this->url0, $e['id']);
+
+			$e['image'] = isset($e['img']) ? Utilities::formatImageSimple($e) : NULL;
+
+			$entry_array[] = $e;
 		}
+
+		if ( file_exists(CMS_PATH.'template/'.$this->url0.'-full.inc') )
+		{
+			$template = file_get_contents(CMS_PATH.'template/'.$this->url0.'-full.inc');
+		}
+		else
+		{
+			$template = file_get_contents(CMS_PATH.'template/'.DEFAULT_TEMPLATE);
+		}
+		$entry .= UTILITIES::parseTemplate($entry_array, $template);
 
 		return $entry;
 	}

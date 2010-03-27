@@ -110,10 +110,11 @@ class Page extends AdminUtilities
 				data3, data4, data5, data6, data7, data8, author, created
 				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 				WHERE title LIKE ?
+				OR data6=?
 				LIMIT 1";
 		$stmt = $this->mysqli->prepare($sql);
 		$var = '%'.$title.'%';
-		$stmt->bind_param("s", $var);
+		$stmt->bind_param("ss", $var, $title);
 		return $this->loadEntryArray($stmt);
 	}
 
@@ -216,18 +217,6 @@ class Page extends AdminUtilities
 		} else {
 			exit('Database query failed. '.$this->mysqli->error);
 		}
-	}
-
-	public function parseTemplate($replacement_array, $template)
-	{
-		//$pattern = "/\{(\w+?)\}/i"; // Matches any template tag
-		$markup = NULL;
-		$pattern = "/\{loop[|:\s\[|:\[]([\s\w:,]*?)\}/i";
-		preg_match($pattern, $template, $matches);
-		print_r($matches);
-		//$callback = Utilities::curry('Utilities::replaceTags', 2);
-
-		//return preg_replace_callback($pattern, $callback($replacement_array), $template);
 	}
 
 	protected function paginateEntries()
@@ -353,46 +342,58 @@ class Page extends AdminUtilities
 	/**
 	 * Writes data to the database; either updates or creates an entry
 	 *
-	 * @param array $post
-	 * @param array $files
 	 * @return bool		Returns true on success or false on error
 	 */
-	public function write($post, $files)
+	public function write()
 	{
 		/*
-		 * Check all the variables and make sure they're escaped for storage
+		 * Initialize all variables to prevent any notices
 		 */
-		$id = isset($post['id']) ? $post['id'] : '';
-		$page = $post['page'];
-		$title = isset($post['title']) ? $post['title'] : NULL;
-		$subhead = isset($post['subhead']) ? $post['subhead'] : NULL;
-		$body = isset($post['body']) ? $post['body'] : NULL;
-		$imgcap = isset($post['imgcap']) ? $post['imgcap'] : NULL;
-		$data1 = isset($post['data1']) ? $post['data1'] : NULL;
-		$data2 = isset($post['data2']) ? $post['data2'] : NULL;
-		$data3 = isset($post['data3']) ? $post['data3'] : NULL;
-		$data4 = isset($post['data4']) ? $post['data4'] : NULL;
-		$data5 = isset($post['data5']) ? $post['data5'] : NULL;
-		$data6 = isset($post['data6']) ? $post['data6'] : NULL;
-		$data7 = isset($post['data7']) ? $post['data7'] : NULL;
+		$id = ''; $title = NULL; $subhead = NULL; $body = NULL; $imgcap = NULL;
+		$data1 = NULL; $data2 = NULL; $data3 = NULL; $data4 = NULL;
+		$data5 = NULL; $data6 = NULL; $data7 = NULL; $data8 = NULL;
+
+		/*
+		 * Loop through the POST array and define all variables
+		 */
+		foreach ( $_POST as $key => $val )
+		{
+			if ( $key=="body" )
+			{
+				$$key = $val;
+			}
+			else
+			{
+				$$key = htmlentities($val, ENT_QUOTES);
+			}
+		}
+
+		/*
+		 * If a value wasn't explicity passed for data6, save a URL version of
+		 * the title
+		 */
+		if ( !isset($_POST['data6']) )
+		{
+			$data6 = UTILITIES::makeUrl($title);
+		} else { $data6 = $_POST['data6']; }
 
 		/*
 		 * Processes the image and returns the path, or sets the variable to
 		 * NULL if no image was uploaded
 		 */
-		$img = (isset($files['img'])) ? $this->checkIMG($files['img']) : NULL;
-		if($img===false) {
-			$img = (isset($post['stored_img'])) ? $post['stored_img'] : NULL;
+		$img = isset($_FILES['img']) ? $this->checkIMG($_FILES['img']) : NULL;
+		if ( $img===false )
+		{
+			$img = isset($_POST['stored_img']) ? $_POST['stored_img'] : NULL;
 		}
 
 		/*
-		 * PDF uploads go through the data8 field. If the $_FILES superglobal isn't
-		 * set, handle the input as a string. Otherwise, process as a PDF
+		 * PDF uploads go through the data8 field. If the $_FILES superglobal
+		 * isn't set, handle the input as a string. Otherwise, process as a PDF
 		 */
-		if(!is_array($files['data8'])) {
-			$data8 = $post['data8'] ? $post['data8'] : NULL;
-		} else if($files['data8']['size']>0) {
-			$data8check = $this->uploadPDF($files['data8'],$title);
+		if ( isset($_FILES['data8']) && $_FILES['data8']['size']>0 )
+		{
+			$data8check = $this->uploadPDF($_FILES['data8'],$title);
 			$data8 = ($data8check===false) ? NULL : $data8;
 		}
 
@@ -405,11 +406,15 @@ class Page extends AdminUtilities
 		/*
 		 * If the ID was passed, set up the query to update the entry
 		 */
-		if ( $id ) {
+		if ( $id )
+		{
 			$sql = "UPDATE `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-					SET title=?, subhead=?, body=?, img=?, imgcap=?
-						, data1=?, data2=?, data3=?, data4=?, data5=?, data6=?, data7=?
-						, data8=? WHERE id=? LIMIT 1";
+					SET
+						title=?, subhead=?, body=?, img=?, imgcap=?,
+						data1=?, data2=?, data3=?, data4=?,
+						data5=?, data6=?, data7=?, data8=?
+					WHERE id=?
+					LIMIT 1";
 			$stmt = $this->mysqli->prepare($sql);
 			$stmt->bind_param("sssssssssssssi",$title, $subhead, $body, $img, 
 					$imgcap, $data1, $data2, $data3, $data4, $data5, $data6, 

@@ -394,7 +394,8 @@ ADMIN_OPTIONS;
 				INSERT INTO `".DB_NAME."`.`".DB_PREFIX."adminMgr`
 					(`admin_u`, `admin_e`, `admin_p`, `admin_v`, `is_admin`)
 				VALUES
-					('$admin_u', '$admin_e', '$admin_p', '".sha1(time())."', '1');
+					('$admin_u', '$admin_e', '$admin_p', '".sha1(time())."', '1')
+				ON DUPLICATE KEY UPDATE `is_admin`=1;
 				INSERT INTO `".DB_NAME."`.`".DB_PREFIX."entryMgr`
 					(`id`, `page`, `title`, `subhead`, `body`, `img`, `imgcap`,
 						`data1`, `data2`, `data3`, `data4`, `data5`, `data6`,
@@ -435,7 +436,8 @@ ADMIN_OPTIONS;
 						. "wisi consequat. Typi illum ad luptatum "
 						. "Investigationes legentis.</p>', NULL, NULL, NULL,
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-						'Jason Lengstorf', 1261511658);";
+						'Jason Lengstorf', 1261511658)
+				ON DUPLICATE KEY UPDATE `created`=".time().";";
 
 		if(array_key_exists('blog', $menuPages))
 		{

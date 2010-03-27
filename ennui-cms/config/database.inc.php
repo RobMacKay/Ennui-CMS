@@ -24,6 +24,6 @@ $_CONSTANTS['DEFAULT_COLLATION'] = "utf8_unicode_ci";
  * necessary tables in the database. IF NOT EXISTS is used to avoid accidental 
  * overwrites of data.
  */
-$_CONSTANTS['CREATE_DB'] = TRUE;
+$_CONSTANTS['CREATE_DB'] = FALSE;
 
 ?>
