@@ -245,9 +245,14 @@ class Utilities
 			');
 		");
 	}
-
+	
 	static function replaceTags($transformations, $matches)
 	{
+		/**Catches undefined indexs on root pages**/
+		if(!isset($tranformations['url']))
+		{
+			$transformations['url'] = null;
+		}
 		return $transformations[strtolower($matches[1])];
 	}
 

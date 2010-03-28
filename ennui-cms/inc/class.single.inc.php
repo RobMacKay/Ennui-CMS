@@ -29,6 +29,8 @@ class Single extends Page
 		if( isset($entries[0]['title']) )
 		{
 			/*
+			 * @TODO - Use fopen first, then fall back on file_get_contents.
+			 * @TODO - Ensure we are NOT allowing a non existant url to load an undesired template file. 
 			 * Load the template into a variable
 			 */
 			$template = file_get_contents(CMS_PATH.'template/'.$this->url0.'.inc');
