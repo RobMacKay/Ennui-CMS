@@ -6,6 +6,11 @@
 $_CONSTANTS['DEFAULT_PAGE'] = 'home';
 
 /*
+ * The default template to use
+ */
+$_CONSTANTS['DEFAULT_TEMPLATE'] = "default.inc";
+
+/*
  * This array builds the menu as an unordered list
  * 
  * ----------------------------------------------------------------------------
@@ -74,6 +79,10 @@ $menuPages = array(
 	),
 	'services' => array(
 		'display' => 'Services',
+		'type' => 'multi'
+	),
+	'products' => array(
+		'display' => 'Products',
 		'type' => 'multi'
 	),
 	'photos' => array(

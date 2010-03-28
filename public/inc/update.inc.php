@@ -57,7 +57,7 @@
 		if ( $_POST['action'] == 'write' ) {
 			$loc = str_replace('-image', '', $obj->url0);
 
-			if( $obj->write($_POST,$_FILES) ) {
+			if( $obj->write() ) {
 				$header = "Location: /$loc/";
 			} else {
 				$header = "Location: /{$obj->url0}/error/";
