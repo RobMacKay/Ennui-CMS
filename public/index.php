@@ -131,8 +131,8 @@
 
 </html>
 <?php
-	echo "<!-- Page rendered by Ennui CMS in ",
-		round((microtime(TRUE)-$start_time)*1000), " milliseconds -->";
+	$end_time = microtime(TRUE);
+	echo Utilities::getTimerResults($start_time,$end_time);
 	$mysqli->close();
 	ob_end_flush();
 ?>
