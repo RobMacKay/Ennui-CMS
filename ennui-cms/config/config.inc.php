@@ -26,7 +26,6 @@ $_CONSTANTS['PHONE_NUMBER'] = "(800) 555-1234";
 /*
  * Address for the site.
  */
-$_CONSTANTS['MAILING_ADDRESS'] = '123 Memory Ln, Missoula, MT 59801';
 $_CONSTANTS['STREET_ADDRESS'] = '123 Memory Ln';
 $_CONSTANTS['CITY_STATE_ZIP'] = 'Missoula, MT 59801';
 
@@ -64,19 +63,20 @@ $_CONSTANTS['SITE_TITLE_SEPARATOR'] = "&raquo;";
  * message through the site's contact form.
  */
 $_CONSTANTS['SITE_CONFIRMATION_MESSAGE'] = ""
-	. "Thanks for contacting me! I try to respond to all messages\n"
-	. "within 24 hours. However, if you're writing on a weekend, you may\n"
-	. "not receive a response until Monday.\n\n"
-	. "Thanks!\n"
-	. $_CONSTANTS['SITE_CONTACT_NAME'];
+    . "Thanks for contacting me! I try to respond to all messages\n"
+    . "within 24 hours. However, if you're writing on a weekend, you may\n"
+    . "not receive a response until Monday.\n\n"
+    . "Thanks!\n"
+    . $_CONSTANTS['SITE_CONTACT_NAME'];
 
 /*
  * The year the site was originally created.
  */
-$_CONSTANTS['SITE_CREATED_YEAR'] = '2009';
+$_CONSTANTS['SITE_CREATED_YEAR'] = '2010';
 
 /*
- * The site's Google Analytics username for stats tracking
+ * The site's Google Analytics username for stats tracking. Leave empty if the
+ * site doesn't use Google Analytics
  * 
  * EXAMPLE: UA-1234567-89
  */
@@ -84,27 +84,18 @@ $_CONSTANTS['GOOGLE_ANALYTICS_USER'] = '';
 
 /*
  ******************************************************************************
- * Newsletter Information
+ * Image handling info
  ******************************************************************************
  */
-$_CONSTANTS['NEWSLETTER_HEADLINE'] = "";
-$_CONSTANTS['NEWSLETTER_TEASER'] = "";
-$_CONSTANTS['NEWSLETTER_SUBMIT'] = "";
-
-/*
- * GetResponse-specific options. Leave blank if you don't use GetResponse.
- */
-$_CONSTANTS['GETRESPONSE_CAMPAIGN_NAME'] = "";
-$_CONSTANTS['GETRESPONSE_TEASER'] = "Want more content like this? Get free updates!";
-$_CONSTANTS['GETRESPONSE_SUBMIT'] = "Send Me Updates";
+$_CONSTANTS['FORM_ACTION'] = '/assets/inc/update.inc.php';
 
 /*
  ******************************************************************************
  * Image handling info
  ******************************************************************************
  */
-$_CONSTANTS['IMG_SAVE_DIR'] = 'images/userPics/';
-$_CONSTANTS['GAL_SAVE_DIR'] = 'images/userPics/gallery/';
+$_CONSTANTS['IMG_SAVE_DIR'] = 'assets/images/userPics/';
+$_CONSTANTS['GAL_SAVE_DIR'] = 'assets/images/userPics/gallery/';
 $_CONSTANTS['IMG_MAX_WIDTH'] = 480;
 $_CONSTANTS['IMG_MAX_HEIGHT'] = 375;
 $_CONSTANTS['IMG_THUMB_SIZE'] = 140;

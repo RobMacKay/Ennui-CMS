@@ -1,30 +1,45 @@
 <?php
 
 /*
- * Initialize the session
+ * Enable sessions
  */
 session_start();
 
 /*
- * Includes configuration files
+ * Create a token if one doesn't exist or has timed out
  */
+if ( !isset($_SESSION['token']) && $_SESSION['TTL']<=time() )
+{
+    $_SESSION['token'] = sha1(uniqid(mt_rand(), TRUE));
+    $_SESSION['TTL'] = time()+36000; // Time out in 10 minutes
+}
+
+/*
+ * Include necessary files for execution
+ */
+
+// Configuration files
 include_once CMS_PATH . 'config/config.inc.php';
 include_once CMS_PATH . 'config/database.inc.php';
 include_once CMS_PATH . 'config/menu.inc.php';
 include_once CMS_PATH . 'config/admin.inc.php';
+
+// Core classes
+include_once CMS_PATH . 'core/class.utilities.inc.php';
+include_once CMS_PATH . 'core/class.adminutilities.inc.php';
+include_once CMS_PATH . 'core/class.imagecontrol.inc.php';
+include_once CMS_PATH . 'core/class.page.inc.php';
+
+// FirePHP class for debugging (requires Firefox)
+include_once CMS_PATH . 'debug/fb.php';
 
 /*
  * Define site-wide constants
  */
 foreach($_CONSTANTS as $key=>$value)
 {
-	define($key, $value);
+    define($key, $value);
 }
-
-/*
- * Include the FirePHP class for debugging
- */
-include_once CMS_PATH . 'debug/fb.php';
 
 /*
  * Handles debugging. If set to TRUE, displays all errors and enables logging 
@@ -32,25 +47,17 @@ include_once CMS_PATH . 'debug/fb.php';
  */
 if( ACTIVATE_DEBUG_MODE===TRUE )
 {
-	ini_set("display_errors",1);
-	ERROR_REPORTING(E_ALL);
-	FB::setEnabled(TRUE);
-	FB::warn("FirePHP logging enabled.");
+    ini_set("display_errors",1);
+    ERROR_REPORTING(E_ALL);
+    FB::setEnabled(TRUE);
+    FB::warn("FirePHP logging enabled.");
 }
 else
 {
-	ini_set("display_errors",0);
-	error_reporting(0);
-	FB::setEnabled(FALSE);
+    ini_set("display_errors",0);
+    error_reporting(0);
+    FB::setEnabled(FALSE);
 }
-
-/*
- * Includes core classes
- */
-include_once CMS_PATH . 'core/class.utilities.inc.php';
-include_once CMS_PATH . 'core/class.adminutilities.inc.php';
-include_once CMS_PATH . 'core/class.imagecontrol.inc.php';
-include_once CMS_PATH . 'core/class.page.inc.php';
 
 /*
  * Creates a database object
@@ -58,16 +65,11 @@ include_once CMS_PATH . 'core/class.page.inc.php';
 $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 /*
- * Checks if the user is logged in
- */
-AdminUtilities::isLoggedIn();
-
-/*
  * Creates the database tables if set to true
  */
 if(CREATE_DB === TRUE)
 {
-	AdminUtilities::buildDB($menuPages);
+    AdminUtilities::buildDB($menuPages);
 }
 
 /*
@@ -85,7 +87,7 @@ $menuPage = Utilities::getPageAttributes($menuPages, $url_array[0]);
  */
 if ( $url_array[0]=='admin' )
 {
-	$menuPage = array('display'=>'Administrative Controls', 'type'=>'admin');
+    $menuPage = array('display'=>'Administrative Controls', 'type'=>'admin');
 }
 
 /*
@@ -93,7 +95,7 @@ if ( $url_array[0]=='admin' )
  */
 if ( $menuPage===FALSE )
 {
-	$menuPage = array('display'=>'Invalid URL', 'type'=>'missing');
+    $menuPage = array('display'=>'Invalid URL', 'type'=>'missing');
 }
 
 /*
@@ -101,8 +103,8 @@ if ( $menuPage===FALSE )
  */
 if ( isset($menuPage['showFull']) && $menuPage['showFull']===FALSE )
 {
-	header("Location: /".DEFAULT_PAGE);
-	exit;
+    header("Location: /".DEFAULT_PAGE);
+    exit;
 }
 
 // Build the Page Content
@@ -116,11 +118,11 @@ $entry = $obj->displayPublic($url_array);
  */
 function __autoload($classname)
 {
-	$file = CMS_PATH . 'inc/class.' . strtolower($classname) . '.inc.php';
-	if ( file_exists($file) )
-	{
-		require_once $file;
-	}
+    $file = CMS_PATH . 'inc/class.' . strtolower($classname) . '.inc.php';
+    if ( file_exists($file) )
+    {
+        require_once $file;
+    }
 }
 
 /*

@@ -11,12 +11,11 @@ $_CONSTANTS['DEV_NAME'] = 'admin';
 $_CONSTANTS['DEV_EMAIL'] = 'admin@example.com';
 
 /*
- * The SHA1 hash of the default administrator's password. This can be generated 
- * here: http://www.daveproxy.co.uk/tools/sha1_hash_generator.php
+ * The desired password for the administrator.
  *
- * NOTE: The default password is "admin"
+ * CAUTION: Make sure to clear this value after the database is built!
  */
-$_CONSTANTS['DEV_PASS'] = 'd033e22ae348aeb5660fc2140aec35850c4da997';
+$_CONSTANTS['DEV_PASS'] = 'admin';
 
 /*
  * If set to TRUE, FirePHP logging is enabled and error reporting is set to 

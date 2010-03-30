@@ -1,118 +1,171 @@
 <?php
 
+/**
+ * Methods to display and edit pages with multiple simple entries
+ *
+ * PHP version 5
+ *
+ * LICENSE: This source file is subject to the MIT License, available
+ * at http://www.opensource.org/licenses/mit-license.html
+ *
+ * @author     Jason Lengstorf <jason.lengstorf@ennuidesign.com>
+ * @author     Drew Douglass <drew.douglass@ennuidesign.com>
+ * @copyright  2010 Ennui Design
+ * @license    http://www.opensource.org/licenses/mit-license.html
+ */
 class Multi extends Page
 {
 
-	public function displayPublic()
-	{
-		if(isset($this->url1) && $this->url1!='more')
-		{
-			$entries = $this->getEntryByUrl($this->url1);
-			return $this->displayFull($entries);
-		}
-		else
-		{
-			$limit = MAX_ENTRIES_PER_PAGE; // Number of entries per page
-			if(isset($this->url1) && $this->url1=='more')
-			{
-				$offset = (isset($this->url2)) ? $limit*($this->url2-1) : 0;
-			}
-			else
-			{
-				$offset = 0;
-			}
-			$entries = $this->getAllEntries($limit, $offset);
-			return $this->displayPreview($entries);
-		}
-	}
+    /**
+     * Loads the page entries and outputs HTML markup to display them
+     *
+     * @return string the formatted entries
+     */
+    public function displayPublic()
+    {
+        /*
+         * If an entry URL is passed, load that entry only and output it
+         */
+        if ( isset($this->url1) && $this->url1!='more' && $this->url1!='admin' )
+        {
+            $entries = $this->getEntryByUrl($this->url1);
+            return $this->displayFull($entries);
+        }
 
-	public function displayAdmin($id)
-	{
-		$form = $this->createForm('write', $id);
+        elseif ( isset($this->url1) && $this->url1=='admin'
+            && isset($_SESSION['user']) && $_SESSION['user']['clearance']>=1 )
+        {
+            $id = isset($this->url2) ? (int) $this->url2 : NULL;
+            return $this->displayAdmin($id);
+        }
 
-		$markup = $form['start'];
-		$markup .= $this->createFormInput('title', 'Headline', $id);
-		$markup .= $this->createFormInput('body','Description',$id);
-		$markup .= $form['end'];
+        /*
+         * Displays the entries for the page
+         */
+        else
+        {
+            $limit = MAX_ENTRIES_PER_PAGE; // Number of entries per page
 
-		return $markup;
-	}
+            /*
+             * If the entries are paginated, this determines what page to show
+             */
+            if(isset($this->url1) && $this->url1=='more')
+            {
+                $offset = (isset($this->url2)) ? $limit*($this->url2-1) : 0;
+            }
+            else
+            {
+                $offset = 0;
+            }
 
-	private function displayPreview($entries)
-	{
-		$id = isset($entries[0]['id']) ? $entries[0]['id'] : NULL;
-		$admin = $this->admin_general_options($this->url0, $id, false);
+            /*
+             * Load entries and pass them to be formatted
+             */
+            $entries = $this->getAllEntries($limit, $offset);
+            return $this->displayPreview($entries);
+        }
+    }
 
-		$entry = $admin;
+    /**
+     * Outputs the editing controls for a given entry
+     *
+     * @param int $id the ID of the entry to be edited
+     * @return string HTML markup to display the editing form
+     */
+    public function displayAdmin($id)
+    {
+        $form = $this->createForm('write', $id);
 
-		if(isset($entries[0]['title'])) {
-			$entry_array = array();
-			foreach($entries as $e) {
-				// Entry options for the admin, if logged in
-				$e['admin'] = $this->admin_simple_options($this->url0, $e['id']);
+        $markup = $form['start'];
+        $markup .= $this->createFormInput('title', 'Headline', $id);
+        $markup .= $this->createFormInput('body','Description',$id);
+        $markup .= $form['end'];
 
-				// Rename the URL for use in the template
-				$e['url'] = empty($e['data6']) ? urlencode($e['title']) : $e['data6'];
+        return $markup;
+    }
 
-				$e['image'] = isset($e['img']) ? Utilities::formatImageSimple($e) : NULL;
+    /**
+     * Displays entries for the page as previews
+     *
+     * @param array $entries an array of entries to be formatted
+     * @return string HTML markup to display the entry previews
+     */
+    protected function displayPreview($entries)
+    {
+        /*
+         * Initialize the $entry variable by loading admin options if the user
+         * is logged in
+         */
+        $entry = $this->admin_general_options($this->url0);
 
-				$e['preview'] = UTILITIES::textPreview($e['body'], 45);
+        /*
+         * If at least one entry exists, loop through entries and format them
+         */
+        if ( isset($entries[0]['title']) )
+        {
+            $entry_array = array(); // Initialize the variable to avoid a notice
 
-				$entry_array[] = $e;
-			}
-			if ( file_exists(CMS_PATH.'template/'.$this->url0.'-preview.inc') )
-			{
-				$template = file_get_contents(CMS_PATH.'template/'.$this->url0.'-preview.inc');
-			}
-			else
-			{
-				$template = file_get_contents(CMS_PATH.'template/'.DEFAULT_TEMPLATE);
-			}
-			$entry .= UTILITIES::parseTemplate($entry_array, $template);
-		} else {
-			$entry .= "
-					<h2> No Entry Found </h2>
-					<p>
-						Log in to create this entry.
-					</p>";
-		}
+            /*
+             * Loop through entries and create special pieces of information in
+             * the entry array for the template
+             */
+            foreach ( $entries as $e )
+            {
+                // Entry options for the admin, if logged in
+                $e['admin'] = $this->admin_simple_options($this->url0, $e['id']);
 
-		return $entry;
-	}
+                // Rename the URL for use in the template
+                $e['url'] = empty($e['data6']) ? urlencode($e['title']) : $e['data6'];
 
-	private function displayFull($entries)
-	{
-		if($_SESSION['loggedIn']==1) {
-			$id = (isset($entries[0]['id'])) ? $entries[0]['id'] : NULL;
-			$admin = $this->admin_entry_options($this->url0, $id, false);
-		} else {
-			$admin = NULL;
-		}
+                // Format the image if one exists
+                $e['image'] = isset($e['img']) ? Utilities::formatImageSimple($e) : NULL;
 
-		$entry = $admin;
-		$entry_array = array();
-		foreach($entries as $e) {
-			// Entry options for the admin, if logged in
-			$e['admin'] = $this->admin_simple_options($this->url0, $e['id']);
+                // Create a text preview for the entry
+                $e['preview'] = UTILITIES::textPreview($e['body'], 45);
 
-			$e['image'] = isset($e['img']) ? Utilities::formatImageSimple($e) : NULL;
+                $entry_array[] = $e;
+            }
 
-			$entry_array[] = $e;
-		}
+            /*
+             * Load the template into a variable
+             */
+            $template = UTILITIES::loadTemplate($this->url0.'-preview.inc');
 
-		if ( file_exists(CMS_PATH.'template/'.$this->url0.'-full.inc') )
-		{
-			$template = file_get_contents(CMS_PATH.'template/'.$this->url0.'-full.inc');
-		}
-		else
-		{
-			$template = file_get_contents(CMS_PATH.'template/'.DEFAULT_TEMPLATE);
-		}
-		$entry .= UTILITIES::parseTemplate($entry_array, $template);
+            $entry .= UTILITIES::parseTemplate($entry_array, $template);
+        } else {
+            $entry .= "
+                    <h2> No Entry Found </h2>
+                    <p>
+                        Log in to create this entry.
+                    </p>";
+        }
 
-		return $entry;
-	}
+        return $entry;
+    }
+
+    protected function displayFull($entries)
+    {
+        $id = (isset($entries[0]['id'])) ? $entries[0]['id'] : NULL;
+        $entry = $this->admin_entry_options($this->url0, $id, false);
+
+        $entry_array = array();
+        foreach($entries as $e) {
+            // Entry options for the admin, if logged in
+            $e['admin'] = $this->admin_simple_options($this->url0, $e['id']);
+
+            $e['image'] = isset($e['img']) ? Utilities::formatImageSimple($e) : NULL;
+
+            $entry_array[] = $e;
+        }
+
+        /*
+         * Load the template into a variable
+         */
+        $template = UTILITIES::loadTemplate($this->url0.'-full.inc');
+
+        $entry .= UTILITIES::parseTemplate($entry_array, $template);
+
+        return $entry;
+    }
 
 }
-
-?>
