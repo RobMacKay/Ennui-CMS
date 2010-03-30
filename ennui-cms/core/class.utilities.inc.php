@@ -2,6 +2,7 @@
 
 class Utilities
 {
+
     public static function textPreview($body, $limit='45')
     {
         $preview = NULL;
@@ -351,4 +352,5 @@ class Utilities
         $sep = SITE_TITLE_SEPARATOR;
         $title = SITE_TITLE;
     }
+
 }

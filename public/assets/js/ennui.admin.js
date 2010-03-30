@@ -40,12 +40,28 @@ $(".ecms-gallery").live("click", function(e){
 
 function showedit(page,option,id) {
 	var params = "page=" + page + "&action=" + option + "&id=" + id;
+	$.fancybox.showActivity();
 
 	$.ajax({
 		data: params,
 		success: function(response)
 			{
-				$('#'+page).html(response).height('auto');
+				//$('#'+page).html(response).height('auto');
+				$.fancybox({
+					'content': response,
+					'width': 700,
+					'height': 'auto',
+					'scrolling': 'no',
+					'autoDimensions': false,
+					'overlayOpacity': 0.6,
+					'overlayColor': '#000',
+					'transitionIn': 'elastic',
+					'transitionOut': 'elastic',
+					'speedIn': 500,
+					'speedOut': 400,
+					'easingIn': 'easeInQuad',
+					'easingOut': 'easeOutBounce'
+				});
 				$('input.nl_preview')
 					.bind("click", function(){return newsletterPreview("newsletter");});
 				setTimeout("textEdit();", 500);
