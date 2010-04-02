@@ -55,11 +55,15 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
 
     <link rel="stylesheet" type="text/css" media="screen,projection"
           href="/assets/css/admin.css" />
+    <link rel="stylesheet" type="text/css" media="screen"
+          href="/assets/js/fancybox/jquery.fancybox-1.3.1.css" />
     <link rel="stylesheet" type="text/css" media="screen,projection"
           href="/assets/css/uploadify.css" />
 <?php endif ?>
 
     <!--[if lte IE 8]>
+        <script type="text/javascript"
+            src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
         <link rel="stylesheet" type="text/css" media="screen,projection"
               href="/css/ie8.css" />
     <![endif]-->
@@ -125,6 +129,10 @@ if($obj->url0=="admin" || isset($_SESSION['user']) && $_SESSION['user']['clearan
 
     <script type="text/javascript"
             src="/assets/js/tiny_mce/jquery.tinymce.js"></script>
+    <script type="text/javascript"
+            src="/assets/js/jquery.easing.js"></script>
+    <script type="text/javascript"
+            src="/assets/js/fancybox/jquery.fancybox-1.3.1.pack.js"></script>
     <script type="text/javascript"
             src="/assets/js/ennui.admin.js"></script>
     <script type="text/javascript"

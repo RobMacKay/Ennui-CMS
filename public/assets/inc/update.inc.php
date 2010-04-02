@@ -144,7 +144,7 @@
 					$check = false;
 					break;
 			}
-			$header = $check === true ? 'Location: ../admin/' : "Location: ../{$obj->url0}/error/";
+			$header = $check === true ? 'Location: /admin/' : "Location: /{$obj->url0}/error/";
 		}
 	}
 

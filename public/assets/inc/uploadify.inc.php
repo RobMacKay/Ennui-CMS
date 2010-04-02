@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 if (!empty($_FILES)) {
 	$tempFile = $_FILES['Filedata']['tmp_name'];
-	$targetPath = $_SERVER['DOCUMENT_ROOT'] . SERVER_PATH . $_GET['folder'] . '/';
+	$targetPath = dirname($_SERVER['SCRIPT_FILENAME']) . $_GET['folder'] . '/';
 	if ( !$ext=getExtension($_FILES['Filedata']['type']) )
 		echo 'Uploaded file is not an image. Type: '.$_FILES['Filedata']['type']."<br />\nExtension: ".$ext;
 

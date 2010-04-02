@@ -177,7 +177,7 @@ function galleryUpload(dir, page, id)
 		'uploader': '/assets/swf/uploader.swf',
 		'cancelImg': '/assets/images/cancel.png',
 		'script': uploadifyfile,
-		'folder': dir+page+id,
+		'folder': '/'+dir+page+id,
 		'fileDesc': 'Image Files',
 		'buttonText': 'Select Photos',
 		'fileExt': '*.jpg;*.jpeg;*.gif;*.png',
