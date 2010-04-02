@@ -36,15 +36,15 @@ ul,ol {
  */
 
 /*
- * Junction is used under the OFL license
+ * Junction is available under the OFL license
  * http://www.theleagueofmoveabletype.com/fonts/1-junction
  * Made by Caroline Hadilaksono (http://www.hadilaksono.com/)
  */
 @font-face {
-  font-family: 'Junction';
-  src: url(/assets/fonts/Junction.eot);
-  src: local('Junction Regular'), local('Junction'),
-         url(/assets/fonts/Junction.ttf) format('truetype');
+    font-family: 'Junction';
+    src: url(Junction.eot);
+    src: local('Junction Regular'), local('Junction'),
+        url(Junction.ttf) format('truetype');
 }
 
 a:link,a:visited,a:active,a:hover {
