@@ -219,38 +219,71 @@ class Utilities
     public static function parseTemplate($entries, $template)
     {
         $params = preg_replace('/.*\{loop\s\[(.*?)\]\}.*/is', "$1", $template);
-        $entry_template = preg_replace('/.*\{loop.*?\}(.*?)\{\/loop\}.*/is', "$1", $template);
+        if ( $params===$template )
+        {
+            $params = NULL;
+        }
 
         /*
-         * Define the template tag matching regex and curry the function that
-         * will replace the tags with entry data
+         * Define default parameters
          */
-        $pattern = "/\{([\w-]+?)\}/i"; // Matches any template tag
-        $callback = Utilities::curry('Utilities::replaceTags', 2);
+        $p = array(
+            "max_entries" => MAX_ENTRIES_PER_PAGE,
+            "htmlentities" => TRUE,
+            "strip_tags" => TRUE,
+            "tag_whitelist" => "<strong><em><p>"
+        );
+
+        /*
+         * If parameters were passed, decode them here
+         */
+        if ( !empty($params) )
+        {
+            $param_array = json_decode('{'.$params.'}', TRUE);
+            foreach ( $param_array as $key => $val )
+            {
+                if ( array_key_exists($key, $p) )
+                {
+                    $p[$key] = $val;
+                }
+            }
+        }
+
+        /*
+         * Extract the entry template from the file
+         */
+        $entry_template = preg_replace('/.*\{loop.*?\}(.*?)\{\/loop\}.*/is', "$1", $template);
 
         /*
          * Extract the header and footer from the template if they exist
          */
         $header = preg_replace('/^(.*)?\{loop.*/is', "$1", $template);
         $footer = preg_replace('/^.*?\{\/loop\}(.*)/is', "$1", $template);
-        if ( $header==$template )
+        if ( $header===$template )
         {
             $header = NULL;
         }
 
-        if ( $footer==$template )
+        if ( $footer===$template )
         {
             $footer = NULL;
         }
+
+        /*
+         * Define the template tag matching regex and curry the function that
+         * will replace the tags with entry data
+         */
+        $pattern = "/\{([\w-]+?)\}/i"; // Matches any template tag
+        $callback = Utilities::curry('Utilities::replaceTags', 3);
 
         /*
          * Loop through each passed entry and insert its values into the
          * layout defined in the looped section of the template
          */
         $markup = NULL;
-        foreach ( $entries as $e )
+        for ( $i=0, $c=min($p['max_entries'],count($entries)); $i<$c; ++$i )
         {
-            $markup .= preg_replace_callback($pattern, $callback($e), $entry_template);
+            $markup .= preg_replace_callback($pattern, $callback($entries[$i], $p), $entry_template);
         }
 
         /*
@@ -274,14 +307,26 @@ class Utilities
         ");
     }
 
-    static function replaceTags($transformations, $matches)
+    static function replaceTags($entries, $params, $matches)
     {
         /*
          * Make sure the template tag has a matching array element
          */
-        if ( array_key_exists(strtolower($matches[1]), $transformations) )
+        if ( array_key_exists(strtolower($matches[1]), $entries) )
         {
-            return $transformations[strtolower($matches[1])];
+            $val = $entries[$matches[1]];
+            if ( $params['htmlentities']===TRUE )
+            {
+                $val = htmlentities($val, ENT_QUOTES);
+            }
+
+            if ( $params['strip_tags']===TRUE )
+            {
+                $whitelist = isset($params['tag_whitelist']) ? $params['tag_whitelist'] : NULL;
+                $val = strip_tags($val, $whitelist);
+            }
+
+            return $entries[strtolower($matches[1])];
         }
 
         /*

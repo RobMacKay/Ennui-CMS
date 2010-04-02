@@ -29,6 +29,7 @@ class Gallery extends Multi
 
         $markup = $form['start'];
         $markup .= $this->createFormInput('title', 'Album Title', $id);
+        $markup .= $this->createFormInput('data1', 'Category', $id);
         $markup .= $this->createFormInput('body', 'Additional Info', $id);
         $markup .= '<input type="hidden" name="data7" value="'.$d7.'" />';
         $markup .= $form['end'];
@@ -139,7 +140,7 @@ class Gallery extends Multi
             }
             else
             {
-                return ($gal->getNumImages()>0)? $gal : NULL;
+                return $gal->getNumImages()>0 ? $gal->displayGallery() : NULL;
             }
         } catch(Exception $e) {
             return $e->getMessage();
