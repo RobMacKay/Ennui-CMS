@@ -45,7 +45,6 @@ class ImageGallery extends ImageControl
 	 * 
 	 * @var string
 	 */
-	public $classLoc = '_class/ImageControl.inc.php';
 	public $relAttr;
 	public $altAttr = "Created by Ennui Design's ImageGallery Tool";
 	public $imgCap_album = NULL;
@@ -76,7 +75,7 @@ class ImageGallery extends ImageControl
 					 * refers to an existing file and that the 
 					 * file is big enough not to throw an error.
 					 */
-					if(is_file($this->dir.$file) 
+					if(is_file($this->dir.$file)
 					&& filesize($this->dir.$file) > 11)
 					{
 						/*
@@ -166,21 +165,28 @@ class ImageGallery extends ImageControl
 	 */
 	public function displayGallery()
 	{
-		$display = "\t\t\t\t\t<ul class=\"thumbbox\">\n";
-		foreach($this->_imageArray as $img) {
+		$image_array = array();
+		foreach ( $this->_imageArray as $img )
+        {
 			if ( isset($this->imgCap_album) )
 			{
-				$title = $this->getImageCaption($img);
+				$e['caption'] = $this->getImageCaption($img);
 			}
-			if ( !isset($title) )
+			if ( !isset($e['caption']) )
 			{
-				$title = isset($this->imgTitle) ? $this->imgTitle : NULL;
+				$e['caption'] = isset($this->imgTitle) ? $this->imgTitle : NULL;
 			}
-			$thumb = '<img src="/'.$this->dir."thumbs/".$img.'" alt="Gallery Image" />';
-			$display .= "\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t<a href=\"/$this->dir$img\" "
-				. " title=\"$title\">$thumb</a>\n\t\t\t\t\t\t</li>\n";
+			$e['thumb'] = '/'.$this->dir."thumbs/".$img;
+            $e['image'] = '/'.$this->dir.$img;
+            $image_array[] = $e;
 		}
-		return $display . "\t\t\t\t\t</ul>\n";
+
+        /*
+         * Load the template into a variable
+         */
+        $template = UTILITIES::loadTemplate('imagegallery.inc');
+
+        return UTILITIES::parseTemplate($image_array, $template);
 	}
 
 	public function getImagesAsArray()

@@ -243,16 +243,18 @@ class ImageControl
 				/*
 				 * Squares off the image if set to TRUE
 				 */
-				if($this->thumb===TRUE) {
+				if ( $this->thumb===TRUE )
+                {
 					$new[0] = $this->max_dims[0];
 					$new[1] = $this->max_dims[1];
 					if($src_w>$src_h) {
-						$to_x = round($this->max_dims[0]/$src_h*$src_w-$this->max_dims[0]/2);
+                        // 140 / 800*600-70
+						$to_x = round($this->max_dims[0]/$src_h*($src_w-$this->max_dims[0])/2);
 						$to_y = 0;
 						$src_w = $src_h;
 					} else {
 						$to_x = 0;
-						$to_y = round($this->max_dims[0]/$src_w*$src_h-$this->max_dims[0]/2);
+						$to_y = round($this->max_dims[0]/$src_w*($src_h-$this->max_dims[0])/2);
 						$src_h = $src_w;
 					}
 				}
@@ -291,6 +293,7 @@ class ImageControl
 			} else {
 				$imgDims = array($src_w, $src_h, $src_w, $src_h, 0, 0);
 			}
+
 			return $imgDims;
 		}
 	}
