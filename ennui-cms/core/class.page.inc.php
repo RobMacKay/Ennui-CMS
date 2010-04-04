@@ -65,6 +65,7 @@ class Page extends AdminUtilities
      */
     public function __construct($mysqli=NULL, $url_array=NULL)
     {
+        // TODO: Migrate to PDO
         if(isset($mysqli)) {
             $this->mysqli = $mysqli;
         } else {
@@ -76,13 +77,40 @@ class Page extends AdminUtilities
         $this->url3 = (isset($url_array[3]) && !empty($url_array[3])) ? $url_array[3] : NULL;
     }
 
+    public function getPageTitle($menuPage)
+    {
+        $page = $menuPage['display'];
+        $title = SITE_TITLE;
+        $sep = SITE_TITLE_SEPARATOR;
+
+        $lookup = array(
+                'category', 'more'
+            );
+
+        if ( in_array($this->url1, $lookup) )
+        {
+            if ( isset($this->url2) )
+            {
+                $entry_title = $this->url2;
+            }
+            $entry = ucwords(str_replace("-", " ", $this->url1))
+                    . ": " . ucwords($entry_title) . " $sep";
+        }
+        else
+        {
+            $entry = empty($this->url1) ? NULL : "$this->url1 $sep";
+        }
+
+        return "$entry $page $sep $title";
+    }
+
     /**
      * Returns an entry by its ID
      *
      * @param int $id
      * @return array    The entry as an associative array
      */
-    public function getEntryById($id)
+    protected function getEntryById($id)
     {
         /*
          * Prepare the query and execute it
@@ -98,7 +126,7 @@ class Page extends AdminUtilities
         return $this->loadEntryArray($stmt);
     }
 
-    public function getEntryByUrl($url)
+    protected function getEntryByUrl($url)
     {
         $title = urldecode($url);
 
@@ -118,7 +146,7 @@ class Page extends AdminUtilities
         return $this->loadEntryArray($stmt);
     }
 
-    public function getEntriesByCategory($category, $limit=10, $offset=0)
+    protected function getEntriesByCategory($category, $limit=10, $offset=0)
     {
         /*
          * Prepare the query and execute it
@@ -127,7 +155,7 @@ class Page extends AdminUtilities
                 id, page, title, subhead, body, img, imgcap, data1, data2,
                 data3, data4, data5, data6, data7, data8, author, created
                 FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                WHERE data2 LIKE ?
+                WHERE LOWER(data2) LIKE ?
                 ORDER BY created DESC
                 LIMIT $offset, $limit";
         $stmt = $this->mysqli->prepare($sql);
@@ -143,7 +171,7 @@ class Page extends AdminUtilities
      * @param int $limit
      * @return array    A multi-dimensional array of entries
      */
-    public function getAllEntries($limit=10, $offset=0, $orderby="created DESC")
+    protected function getAllEntries($limit=10, $offset=0, $orderby="created DESC")
     {
         $entries = array();
 

@@ -29,7 +29,7 @@ class Gallery extends Multi
 
         $markup = $form['start'];
         $markup .= $this->createFormInput('title', 'Album Title', $id);
-        $markup .= $this->createFormInput('data1', 'Category', $id);
+        $markup .= $this->createFormInput('data2', 'Category', $id);
         $markup .= $this->createFormInput('body', 'Additional Info', $id);
         $markup .= '<input type="hidden" name="data7" value="'.$d7.'" />';
         $markup .= $form['end'];
@@ -82,6 +82,80 @@ class Gallery extends Multi
         $id = (isset($entries[0]['id'])) ? $entries[0]['id'] : NULL;
         $entry = $this->admin_general_options($this->url0, $id, false);
 
+        if(isset($entries[0]['title']))
+        {
+            // Number of results
+            $n = count($entries);
+            $entry_array = array(); // Initialize the variable to avoid a notice
+            foreach ( $entries as $e )
+            {
+                // Entry options for the admin, if logged in
+                $e['admin'] = $this->admin_gallery_options($this->url0, $e['id'], $n, $e['data7']);
+
+                /*
+                 * URLs for different versions of the image
+                 */
+                $gal = $this->getGalleryImages($e['id'], TRUE);
+                $image = array_shift($gal);
+                if ( !empty($image) )
+                {
+                    /*
+                     * Display the latest two galleries
+                     */
+                    $e['image'] = '/' . GAL_SAVE_DIR . $this->url0 . $e['id']
+                            . $image;
+                    $e['preview'] = '/' . GAL_SAVE_DIR . $this->url0 . $e['id']
+                            . '/preview/' . $image;
+                    $e['thumb'] = '/' . GAL_SAVE_DIR . $this->url0 . $e['id']
+                            . '/thumbs/' . $image;
+                }
+                else
+                {
+                    $e['image'] = '/assets/images/no-image.jpg';
+                    $e['preview'] = '/assets/images/no-image.jpg';
+                    $e['thumb'] = '/assets/images/no-image-thumb.jpg';
+                }
+
+                /*
+                 * Entry URL
+                 */
+                $e['url'] = isset($e['data6']) ? $e['data6'] : urlencode($e['title']);
+
+                /*
+                 * Text options
+                 */
+                $e['text-full'] = Utilities::textPreview($e['body'], 45);
+                $e['text-preview'] = Utilities::textPreview($e['body'], 45);
+
+                $entry_array[] = $e;
+            }
+
+            $template_file = $this->url0 . '-preview.inc';
+        }
+        else
+        {
+            $entry_array[] = array(
+                    'title' => 'No Entry Found',
+                    'body' => "<p>That entry doesn't appear to exist.</p>"
+                );
+            $template_file = 'default.inc';
+        }
+
+        /*
+         * Load the template into a variable
+         */
+        $template = UTILITIES::loadTemplate($template_file);
+
+        $entry .= UTILITIES::parseTemplate($entry_array, $template);
+
+        return $entry;
+    }
+
+    protected function displayFull($entries)
+    {
+        $id = (isset($entries[0]['id'])) ? $entries[0]['id'] : NULL;
+        $entry = $this->admin_general_options($this->url0, $id, false);
+
         if(isset($entries[0]['title'])) {
             // Number of results
             $n = count($entries);
@@ -92,26 +166,46 @@ class Gallery extends Multi
                 $e['admin'] = $this->admin_gallery_options($this->url0, $e['id'], $n, $e['data7']);
 
                 /*
+                 * Category and page names for breadcrumbs
+                 */
+                $e['page-url'] = strtolower($e['page']);
+                $e['page-name'] = ucwords(str_replace("-", " ", $e['page']));
+                $e['category-url'] = "/{$e['page-url']}/category/" . strtolower($e['data2']);
+                $e['category-name'] = ucwords($e['data2']);
+
+                /*
                  * Load the photos associated with this entry as HTML
                  */
                 $e['gallery'] = $this->getGalleryImages($e['id'], FALSE, $e['title']);
 
                 $entry_array[] = $e;
             }
-
-            /*
-             * Load the template into a variable
-             */
-            $template = UTILITIES::loadTemplate($this->url0.'-preview.inc');
-
-            $entry .= UTILITIES::parseTemplate($entry_array, $template);
-        } else {
-            $entry .= "
-                    <h2> No Entry Found </h2>
-                    <p>
-                        Log in to create this entry.
-                    </p>";
         }
+        else
+        {
+            $entry_array[] = array(
+                    'page-url' => $this->url0,
+                    'page-name' => ucwords(str_replace("-", " ", $this->url0)),
+                    'category-url' => NULL,
+                    'category-name' => NULL,
+                    'title' => 'No Entry Found',
+                    'body' => "That entry doesn't appear to exist.",
+                    'text-full' => "That entry doesn't appear to exist.",
+                    'text-preview' => "That entry doesn't appear to exist.",
+                    'gallery' => NULL,
+                    'admin' => NULL,
+                    'image' => NULL,
+                    'preview' => NULL,
+                    'thumb' => NULL
+                );
+        }
+
+        /*
+         * Load the template into a variable
+         */
+        $template = UTILITIES::loadTemplate($this->url0.'-full.inc');
+
+        $entry .= UTILITIES::parseTemplate($entry_array, $template);
 
         return $entry;
     }
@@ -120,7 +214,7 @@ class Gallery extends Multi
     {
         try {
             $gal = new ImageGallery();
-            $gal->max_dims = array(700, 470); // Maximum dimensions of the images (w, h)
+            $gal->max_dims = array(IMG_MAX_WIDTH, IMG_MAX_HEIGHT); // Maximum dimensions of the images (w, h)
             $gal->dir = GAL_SAVE_DIR . $this->url0 .  $id . '/';
             $gal->imgCap_album = $id;
             $gal->imgTitle = $caption;
@@ -129,7 +223,7 @@ class Gallery extends Multi
             if($gal->checkSize()===FALSE) // Make sure the images are the right size
             {
                 $gal->preview = TRUE;
-                $gal->max_dims = array(233, 136); // Maximum dimensions of the images (w, h)
+                $gal->max_dims = array(IMG_PREV_WIDTH, IMG_PREV_HEIGHT); // Maximum dimensions of the images (w, h)
                 $gal->checkSize(); // Make sure the images are the right size
             }
             $gal->makeThumb(IMG_THUMB_SIZE); // Creates thumb if they don't exist

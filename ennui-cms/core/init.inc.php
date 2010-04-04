@@ -126,12 +126,8 @@ function __autoload($classname)
 }
 
 /*
- * This builds the content for the title tag. This should probably be moved to 
- * the Utilities class and cleaned up.
- * 
- * TODO Move to Utilities class
+ * Load the page title
  */
-$entrytitle = (isset($obj->url1)) ? ucfirst(urldecode($obj->url1)) . ' | ' : NULL;
-$title = $entrytitle . $menuPage['display'] . ' | ' . SITE_TITLE;
+$title = $obj->getPageTitle($menuPage);
 
 ?>

@@ -24,14 +24,25 @@ class Multi extends Page
     public function displayPublic()
     {
         /*
+         * Lookup array for reserved values in $this->url1
+         */
+        $reserved = array(
+                'more', 'admin', 'category'
+            );
+
+        /*
          * If an entry URL is passed, load that entry only and output it
          */
-        if ( isset($this->url1) && $this->url1!='more' && $this->url1!='admin' )
+        if ( isset($this->url1) && !in_array($this->url1, $reserved) )
         {
             $entries = $this->getEntryByUrl($this->url1);
             return $this->displayFull($entries);
         }
 
+        /*
+         * If admin options are being requested, verify that the user is cleared
+         * before displaying them
+         */
         elseif ( isset($this->url1) && $this->url1=='admin'
             && isset($_SESSION['user']) && $_SESSION['user']['clearance']>=1 )
         {
@@ -49,7 +60,7 @@ class Multi extends Page
             /*
              * If the entries are paginated, this determines what page to show
              */
-            if(isset($this->url1) && $this->url1=='more')
+            if ( isset($this->url1) && $this->url1=='more' )
             {
                 $offset = (isset($this->url2)) ? $limit*($this->url2-1) : 0;
             }
@@ -59,9 +70,38 @@ class Multi extends Page
             }
 
             /*
-             * Load entries and pass them to be formatted
+             * If loading by category, get the proper number of entries from the
+             * given category
              */
-            $entries = $this->getAllEntries($limit, $offset);
+            if ( isset($this->url1) && $this->url1==='category'
+                    && isset($this->url2) )
+            {
+                $offset = isset($this->url3) ? $limit*($this->url3-1) : 0;
+                $cat = htmlentities($this->url2, ENT_QUOTES);
+
+                /*
+                 * If no category was passed, go back to the main page
+                 */
+                if ( empty($cat) )
+                {
+                    header("Location: /$this->url0");
+                    exit;
+                }
+
+                /*
+                 * Load entries by category
+                 */
+                $entries = $this->getEntriesByCategory($cat, $limit, $offset);
+            }
+
+            /*
+             * Load most recent entries otherwise
+             */
+            else
+            {
+                $entries = $this->getAllEntries($limit, $offset);
+            }
+
             return $this->displayPreview($entries);
         }
     }
@@ -126,19 +166,24 @@ class Multi extends Page
                 $entry_array[] = $e;
             }
 
-            /*
-             * Load the template into a variable
-             */
-            $template = UTILITIES::loadTemplate($this->url0.'-preview.inc');
-
-            $entry .= UTILITIES::parseTemplate($entry_array, $template);
-        } else {
-            $entry .= "
-                    <h2> No Entry Found </h2>
-                    <p>
-                        Log in to create this entry.
-                    </p>";
+            $template_file = $this->url0.'-preview.inc';
         }
+        else
+        {
+            $entry_array[] = array(
+                    'title' => "No Entry Found",
+                    'body' => "<p>That entry doesn't appear to exist.</p>"
+                );
+
+            $template_file = 'default.inc';
+        }
+
+        /*
+         * Load the template into a variable
+         */
+        $template = UTILITIES::loadTemplate($template_file);
+
+        $entry .= UTILITIES::parseTemplate($entry_array, $template);
 
         return $entry;
     }

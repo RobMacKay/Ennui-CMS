@@ -177,6 +177,7 @@ class ImageGallery extends ImageControl
 				$e['caption'] = isset($this->imgTitle) ? $this->imgTitle : NULL;
 			}
 			$e['thumb'] = '/'.$this->dir."thumbs/".$img;
+            $e['preview'] = '/'.$this->dir."preview/".$img;
             $e['image'] = '/'.$this->dir.$img;
             $image_array[] = $e;
 		}

@@ -188,19 +188,20 @@ class ImageControl
 	 */
 	private function getImageInfo($type)
 	{
-		switch($type) {
+		$quality = ( IMG_QUALITY >=0 && IMG_QUALITY<=9) ? IMG_QUALITY : 7;
+        switch($type) {
 			case 1:
 			case 'image/gif':
-				$imgInfo = array('.gif', 'imagecreatefromgif', 'imagegif');
+				$imgInfo = array('.gif', 'imagecreatefromgif', 'imagegif', $quality);
 				break;
 			case 2:
 			case 'image/jpeg':
 			case 'image/pjpeg':
-				$imgInfo = array('.jpg', 'imagecreatefromjpeg', 'imagejpeg');
+				$imgInfo = array('.jpg', 'imagecreatefromjpeg', 'imagejpeg', $quality*10);
 				break;
 			case 3:
 			case 'image/png':
-				$imgInfo = array('.png', 'imagecreatefrompng', 'imagepng');
+				$imgInfo = array('.png', 'imagecreatefrompng', 'imagepng', $quality);
 				break;
 			default:
 				throw new Exception('This file is not in JPG, GIF, or PNG format!');
@@ -367,7 +368,7 @@ class ImageControl
 			 * destination specified above, then frees the resources used for
 			 * the temporary image
 			 */
-			if($new_img && $funcs[2]($new_img, $finalloc)) {
+			if($new_img && $funcs[2]($new_img, $finalloc, $funcs[3])) {
 				imagedestroy($new_img);
 				return $finalloc;
 			} else {

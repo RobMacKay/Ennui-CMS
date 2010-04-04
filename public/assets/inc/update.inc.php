@@ -170,7 +170,7 @@
 	{
 		require_once CMS_PATH . 'inc/class.newsletter.inc.php';
 		Newsletter::removeCookies();
-		$header = "Location: ../" . htmlentities(strip_tags($_GET['page'])) . '/';
+		$header = "Location: /" . htmlentities(strip_tags($_GET['page'])) . '/';
 	}
 
 	/*
@@ -180,10 +180,10 @@
 		include CMS_PATH . 'inc/class.admin.inc.php';
 		$admin = new admin();
 		$check = $admin->logout();
-		$header =  $check === true ? 'Location: ../': 'Location: ../admin/error/';
+		$header =  $check === true ? 'Location: /': 'Location: /admin/error/';
 	}
 
-	else { $header = "Location: ../"; }
+	else { $header = "Location: /"; }
 
 	header($header);
 ?>

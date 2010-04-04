@@ -33,6 +33,12 @@ class Contact extends Single
         $admin = $this->admin_entry_options($this->url0, $id, false);
 
         /*
+         * Store variables for the form
+         */
+        $siteName = SITE_NAME;
+        $formProcessing = FORM_ACTION;
+
+        /*
          * If an entry exists, load the template and insert the data into it
          */
         if( isset($entries[0]['title']) )
@@ -45,36 +51,10 @@ class Contact extends Single
             /*
              * Generate the contact form
              */
-            $siteName = SITE_NAME;
-            $entries[0]['contact'] = <<<DISPLAY
+            $entries[0]['site-name'] = $siteName;
+            $entries[0]['form-processing'] = $formProcessing;
 
-        <form action="/inc/update.inc.php" method="post" id="contact">
-            <fieldset id="cf">
-                <legend> Contact $siteName </legend>
-                <label for="cf_n">Name</label>
-                <input type="text" name="cf_n" id="cf_n" />
-                <label for="cf_e">Email</label>
-                <input type="text" name="cf_e" id="cf_e" />
-                <label for="cf_p">Phone Number (optional)</label>
-                <input type="text" name="cf_p" id="cf_p" />
-                <label for="cf_m">Enter Your Message Here</label>
-                <textarea name="cf_m" id="cf_m" rows="18" cols="35"></textarea>
-                <input type="hidden" name="page" value="$this->url0" />
-                <input type="hidden" name="action" value="contact_form" />
-                <input type="submit" name="cf_s" id="cf_s" value="Send This Message" />
-            </fieldset>
-        </form>
-DISPLAY;
-
-            /*
-             * Load the template into a variable
-             */
-            $template = UTILITIES::loadTemplate($this->url0.'.inc');
-
-            /*
-             * Return the entry as formatted by the template
-             */
-            return UTILITIES::parseTemplate($entries, $template);
+            $template_file = $this->url0.'.inc';
         }
 
         /*
@@ -82,9 +62,27 @@ DISPLAY;
          */
         else
         {
-            return "\n$admin<h2> No Entry Found </h2>"
-                . "\n<p>This page has not been created yet.</p>\n";
+            $entries[0] = array(
+                    'admin' => $admin,
+                    'page' => $this->url0,
+                    'title' => "No Entry Found",
+                    'body' => "<p>That entry doesn't appear to exist.</p>",
+                    'site-name' => $siteName,
+                    'form-processing' => $formProcessing
+                );
+
+            $template_file = $this->url0.'.inc';
         }
+
+        /*
+         * Load the template into a variable
+         */
+        $template = UTILITIES::loadTemplate($template_file);
+
+        /*
+         * Return the entry as formatted by the template
+         */
+        return UTILITIES::parseTemplate($entries, $template);
     }
 
     public function sendMessage($p)

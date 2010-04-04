@@ -23,14 +23,32 @@ class Single extends Page
      */
     public function displayPublic()
     {
+        /*
+         * Check if the user is logged in and attempting to edit an entry
+         */
         if ( isset($this->url1) && $this->url1=='admin'
-            && isset($_SESSION['user']) && $_SESSION['user']['clearance']>=1 )
+                && isset($_SESSION['user'])
+                && $_SESSION['user']['clearance']>=1 )
         {
+            /*
+             * Load the entry ID if one was passed
+             */
             $id = isset($this->url2) ? (int) $this->url2 : NULL;
+
+            /*
+             * Output the admin controls
+             */
             return $this->displayAdmin($id);
         }
 
+        /*
+         * Load the entries
+         */
         $entries = $this->getAllEntries(1);
+
+        /*
+         * Output the markup
+         */
         return $this->displayEntry($entries);
     }
 
@@ -80,16 +98,10 @@ class Single extends Page
              */
             $entries[0]['admin'] = $admin;
 
-
             /*
-             * Load the template into a variable
+             * Set the template file
              */
-            $template = UTILITIES::loadTemplate($this->url0.'.inc');
-
-            /*
-             * Return the entry as formatted by the template
-             */
-            return UTILITIES::parseTemplate($entries, $template);
+            $template_file = $this->url0 . '.inc';
         }
 
         /*
@@ -97,9 +109,30 @@ class Single extends Page
          */
         else
         {
-            return "\n$admin<h2> No Entry Found </h2>"
-                . "\n<p>This page has not been created yet.</p>\n";
+            /*
+             * Set default values if no entries are found
+             */
+            $entries[0][] = array(
+                    'admin' => $admin,
+                    'title' => "No Entry Found",
+                    'body' => "<p>That entry doesn't appear to exist.</p>"
+                );
+
+            /*
+             * Load the default template
+             */
+            $template_file = $this->url0 . '.inc';
         }
+
+        /*
+         * Load the template into a variable
+         */
+        $template = UTILITIES::loadTemplate($template_file);
+
+        /*
+         * Return the entry as formatted by the template
+         */
+        return UTILITIES::parseTemplate($entries, $template);
     }
 
 }
