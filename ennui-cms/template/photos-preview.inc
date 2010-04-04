@@ -1,7 +1,11 @@
-<h2>Photo Gallery</h2>
+<article class="galleries">
+    <h2>Photo Gallery</h2>
+    <h3>Latest Albums</h3>
 {loop}
-<article class="gallery">
-    <h3>{title}</h3>
-    {body}{gallery}{admin}
-</article>
+    <div class="gallery">
+        <a href="/{page}/{url}"><img src="{preview}" alt="{title}" /></a>
+        <h4><a href="/{page}/{url}">{title}</a></h4>
+        <p>{text-preview}</p>{admin}
+    </div>
 {/loop}
+</article>

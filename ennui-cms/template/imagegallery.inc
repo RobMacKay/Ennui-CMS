@@ -1,11 +1,8 @@
                     <ul class="thumbbox">
-{loop [
-        "max_entries" : 2,
-        "htmlentities" : true
-    ]}
+{loop}
                         <li>
                             <a href="{image}">
-                                <img src="{thumb}"
+                                <img src="{preview}"
                                      alt="{caption}" />
                             </a>
                         </li>

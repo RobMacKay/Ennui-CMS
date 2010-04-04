@@ -1,2 +1,4 @@
-<h2>{title}</h2>
-{body}
+<article>
+    <h2>{title}</h2>
+    {body}
+</article>
