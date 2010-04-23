@@ -104,6 +104,59 @@ class Page extends AdminUtilities
         return "$entry $page $sep $title";
     }
 
+    protected function getEntryCategories($entries)
+    {
+        $cat_arr = array();
+        if ( isset($entries[0]['data2']) )
+        {
+            foreach ( $entries as $e )
+            {
+                $cat_url = strtolower(Utilities::makeUrl($e['data2']));
+                if ( !isset($cat_arr[$cat_url]) )
+                {
+                    $cat_arr[$cat_url] = array(
+                            'category-url' => "$this->url0/category/$cat_url",
+                            'category-name' => $e['data2'],
+                            'count' => 1
+                        );
+                }
+                else
+                {
+                    $cat_arr[$cat_url]['count'] += 1;
+                }
+            }
+
+            /*
+             * Sort the array
+             */
+            usort($cat_arr, "CategorizedGallery::cmp");
+
+            /*
+             * Load the template into a variable
+             */
+            $template = UTILITIES::loadTemplate($this->url0.'-category.inc');
+
+            return UTILITIES::parseTemplate(array_values($cat_arr), $template);
+        }
+
+        /*
+         * If no categories exist, there's no reason to display this view
+         */
+        else
+        {
+            return NULL;
+        }
+    }
+
+    static function cmp($a, $b)
+    {
+        if ( $a['count']===$b['count'] )
+        {
+            return 0;
+        }
+        return $a['count']<$b['count'] ? 1 : -1;
+    }
+
     /**
      * Returns an entry by its ID
      *
@@ -155,12 +208,13 @@ class Page extends AdminUtilities
                 id, page, title, subhead, body, img, imgcap, data1, data2,
                 data3, data4, data5, data6, data7, data8, author, created
                 FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                WHERE LOWER(data2) LIKE ?
+                WHERE `page` = ?
+                AND LOWER(data2) LIKE ?
                 ORDER BY created DESC
                 LIMIT $offset, $limit";
         $stmt = $this->mysqli->prepare($sql);
         $var = '%'.str_replace('-', ' ', $category).'%';
-        $stmt->bind_param("s", $var);
+        $stmt->bind_param("ss", $this->url0, $var);
         return $this->loadEntryArray($stmt);
     }
 

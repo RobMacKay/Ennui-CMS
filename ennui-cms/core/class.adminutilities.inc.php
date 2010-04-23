@@ -62,12 +62,13 @@ FORM_START;
 
         $form['end'] = <<<FORM_END
 
-        <input type="hidden" name="page" value="{$this->url0}" />
+        <input type="hidden" name="page" value="$this->url0" />
         <input type="hidden" name="action" value="$action" />
         <input type="hidden" name="id" value="$id" />
         <input type="hidden" name="token"
                value="$_SESSION[token]" />
-        <input type="submit" name="confirm" value="$form_cap" />
+        <input type="submit" name="confirm"
+               value="$form_cap" />
     </fieldset>
 </form>
 <!-- END FORM DISPLAY -->

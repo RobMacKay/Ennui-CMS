@@ -3,10 +3,10 @@
 /*
  * Database credentials
  */
-$_CONSTANTS['DB_HOST'] = 'localhost';
-$_CONSTANTS['DB_USER'] = 'root';
-$_CONSTANTS['DB_PASS'] = '';
-$_CONSTANTS['DB_NAME'] = 'ennui-cms_db';
+$_CONSTANTS['DB_HOST'] = 'DB1985000.db.5362664.hostedresource.com';
+$_CONSTANTS['DB_USER'] = 'DB1985000';
+$_CONSTANTS['DB_PASS'] = 'EDt3stDBASE';
+$_CONSTANTS['DB_NAME'] = 'DB1985000';
 
 /*
  * Assign a custom prefix for all database tables to avoid conflicts
@@ -24,6 +24,6 @@ $_CONSTANTS['DEFAULT_COLLATION'] = "utf8_unicode_ci";
  * necessary tables in the database. IF NOT EXISTS is used to avoid accidental 
  * overwrites of data.
  */
-$_CONSTANTS['CREATE_DB'] = FALSE;
+$_CONSTANTS['CREATE_DB'] = TRUE;
 
 ?>

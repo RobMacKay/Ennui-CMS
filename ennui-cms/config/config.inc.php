@@ -5,18 +5,18 @@
  * Basic site information
  ******************************************************************************
  */
-$_CONSTANTS['SITE_URL'] = "http://localhost";
+$_CONSTANTS['SITE_URL'] = "http://ennui-cms.ennuidesign.com/";
 
 /*
  * Site name (i.e. "Debbie's Donuts" or "John Doe, DDS")
  */
-$_CONSTANTS['SITE_NAME'] = "Example Site";
+$_CONSTANTS['SITE_NAME'] = "ECMS Demo";
 
 /*
  * Description of the site. This is used in the "description" meta tag, which 
  * is used by some search engines to describe the site.
  */
-$_CONSTANTS['SITE_DESCRIPTION'] = "Example installation of the Ennui CMS.";
+$_CONSTANTS['SITE_DESCRIPTION'] = "Beta testing for the new ECMS.";
 
 /*
  * Contact phone number for the site
@@ -33,25 +33,25 @@ $_CONSTANTS['CITY_STATE_ZIP'] = 'Missoula, MT 59801';
  * Link to the site RSS feed. If using a third-party service for feeds (such as
  * FeedBurner), be sure to include the http://
  */
-$_CONSTANTS['SITE_RSS'] = '/feeds/';
+$_CONSTANTS['SITE_RSS'] = '/assets/feeds/';
 
 /*
  * Administrative contact for the site. This is the name that will be used in 
  * the confirmation message from the contact page.
  */
-$_CONSTANTS['SITE_CONTACT_NAME'] = 'John Doe';
+$_CONSTANTS['SITE_CONTACT_NAME'] = 'Ennui Design';
 
 /*
  * Administrative contact email. This is the address to which all site 
  * notifications will be sent.
  */
-$_CONSTANTS['SITE_CONTACT_EMAIL'] = 'john.doe@example.com';
+$_CONSTANTS['SITE_CONTACT_EMAIL'] = 'answers@ennuidesign.com';
 
 /*
  * Information to be displayed in the site's title tag. The name of the page 
  * will be displayed first.
  */
-$_CONSTANTS['SITE_TITLE'] = "Example Site &raquo; Ennui CMS";
+$_CONSTANTS['SITE_TITLE'] = "ECMS";
 
 /*
  * A separator to use between site title data
@@ -96,9 +96,12 @@ $_CONSTANTS['FORM_ACTION'] = '/assets/inc/update.inc.php';
  */
 $_CONSTANTS['IMG_SAVE_DIR'] = 'assets/images/userPics/';
 $_CONSTANTS['GAL_SAVE_DIR'] = 'assets/images/userPics/gallery/';
-$_CONSTANTS['IMG_MAX_WIDTH'] = 480;
-$_CONSTANTS['IMG_MAX_HEIGHT'] = 375;
-$_CONSTANTS['IMG_THUMB_SIZE'] = 140;
+$_CONSTANTS['IMG_MAX_WIDTH'] = 1280;
+$_CONSTANTS['IMG_MAX_HEIGHT'] = 1024;
+$_CONSTANTS['IMG_PREV_WIDTH'] = 175;
+$_CONSTANTS['IMG_PREV_HEIGHT'] = 255;
+$_CONSTANTS['IMG_THUMB_SIZE'] = 75;
+$_CONSTANTS['IMG_QUALITY'] = 8; // Range: 0-9, 9 is highest quality
 
 /*
  ******************************************************************************
@@ -150,5 +153,3 @@ $_CONSTANTS['GRAVATAR_BORDER_COLOR'] = "222222";
  * Tags to allow in user-posted comments
  */
 $_CONSTANTS['COMMENT_WHITELIST'] = "<strong><em>";
-
-?>

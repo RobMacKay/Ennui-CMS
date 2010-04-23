@@ -135,6 +135,11 @@ class Utilities
             if ( !isset($showFull) || $showFull===TRUE )
             {
                 /*
+                 * If the item is hidden, don't build markup for it
+                 */
+                if ( isset($hide) && $hide===TRUE ) { continue; }
+
+                /*
                  * Check if additional attributes are present
                  */
                 $extra = isset($inline) ? ' '.trim($inline) : NULL;
@@ -192,41 +197,66 @@ class Utilities
         return FALSE;
     }
 
+    /**
+     * Loads a template with which markup should be formatted
+     *
+     * @param string $template The name of the template file to use
+     * @return string The contents of the template file
+     */
     public static function loadTemplate($template)
     {
-        $path = CMS_PATH . 'template/' . $template;
-        $default = CMS_PATH . 'template/default.inc';
-        if ( file_exists($path) )
+        // Check for a custom template
+        if ( file_exists('assets/templates/' . $template) )
         {
-            $file = fopen($path, 'r');
-            $contents = fread($file, filesize($path));
-            fclose($file);
+            $path = 'assets/templates/' . $template;
         }
 
-        elseif ( file_exists($default) )
+        // Look for a system template
+        elseif ( file_exists(CMS_PATH . 'template/' . $template) )
         {
-            $file = fopen($default, 'r');
-            $contents = fread($file, filesize($default));
-            fclose($file);
+            $path = CMS_PATH . 'template/' . $template;
         }
+
+        // Load the default template as last resort
+        elseif ( file_exists(CMS_PATH . 'template/default.inc') )
+        {
+            $path = CMS_PATH . 'template/default.inc';
+        }
+
+        // If the default template is missing, throw an error
         else
         {
             throw new Exception ( "No default template found at $default" );
         }
+
+        // For debugging, log the template file location
+        FB::log($path, "Template File");
+
+        // Load the contents of the file into a variable
+        $file = fopen($path, 'r');
+        $contents = fread($file, filesize($path));
+        fclose($file);
+
         return $contents;
     }
 
-    public static function parseTemplate($entries, $template)
+    /**
+     *
+     * @param array $entries The entries to be marked up
+     * @param string $template The template to use for marking up entries
+     * @param array $extra Additional content for marking up the header/footer
+     * @return sring The marked up content
+     */
+    public static function parseTemplate($entries, $template, $extra=array())
     {
+        // Extract the loop parameters if they exist
         $params = preg_replace('/.*\{loop\s\[(.*?)\]\}.*/is', "$1", $template);
         if ( $params===$template )
         {
             $params = NULL;
         }
 
-        /*
-         * Define default parameters
-         */
+        // Define default parameters
         $p = array(
             "max_entries" => MAX_ENTRIES_PER_PAGE,
             "htmlentities" => TRUE,
@@ -234,40 +264,24 @@ class Utilities
             "tag_whitelist" => "<strong><em><p>"
         );
 
-        /*
-         * If parameters were passed, decode them here
-         */
+        // If parameters were passed, decode them here
         if ( !empty($params) )
         {
             $param_array = json_decode('{'.$params.'}', TRUE);
             foreach ( $param_array as $key => $val )
             {
+                // Make sure the parameter is valid before saving
                 if ( array_key_exists($key, $p) )
                 {
+                    // Overwrite the default parameter
                     $p[$key] = $val;
                 }
             }
         }
 
-        /*
-         * Extract the entry template from the file
-         */
-        $entry_template = preg_replace('/.*\{loop.*?\}(.*?)\{\/loop\}.*/is', "$1", $template);
-
-        /*
-         * Extract the header and footer from the template if they exist
-         */
-        $header = preg_replace('/^(.*)?\{loop.*/is', "$1", $template);
-        $footer = preg_replace('/^.*?\{\/loop\}(.*)/is', "$1", $template);
-        if ( $header===$template )
-        {
-            $header = NULL;
-        }
-
-        if ( $footer===$template )
-        {
-            $footer = NULL;
-        }
+        // Extract the main entry template from the file
+        $pattern = '/.*\{loop.*?\}(.*?)\{\/loop\}.*/is';
+        $entry_template = preg_replace($pattern, "$1", $template);
 
         /*
          * Define the template tag matching regex and curry the function that
@@ -276,6 +290,40 @@ class Utilities
         $pattern = "/\{([\w-]+?)\}/i"; // Matches any template tag
         $callback = Utilities::curry('Utilities::replaceTags', 3);
 
+        // Extract the header from the template if one exists
+        $header = preg_replace('/^(.*)?\{loop.*/is', "$1", $template);
+        if ( $header===$template )
+        {
+            $header = NULL;
+        }
+
+        // If extra data was passed to fill in the header, parse it here
+        if ( isset($header) && array_key_exists('header', $extra) )
+        {
+            $header = preg_replace_callback(
+                            $pattern,
+                            $callback($extra['header'], $p),
+                            $header
+                        );
+        }
+
+        // Extract the footer from the template if one exists
+        $footer = preg_replace('/^.*?\{\/loop\}(.*)/is', "$1", $template);
+        if ( $footer===$template )
+        {
+            $footer = NULL;
+        }
+
+        // If extra data was passed to fill in the footer, parse it here
+        if ( isset($footer) && array_key_exists('footer', $extra) )
+        {
+            $footer = preg_replace_callback(
+                            $pattern,
+                            $callback($extra['footer'], $p),
+                            $footer
+                        );
+        }
+
         /*
          * Loop through each passed entry and insert its values into the
          * layout defined in the looped section of the template
@@ -283,21 +331,66 @@ class Utilities
         $markup = NULL;
         for ( $i=0, $c=min($p['max_entries'],count($entries)); $i<$c; ++$i )
         {
-            $markup .= preg_replace_callback($pattern, $callback($entries[$i], $p), $entry_template);
+            $markup .= preg_replace_callback(
+                            $pattern,
+                            $callback($entries[$i], $p),
+                            $entry_template
+                        );
         }
 
-        /*
-         * Return the formatted data and append the footer if a match is made
-         */
+        // Return the formatted data and append the footer if a match is made
         return $header . $markup . $footer;
     }
 
+    /**
+     * A currying function
+     *
+     * Currying allows a function to be called in increments. This means that if
+     * a function accepts two arguments, it can be curried with only one
+     * argument supplied, which returns a new function that will accept the
+     * remaining argument and return the output of the original curried function
+     * using the two supplied parameters.
+     *
+     * Example:
+     *
+     * function add($a, $b)
+     * {
+     *     return $a + $b;
+     * }
+     *
+     * $func = Utilities::curry('add', 1);
+     *
+     * $func2 = $func(1); // Stores 1 as the first argument of add()
+     *
+     * echo $func2(2); // Executes add() with 2 as the second arg and outputs 3
+     *
+     * @param string $func The name of the function to curry
+     * @param int $arity The number of arguments the function accepts
+     * @return mixed A curried function or the return of the original function
+     */
     public static function curry($func, $arity) {
         return create_function('', "
+            // Store the passed arguments in an array
             \$args = func_get_args();
+
+            /*
+             * If the number of arguments passed is equal to or greater than the
+             * number of arguments defined in \$arity, execute the function in
+             * \$func using the provided arguments
+             */
             if(count(\$args) >= $arity)
+            {
                 return call_user_func_array('$func', \$args);
+            }
+
+            // Export the function arguments as executable PHP code
             \$args = var_export(\$args, 1);
+
+            /*
+             * If the number of arguments does not meet or exceed the number of
+             * arguments defined in \$arity, a new function is returned with the
+             * passed arguments stored as an array
+             */
             return create_function('','
                 \$a = func_get_args();
                 \$z = ' . \$args . ';

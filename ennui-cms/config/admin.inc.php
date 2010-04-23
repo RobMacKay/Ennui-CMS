@@ -7,15 +7,15 @@
  *
  * NOTE: By default, the default administrator login name is "admin"
  */
-$_CONSTANTS['DEV_NAME'] = 'admin';
-$_CONSTANTS['DEV_EMAIL'] = 'admin@example.com';
+$_CONSTANTS['DEV_NAME'] = 'Jason Lengstorf';
+$_CONSTANTS['DEV_EMAIL'] = 'answers@ennuidesign.com';
 
 /*
  * The desired password for the administrator.
  *
  * CAUTION: Make sure to clear this value after the database is built!
  */
-$_CONSTANTS['DEV_PASS'] = 'admin';
+$_CONSTANTS['DEV_PASS'] = '';
 
 /*
  * If set to TRUE, FirePHP logging is enabled and error reporting is set to 
@@ -24,5 +24,3 @@ $_CONSTANTS['DEV_PASS'] = 'admin';
  * NOTE: Be sure to turn off debug mode before your site goes live!
  */
 $_CONSTANTS['ACTIVATE_DEBUG_MODE'] = TRUE;
-
-?>

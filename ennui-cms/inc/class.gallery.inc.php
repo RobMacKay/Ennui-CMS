@@ -1,10 +1,5 @@
 <?php
 
-/*
- * This class depends on the ImageGallery class
- */
-include_once CMS_PATH.'/core/class.imagegallery.inc.php';
-
 /**
  * Methods to display and edit a page with a contact form
  *
@@ -96,6 +91,22 @@ class Gallery extends Multi
                  * URLs for different versions of the image
                  */
                 $gal = $this->getGalleryImages($e['id'], TRUE);
+
+                /*
+                 * Store the count
+                 */
+                $e['photo-count'] = count($gal);
+
+                /*
+                 * Store the category name and URL
+                 */
+                $e['category-url'] = "/$this->url0/category/"
+                        . Utilities::makeUrl($e['data2']);
+                $e['category-name'] = $e['data2'];
+
+                /*
+                 * Grab the first image
+                 */
                 $image = array_shift($gal);
                 if ( !empty($image) )
                 {
@@ -142,11 +153,34 @@ class Gallery extends Multi
         }
 
         /*
+         * Set up header and footer information
+         */
+        if ( $this->url1=='category' )
+        {
+            $name = $entry_array[0]['category-name'];
+            $count = count($entry_array);
+            $gal = $count==1 ? 'gallery' : 'galleries';
+            $extra = array(
+                'header' => array(
+                    'title' => "Viewing Category: $name ($count $gal)"
+                )
+            );
+        }
+        else
+        {
+            $extra = array(
+                'header' => array(
+                    'title' => 'Latest Galleries'
+                )
+            );
+        }
+
+        /*
          * Load the template into a variable
          */
         $template = UTILITIES::loadTemplate($template_file);
 
-        $entry .= UTILITIES::parseTemplate($entry_array, $template);
+        $entry .= UTILITIES::parseTemplate($entry_array, $template, $extra);
 
         return $entry;
     }

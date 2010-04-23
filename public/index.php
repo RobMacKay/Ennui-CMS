@@ -24,7 +24,7 @@
     /*
      * Initialize classes used in the sidebar or in widgets
      */
-    $minibio = new Single(NULL, array('minibio'));
+    $sidebar = new Single(NULL, array('sidebar'));
 ?>
 <!DOCTYPE html>
 
@@ -97,10 +97,10 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
 
         </section><!-- end .entrydisplay -->
         <aside>
-            <div id="<?php echo $minibio->url0 ?>"><?php echo $minibio->displayPublic(); ?>
+            <div id="<?php echo $sidebar->url0 ?>"><?php echo $sidebar->displayPublic(); ?>
 
-            </div><!-- end #minibio -->
-        </aside><!-- end #sidebar -->
+            </div>
+        </aside>
         <div class="clearfix"></div><!-- end .clearfix -->
     </div><!-- end #content -->
 

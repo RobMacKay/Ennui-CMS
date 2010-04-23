@@ -73,32 +73,48 @@ $_CONSTANTS['DEFAULT_TEMPLATE'] = "default.inc";
  *         </ul><!-- end menu -->
  */
 $menuPages = array(
+    'photos' => array(
+        'display' => 'Photo Gallery',
+        'type' => 'categorizedgallery',
+        'class' => 'nav-photos'
+    ),
+    'videos' => array(
+        'display' => 'Video Gallery',
+        'type' => 'categorizedmulti',
+        'class' => 'nav-videos'
+    ),
+    'snapshots' => array(
+        'display' => 'Snapshots',
+        'type' => 'categorizedgallery',
+        'class' => 'nav-snapshots'
+    ),
+    'muscle-art' => array(
+        'display' => 'Muscle Art',
+        'type' => 'multi',
+        'class' => 'nav-muscleart'
+    ),
+    'q-a' => array(
+        'display' => 'Q &amp; A',
+        'type' => 'multi',
+        'class' => 'nav-qa'
+    ),
+    'forum' => array(
+        'display' => 'Forum',
+        'type' => 'single',
+        'class' => 'nav-forum'
+    ),
+    'feedback' => array(
+        'display' => 'Feedback',
+        'type' => 'contact',
+        'class' => 'nav-feedback'
+    ),
     'home' => array(
         'display' => 'Home',
-        'type' => 'single'
+        'type' => 'home',
+        'class' => 'nav-home'
     ),
-    'services' => array(
-        'display' => 'Services',
-        'type' => 'multi'
-    ),
-    'products' => array(
-        'display' => 'Products',
-        'type' => 'multi'
-    ),
-    'photos' => array(
-        'display' => 'Photos',
-        'type' => 'gallery'
-    ),
-    'podcast' => array(
-        'display' => 'Radio Show',
-        'type' => 'podcast'
-    ),
-    'contact' => array(
-        'display' => 'Contact Us',
-        'type' => 'contact'
-    ),
-    'minibio' => array(
-        'display' => 'Mini Bio',
+    'sidebar' => array(
+        'display' => 'Sidebar',
         'type' => 'single',
         'hide' => TRUE,
         'showFull' => FALSE
