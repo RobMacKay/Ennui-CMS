@@ -33,7 +33,6 @@
 			exit;
 		}
 
-		include_once CMS_PATH . 'inc/class.'.$class.'.inc.php';
 		$obj = new $class(NULL, array(strtolower($_POST['page'])));
 
 		/*

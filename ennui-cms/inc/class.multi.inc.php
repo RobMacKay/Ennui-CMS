@@ -73,7 +73,8 @@ class Multi extends Page
              * If loading by category, get the proper number of entries from the
              * given category
              */
-            if ( isset($this->url1) && $this->url1==='category'
+            if ( isset($this->url1)
+                    && $this->url1==='category'
                     && isset($this->url2) )
             {
                 $offset = isset($this->url3) ? $limit*($this->url3-1) : 0;
@@ -194,7 +195,8 @@ class Multi extends Page
         $entry = $this->admin_entry_options($this->url0, $id, false);
 
         $entry_array = array();
-        foreach($entries as $e) {
+        foreach($entries as $e)
+        {
             // Entry options for the admin, if logged in
             $e['admin'] = $this->admin_simple_options($this->url0, $e['id']);
 

@@ -104,7 +104,7 @@ password by following the link below.
 
 Your Username: $admin_u
 
-Activate your account: $siteURL/admin/verify/$admin_v/
+Activate your account: {$siteURL}admin/verify/$admin_v/
 
 If you have any questions, please contact $_SESSION[admin_u] 
 at $_SESSION[admin_e].
@@ -124,7 +124,7 @@ content on $siteName.</p>
 <p>To get started, please activate your account and choose a password
 by following the link below.</p>
 <h2>Your User Name: $admin_u</h2>
-<h2><a href="$siteURL/admin/verify/$admin_v/">Click to Activate Your Account</a></h2>
+<h2><a href="{$siteURL}admin/verify/$admin_v/">Click to Activate Your Account</a></h2>
 <p>If you have any questions, please contact $_SESSION[admin_u] at 
 <a href="mailto:$_SESSION[admin_e]">$_SESSION[admin_e]</a>.</p>
 <p>For technical questions and support, contact

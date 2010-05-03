@@ -51,13 +51,6 @@ class Page extends AdminUtilities
     public $url3;
 
     /**
-     * Page header (optional)
-     *
-     * @var string
-     */
-    public $headline=NULL;
-
-    /**
      * Loads the mysqli object and organizes the URL into variables
      *
      * @param object $mysqli
@@ -575,6 +568,13 @@ class Page extends AdminUtilities
                 if(!$stored) {
                     return false;
                 } else {
+                    $img_ctrl->preview = TRUE;
+                    $img_ctrl->max_dims = array(IMG_PREV_WIDTH, IMG_PREV_HEIGHT);
+                    if ( !$img_ctrl->processStoredImage($stored) )
+                    {
+                        throw new Exception("Couldn't create image preview!");
+                    }
+                    $img_ctrl->preview = FALSE;
                     $img_ctrl->max_dims = array($this->img_dims['t'], $this->img_dims['t']);
                     if($img_ctrl->processStoredImage($stored, TRUE)) {
                         return $stored;

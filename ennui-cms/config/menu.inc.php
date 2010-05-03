@@ -73,45 +73,30 @@ $_CONSTANTS['DEFAULT_TEMPLATE'] = "default.inc";
  *         </ul><!-- end menu -->
  */
 $menuPages = array(
+    'about' => array(
+        'display' => 'About',
+        'type' => 'single'
+    ),
+    'blog' => array(
+        'display' => 'Blog',
+        'type' => 'blog'
+    ),
+    'services' => array(
+        'display' => 'Services',
+        'type' => 'multi'
+    ),
     'photos' => array(
-        'display' => 'Photo Gallery',
-        'type' => 'categorizedgallery',
-        'class' => 'nav-photos'
+        'display' => 'Photos',
+        'type' => 'gallery'
     ),
-    'videos' => array(
-        'display' => 'Video Gallery',
-        'type' => 'categorizedmulti',
-        'class' => 'nav-videos'
-    ),
-    'snapshots' => array(
-        'display' => 'Snapshots',
-        'type' => 'categorizedgallery',
-        'class' => 'nav-snapshots'
-    ),
-    'muscle-art' => array(
-        'display' => 'Muscle Art',
-        'type' => 'multi',
-        'class' => 'nav-muscleart'
-    ),
-    'q-a' => array(
-        'display' => 'Q &amp; A',
-        'type' => 'multi',
-        'class' => 'nav-qa'
-    ),
-    'forum' => array(
-        'display' => 'Forum',
-        'type' => 'single',
-        'class' => 'nav-forum'
-    ),
-    'feedback' => array(
-        'display' => 'Feedback',
-        'type' => 'contact',
-        'class' => 'nav-feedback'
+    'contact' => array(
+        'display' => 'Contact',
+        'type' => 'contact'
     ),
     'home' => array(
         'display' => 'Home',
-        'type' => 'home',
-        'class' => 'nav-home'
+        'type' => 'single',
+        'hide' => TRUE
     ),
     'sidebar' => array(
         'display' => 'Sidebar',

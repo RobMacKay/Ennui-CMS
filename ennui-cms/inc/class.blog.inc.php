@@ -1,366 +1,339 @@
 <?php
 
-include_once 'class.comments.inc.php';
-
-class blog extends Page
+class Blog extends Page
 {
-	public function displayPublic()
-	{
-		if(isset($this->url1)&&$this->url1!='category') {
-			$entries = $this->getEntryByUrl($this->url1);
-			return $this->displayEntry($entries);
-		} else if($this->url1=='category'&&isset($this->url2)) {
-			$url3 = isset($this->url3) ? $this->url3 : 1;
-			$start_num = BLOG_PREVIEW_NUM*$url3-BLOG_PREVIEW_NUM;
-			if($start_num< 0)
-			{
-				$start_num = 0;
-			}
-	
-			if($this->url2!='recent')
-			{
-				$entries = $this->getEntriesByCategory($this->url2, BLOG_PREVIEW_NUM, $start_num);
-			}
-			else
-			{
-				$entries = $this->getAllEntries(BLOG_PREVIEW_NUM, $start_num);
-			}
-			return $this->displayEntriesSmall($entries, '-preview');
-		} else {
-			$entries = $this->getAllEntries(4);
-			return $this->displayEntriesSmall($entries, '-preview');
-		}
-	}
+    public function displayPublic()
+    {
+        // If an entry URL is passed, load the corresponding data
+        //TODO: Rewrite this for consistency. Choose either "tag" or "category"
+        if ( isset($this->url1) && $this->url1!='category' )
+        {
+            $entries = $this->getEntryByUrl($this->url1);
+            return $this->displayFull($entries);
+        }
 
-	public function displayAdmin($id)
-	{
-		$form = $this->createForm('write', $id);
+        // If viewing by category, load the corresponding entries
+        else if ( $this->url1=='category' && isset($this->url2) )
+        {
+            // The page of entries to display
+            $url3 = isset($this->url3) ? $this->url3 : 1;
 
-		$markup = $form['start'];
-		$markup .= $this->createFormInput('title', 'Blog Title', $id);
-		$markup .= $this->createFormInput('img', 'Main Image', $id);
-		$markup .= $this->createFormInput('body','Blog Entry',$id);
-		$markup .= $this->createFormInput('data2','Tags',$id);
-		$markup .= $form['end'];
+            // What entry to use as the starting point
+            $start_num = BLOG_PREVIEW_NUM*$url3-BLOG_PREVIEW_NUM;
+            if($start_num< 0)
+            {
+                $start_num = 0;
+            }
 
-		return $markup;
-	}
+            // If this is an actual category, load corresponding entries
+            if($this->url2!='recent')
+            {
+                $entries = $this->getEntriesByCategory($this->url2, BLOG_PREVIEW_NUM, $start_num);
+            }
 
-	public function displayEntriesSmall($entries)
-	{
-		$markup = $_SESSION['loggedIn']==1 ? $this->admin_general_options($this->url0) : NULL;
+            // If recent entries are being displayed, load them here
+            else
+            {
+                $entries = $this->getAllEntries(BLOG_PREVIEW_NUM, $start_num);
+            }
 
-		foreach($entries as $e) {
-			$e['image'] = Utilities::formatImageThumb($e);
-			$e['preview'] = Utilities::textPreview($e['body'], 50);
-			$e['link'] = "/$this->url0/" . urlencode($e['title']) . "/";
-			$e['comments'] = comments::getCommentCount($e['id']);
-			$e['comments_text'] = $e['comments']==1 ? "comment" : "comments";
+            return $this->displayPreview($entries);
+        }
 
-			$e['commentcount'] = '<p class="comment-count"><a href="'
-				. $e['link'] . '#comments">' . $e['comments'] . '</a> '
-				. $e['comments_text'] . '</p>';
+        // If no parameters were passed, get the latest entries
+        else
+        {
+            $entries = $this->getAllEntries(BLOG_PREVIEW_NUM);
+            return $this->displayPreview($entries);
+        }
+    }
 
-			$markup .= "\n\t\t\t\t\t<div class=\"entry-preview\">
-						<h2> <a href=\"$e[link]\">$e[title]</a> </h2>$e[commentcount]
-						<p class=\"blog-preview\">
-							$e[image]$e[preview]
-							<a href=\"$e[link]\" class=\"readmore\">read more</a>
-						</p>
-					</div><!-- end .entry-preview -->\n";
-		}
+    public function displayAdmin($id)
+    {
+        $form = $this->createForm('write', $id);
 
-		$pagination = $this->paginateEntries();
+        $markup = $form['start'];
+        $markup .= $this->createFormInput('title', 'Blog Title', $id);
+        $markup .= $this->createFormInput('img', 'Main Image', $id);
+        $markup .= $this->createFormInput('body','Blog Entry',$id);
+        $markup .= $this->createFormInput('data2','Tags',$id);
+        $markup .= $form['end'];
 
-		return $markup.$pagination;
-	}
+        return $markup;
+    }
 
-	public function displayEntriesPreview($entries)
-	{
-		if($_SESSION['loggedIn']==1)
-		{
-			$admin = $this->admin_general_options($this->url0);
-		}
-		else
-		{
-			$admin = NULL;
-		}
+    protected function displayPreview($entries)
+    {
+        $entry = $this->admin_general_options($this->url0);
 
-		if(!isset($entries[0]))
-		{
-			return "
-				$admin<h2> No Entries Yet! </h2>
-				<p>
-					Log in to create an entry.
-				</p>\n";
-		}
+        if(!isset($entries[0]))
+        {
+            return "
+                $admin<h2> No Entries Yet! </h2>
+                <p>
+                    Log in to create an entry.
+                </p>\n";
+        }
 
-		$entry = array_shift($entries);
+        $entry_array = array();
+        if ( isset($entries[0]['title']) )
+        {
+            foreach ( $entries as $e )
+            {
+                $e['site-url'] = SITE_URL;
 
-		if($_SESSION['loggedIn']==1)
-		{
-			$admin = $this->admin_entry_options($this->url0, $entry['id']);
-		}
-		else
-		{
-			$admin = NULL;
-		}
+                // Format the date from the timestamp
+                $e['date'] = date('F d, Y', $e['created']);
 
-		$entry['link'] = "/{$this->url0}/" . urlencode($entry['title']) . "/";
-		$entry['image'] = Utilities::formatImage($entry, TRUE);
-		$entry['preview'] = Utilities::textPreview($entry['body'], 120);
-		$entry['subhead'] = isset($entry['data1']) ? "<h2>$entry[data1]</h2>" : NULL;
+                // Image options
+                if ( !empty($e['img']) )
+                {
+                    // Display the latest two galleries
+                    $e['image'] = $e['img'];
+                    $e['preview'] = str_replace(IMG_SAVE_DIR, IMG_SAVE_DIR.'preview/', $e['img']);
+                    $e['thumb'] = str_replace(IMG_SAVE_DIR, IMG_SAVE_DIR.'thumbs/', $e['img']);
+                }
+                else
+                {
+                    $e['image'] = '/assets/images/no-image.jpg';
+                    $e['preview'] = '/assets/images/no-image.jpg';
+                    $e['thumb'] = '/assets/images/no-image-thumb.jpg';
+                }
 
-		$entry['authorinfo'] = $this->formatAuthorInfo($entry);
-		$entry['categories'] = $this->formatCategories($entry['data2']);
-		$latest = "
-				<h1> <a href=\"$entry[link]\">$entry[title]</a> </h1>
-				<p class=\"meta\">
-					$entry[image]$entry[authorinfo] $entry[categories]
-				</p>
-				$entry[image]$entry[subhead]
-				<p>
-					$entry[preview]
-				</p>
-				<p class=\"readmore\">
-					<a href=\"$entry[link]\">read more</a>
-				</p>
-				";
+                $e['comment-count'] = comments::getCommentCount($e['id']);
+                $e['comment-text'] = $e['comments']==1 ? "comment" : "comments";
 
-		$previews = NULL;
-		foreach($entries as $e) {
-			/*
- 			* Only extract the elements we need for display
- 			*/
-			$e['created'] = date('F d, Y', $e['created']);
-			$e['thumb'] = Utilities::formatImageThumb($e);
-			$e['link'] = "/{$this->url0}/" . urlencode(str_replace('"', '', $e['title'])) . "/";
-			$e['categories'] = $this->formatCategories($e['data2']);
-			$e['preview'] = Utilities::textPreview($e['body']);
-			if($_SESSION['loggedIn']==1) {
-				$simpleadmin = $this->admin_simple_options($this->url0, $e['id']);
-			} else {
-				$admin = NULL;
-				$simpleadmin = NULL;
-			}
+                $e['url'] = !empty($e['data6']) ? $e['data6'] : urlencode($e['title']);
+                $e['tags'] = $this->_formatTags($e['data2']);
+                $e['admin'] = $this->admin_simple_options($this->url0, $e['id']);
 
-			$previews .= "
-				<div class=\"preview\">
-					<a href=\"$e[link]\">$e[thumb]</a>
-					<h3> <a href=\"$e[link]\">$e[title]</a> </h3>$simpleadmin
-					<p>
-						$e[preview]
-					</p>
-					<p class=\"readmore\">
-						<a href=\"$e[link]\">read more</a>
-					</p>
-				</div><!-- end preview -->";
-		}
+                $entry_array[] = $e;
+            }
 
-		return "
-			$admin$latest<div id=\"blog_preview\">
-				<h1> Recent Entries </h1>
-				<p class=\"blog_older\">
-					<a href=\"/blog/category/recent/2/\">Older Entries &#187;</a>
-				</p>$previews
-			</div><!-- end blog_preview -->";
-	}
+            $template_file = $this->url0 . '-preview.inc';
+        }
 
-	public function displayEntry($entries)
-	{
-		$entry = NULL;
-		foreach($entries as $e) {
-			/*
- 			* Only extract the elements we need for display
- 			*/
-			$e['image'] = Utilities::formatImage($e);
-			$e['link'] = "/{$this->url0}/" . urlencode($e['title']) . "/";
-			$e['subhead'] = !empty($e['data1']) ? "<h2> $e[data1] </h2>" : NULL;
-			$e['authorinfo'] = $this->formatAuthorInfo($e);
-			$e['categories'] = $this->formatCategories($e['data2']);
+        else
+        {
+            $entry_array[] = array(
+                    'admin' => NULL,
+                    'title' => 'No Entry Found',
+                    'body' => "<p>That entry doesn't appear to exist.</p>"
+                );
+            $template_file = 'blog-preview.inc';
+        }
 
-			$entry = $this->admin_entry_options($this->url0, $e['id']);
+        if ( $this->url1=="category" )
+        {
+            $extra['header']['title'] = "Entries Tagged with "
+                . ucwords(str_replace('-', ' ', $this->url2));
+        }
+        else
+        {
+            $extra['header']['title'] = "Recent Entries";
+        }
 
-			/*
-			 * Adjust width of embedded video to fit the max width
-			 */
-			$pattern[0] = "/<(object|embed)(.*?)(width|height)=\"[\d]+\"(.*?)(width|height)=\"[\d]+\"/i";
-			$replacement[0] = '<$1$2width="' . PAGE_OBJ_WIDTH . '"$4height="' . PAGE_OBJ_HEIGHT . '"';
-			$e['body'] = preg_replace($pattern, $replacement, $e['body']);
+        $extra['footer']['pagination'] = $this->paginateEntries();
 
-			/*
-			 * Load comments for the blog
-			 */
-			$cmnt = new comments();
-			$comments = $cmnt->showEntryComments($e['id']);
+        /*
+         * Load the template into a variable
+         */
+        $template = UTILITIES::loadTemplate($template_file);
 
-			$entry .= "\n\t\t\t\t<div class=\"entry-title\">\n\t\t\t\t\t<h2> "
-				. $e['title'] . "</h2>" . "\n\t\t\t\t</div>". $e['image'] 
-				. $e['body'] . "<p class=\"meta\">\n\t\t\t\t\t" . $e['authorinfo']
-				. "<br />\n\t\t\t\t\t" . $e['categories'] . ".<br />\n\t\t\t\t\t"
-				. "<a class=\"a2a_dd\" href=\"http://www.addtoany.com/share_save\">"
-				. "\n\t\t\t\t\t\t<img src=\"http://static.addtoany.com/buttons"
-				. "/share_save_171_16.png\" width=\"171\" height=\"16\" "
-				. "border=\"0\" alt=\"Share/Bookmark\"/>\n\t\t\t\t\t</a>"
-				. "\n\t\t\t\t\t<script type=\"text/javascript\">a2a_linkname="
-				. "document.title;a2a_linkurl=location.href;</script>"
-				. "\n\t\t\t\t\t<script type=\"text/javascript\" src=\"http://"
-				. "static.addtoany.com/menu/page.js\"></script>\n\t\t\t\t</p>"
-				. $this->generateGetResponseSubscribe() . $comments;
-		}
+        $entry .= UTILITIES::parseTemplate($entry_array, $template, $extra);
 
-		return $entry;
-	}
+        return $entry;
+    }
 
-	private function formatAuthorInfo($e)
-	{
-		$date = date('M d, Y', $e['created']);
-		return "Posted $date by $e[author].";
-	}
+    protected function displayFull($entries)
+    {
+        $entry = NULL;
+        if ( isset($entries[0]['title']) )
+        {
+            foreach($entries as $e)
+            {
+                $e['admin'] = $this->admin_entry_options($this->url0, $e['id']);
 
-	private function formatCategories($categories)
-	{
-		$markup = ($categories) ? 'This entry is filed under ' : NULL;
+                $e['site-url'] = SITE_URL;
 
-		$c = array_map('trim', explode(',', $categories));
-		
-		for($i=0, $count=count($c); $i<$count; ++$i) {
-			$category = str_replace(' ', '-', $c[$i]);
-			$markup .= "<a href=\"/{$this->url0}/category/$category/\">{$c[$i]}</a>";
-			$comma = ($count > 2) ? ',' : NULL;
-			if ( $i < $count-2 )
-				$markup .= $comma.' ';
-			if ( $i == $count-2 )
-				$markup .= $comma.' and ';
-		}
+                // Format the date from the timestamp
+                $e['date'] = date('F d, Y', $e['created']);
 
-		return $markup;
-	}
+                // Image options
+                if ( !empty($e['img']) )
+                {
+                    // Display the latest two galleries
+                    $e['image-url'] = $e['img'];
+                    $e['preview-url'] = str_replace(IMG_SAVE_DIR, IMG_SAVE_DIR.'preview/', $e['img']);
+                    $e['thumb-url'] = str_replace(IMG_SAVE_DIR, IMG_SAVE_DIR.'thumbs/', $e['img']);
+                    $e['image-caption'] = isset($e['imgcap']) ? $e['imgcap'] : $e['title'];
+                }
+                else
+                {
+                    $e['image-url'] = '/assets/images/no-image.jpg';
+                    $e['preview-url'] = '/assets/images/no-image.jpg';
+                    $e['thumb-url'] = '/assets/images/no-image-thumb.jpg';
+                    $e['image-caption'] = "No image supplied for this entry!";
+                }
 
-	static function displayPopularCategories($n=10)
-	{
-		$cat = self::getPopularCategories();
+                $e['url'] = !empty($e['data6']) ? $e['url6'] : urlencode($e['title']);
+                $e['permalink'] = SITE_URL . $this->url0 . "/" . $e['url'];
 
-		echo "<ul class=\"cat-list\">\n";
+                $e['tags'] = $this->_formatTags($e['data2']);
 
-		$i = 0;
-		foreach($cat as $category => $number)
-		{
-			if(++$i > 16)
-			{
-				break;
-			}
-			elseif($i%9==0)
-			{
-				echo "\t\t\t\t\t</ul>\n\t\t\t\t\t<ul class=\"cat-list\">\n";
-			}
+                $entry = $this->admin_entry_options($this->url0, $e['id']);
 
-			echo "\t\t\t\t\t\t<li> <a href=\"/blog/category/", $category, "/\">\n", 
-				str_replace('-', ' ', $category), "</a></li>";
-		}
+                /*
+                 * Adjust width of embedded video to fit the max width
+                 */
+                $pattern[0] = "/<(object|embed)(.*?)(width|height)=\"[\d]+\"(.*?)(width|height)=\"[\d]+\"/i";
+                $replacement[0] = '<$1$2width="' . PAGE_OBJ_WIDTH . '"$4height="' . PAGE_OBJ_HEIGHT . '"';
+                $e['body'] = preg_replace($pattern, $replacement, $e['body']);
 
-		echo "\t\t\t\t\t</ul>\n";
-	}
+                /*
+                 * Load comments for the blog
+                 */
+                $cmnt = new comments();
+                $e['comments'] = $cmnt->showEntryComments($e['id']);
 
-	private function generateGetResponseSubscribe()
-	{
-		/*
-		 * If the site doesn't use GetResponse, return NULL
-		 */
-		if ( GETRESPONSE_CAMPAIGN_NAME=='' ) return NULL;
+                $entry_array[] = $e;
 
-		/*
-		 * Load custom form info
-		 */
-		$url = SITE_URL;
-		$campaign_name = GETRESPONSE_CAMPAIGN_NAME;
-		$teaser = GETRESPONSE_TEASER;
-		$submit = GETRESPONSE_SUBMIT;
+                $template_file = $this->url0 . '-full.inc';
+            }
+        }
 
-		return "\n\t\t\t\t<div id=\"subscribe\">
-					<form action=\"http://www.getresponse.com/cgi-bin/add.cgi\"
-							method=\"post\" accept-charset=\"UTF-8\">
-						<fieldset id=\"blog-footer-capture\">
-							<p>$teaser</p>
-							<label for=\"subscriber_name\">Name</label>
-							<input id=\"subscriber_name\" name=\"subscriber_name\" 
-								type=\"text\" value=\"\" />
-							<label for=\"subscriber_email\">Email</label>
-							<input id=\"subscriber_email\" name=\"subscriber_email\" 
-								type=\"text\" value=\"\" />
-							<input type=\"submit\" value=\"$submit\" />
-							<input type=\"hidden\" name=\"error_url\" id=\"error_url\" 
-								value=\"\" />
-							<input type=\"hidden\" name=\"confirmation_url\" 
-								id=\"confirmation_url\" value=\"$url#signedup\" />
-							<input type=\"hidden\" name=\"campaign_name\" 
-								id=\"campaign_name\" value=\"$campaign_name\" />
-							<input type=\"hidden\" name=\"custom_ref\" id=\"custom_ref\" 
-								value=\"\" />
-							<span class=\"no-spam\"><strong>Spam Free Zone</strong> Your 
-							email address will not be shared or solicited</span>
-						</fieldset>
-					</form>
-				</div>";
-	}
+        /*
+         * Logically, there should be no way for this method to be called
+         * without a valid entry to display. Better safe than sorry, though...
+         */
+        else
+        {
+            $entry_array[] = array(
+                    'admin' => NULL,
+                    'title' => 'No Entry Found',
+                    'body' => "<p>That entry doesn't appear to exist.</p>"
+                );
+            $template_file = 'blog-full.inc';
+        }
 
-	private function getPopularCategories()
-	{
-		$category_array = array();
-		$db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        if ( isset($_SERVER['HTTP_REFERER'])
+                && strpos($_SERVER['HTTP_REFERER'], SITE_URL) )
+        {
+            $extra['footer']['backlink'] = $_SERVER['HTTP_REFERER'];
+        }
+        $extra['footer']['backlink'] = "/blog";
 
-		$sql = "SELECT data2
-				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-				WHERE page='blog'";
-		if($stmt = $db->prepare($sql))
-		{
-			$stmt->execute();
-			$stmt->bind_result($categories);
-			while($stmt->fetch())
-			{
-				$temp_array = explode(',', strtolower($categories));
-				foreach($temp_array as $category)
-				{
-					$c = str_replace(' ', '-', trim($category));
-					if(array_key_exists($c, $category_array))
-					{
-						$category_array[$c] += 1;
-					}
-					else
-					{
-						$category_array[$c] = 1;
-					}
-				}
-			}
-			$stmt->close();
-		}
+        /*
+         * Load the template into a variable
+         */
+        $template = UTILITIES::loadTemplate($template_file);
 
-		arsort($category_array);
-		return $category_array;
-	}
+        $entry .= UTILITIES::parseTemplate($entry_array, $template, $extra);
 
-	static function displayRecentPosts($num=8, $page='blog')
-	{
-		$db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-		$sql = "SELECT title
-				FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-				WHERE page='$page'
-				ORDER BY created DESC
-				LIMIT $num";
-		if($stmt = $db->prepare($sql))
-		{
-			$list = NULL;
-			$stmt->execute();
-			$stmt->bind_result($title);
-			while($stmt->fetch())
-			{
-				$url = SITE_URL . "/" . $page . "/" . urlencode($title);
-				$list .= "\n\t\t\t\t\t\t<li><a href=\"$url\">$title</a></li>";
-			}
-			$stmt->close();
-		}
-		return "\t\t\t\t\t<ul id=\"latest-blogs\">" . $list . "\t\t\t\t\t</ul>\n";
-	}
+        return $entry;
+    }
+
+    private function _formatTags($tags)
+    {
+        $markup = NULL;
+
+        $c = array_map('trim', explode(',', $tags));
+
+        for($i=0, $count=count($c); $i<$count; ++$i) {
+            $tag = str_replace(' ', '-', $c[$i]);
+            $markup .= "<a href=\"/{$this->url0}/category/$tag/\">{$c[$i]}</a>";
+            $comma = ($count > 2) ? ',' : NULL;
+            if ( $i < $count-2 )
+                $markup .= $comma.' ';
+            if ( $i == $count-2 )
+                $markup .= $comma.' and ';
+        }
+
+        return $markup;
+    }
+
+    static function displayPopularCategories($n=10)
+    {
+        $cat = self::getPopularCategories();
+
+        echo "<ul class=\"cat-list\">\n";
+
+        $i = 0;
+        foreach ( $cat as $category => $number )
+        {
+            if ( ++$i>$n )
+            {
+                break;
+            }
+            else if ( $i%($n/2+1)==0 )
+            {
+                echo "\t\t\t\t\t</ul>\n\t\t\t\t\t<ul class=\"cat-list\">\n";
+            }
+
+            echo "\t\t\t\t\t\t<li> <a href=\"/blog/category/", $category, "/\">\n",
+                str_replace('-', ' ', $category), "</a></li>";
+        }
+
+        echo "\t\t\t\t\t</ul>\n";
+    }
+
+    private function getPopularCategories()
+    {
+        //TODO: Convert to PDO
+        $category_array = array();
+        $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+
+        $sql = "SELECT data2
+                FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
+                WHERE page='blog'";
+        if($stmt = $db->prepare($sql))
+        {
+            $stmt->execute();
+            $stmt->bind_result($categories);
+            while($stmt->fetch())
+            {
+                $temp_array = explode(',', strtolower($categories));
+                foreach($temp_array as $category)
+                {
+                    $c = str_replace(' ', '-', trim($category));
+                    if(array_key_exists($c, $category_array))
+                    {
+                        $category_array[$c] += 1;
+                    }
+                    else
+                    {
+                        $category_array[$c] = 1;
+                    }
+                }
+            }
+            $stmt->close();
+        }
+
+        arsort($category_array);
+        return $category_array;
+    }
+
+    static function displayRecentPosts($num=8, $page='blog')
+    {
+        //TODO: Convert to PDO
+        $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        $sql = "SELECT title
+                FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
+                WHERE page='$page'
+                ORDER BY created DESC
+                LIMIT $num";
+        if($stmt = $db->prepare($sql))
+        {
+            $list = NULL;
+            $stmt->execute();
+            $stmt->bind_result($title);
+            while($stmt->fetch())
+            {
+                $url = SITE_URL . "/" . $page . "/" . urlencode($title);
+                $list .= "\n\t\t\t\t\t\t<li><a href=\"$url\">$title</a></li>";
+            }
+            $stmt->close();
+        }
+        return "\t\t\t\t\t<ul id=\"latest-blogs\">" . $list . "\t\t\t\t\t</ul>\n";
+    }
 }
-
-?>

@@ -38,13 +38,20 @@ ul,ol {
 /*
  * Junction is available under the OFL license
  * http://www.theleagueofmoveabletype.com/fonts/1-junction
- * Made by Caroline Hadilaksono (http://www.hadilaksono.com/)
+ * Made by Yann Le Coroller (http://www.hadilaksono.com/)
  */
 @font-face {
-    font-family: 'Junction';
-    src: url(Junction.eot);
-    src: local('Junction Regular'), local('Junction'),
-        url(Junction.ttf) format('truetype');
+    font-family: 'Alte Haas Grotesk Bold';
+    src: url(AlteHaasGroteskBold.eot);
+    src: local('Alte Haas Grotesk Bold'),
+        url(AlteHaasGroteskBold.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Alte Haas Grotesk Regular';
+    src: url(AlteHaasGroteskRegular.eot);
+    src: local('Alte Haas Grotesk Regular'), local('Alte Haas Grotesk'),
+        url(AlteHaasGroteskRegular.ttf) format('truetype');
 }
 
 a:link,a:visited,a:active,a:hover {
@@ -53,12 +60,12 @@ a:link,a:visited,a:active,a:hover {
 
 h1,h2,h3,h4,h5,h6,p,input,textarea,select,label,ul,li,a,span,legend {
     line-height: 18px;
-    letter-spacing: .04em;
 }
 
 h1,h1 a,h2,h2 a,h3,h3 a,h4,h5,h6,p,legend,#menu li a {
-    font-family: Junction, helvetica, arial, sans-serif;
+    font-family: 'Alte Haas Grotesk Bold', helvetica, arial, sans-serif;
     margin-bottom: 18px;
+    letter-spacing: -.05em;
 }
 
 h2,h2 a:link,h2 a:visited,h2 a:active,h2 a:hover,h3,h3 a:link,h3 a:visited,
@@ -69,8 +76,9 @@ h3 a:active,h3 a:hover,h4,h5,h6,legend {
 }
 
 p,input,textarea,select,label,li,a {
-    font-family: helvetica, arial, sans-serif;
+    font-family: 'Alte Haas Grotesk Regular', helvetica, arial, sans-serif;
     font-size: 12px;
+    letter-spacing: .04em;
 }
 
 h2,h2 a:link,h2 a:visited,h2 a:active,h2 a:hover {
@@ -358,6 +366,55 @@ input,select,textarea {
 .clearfix {
     display: block;
     clear: both;
+}
+
+/*
+ ******************************************************************************
+ * PAGINATION
+ ******************************************************************************
+ */
+#pagination {
+	display: block;
+	clear: left;
+	text-align: center;
+}
+
+#pagination li {
+	display: inline-block;
+    vertical-align: top;
+	width: 20px;
+	margin: 0;
+	background: #D8EEFA;
+	border: 1px solid #80A3B7;
+	text-align: center;
+	font-size: 10px;
+}
+
+#pagination li a,#pagination li.off {
+	display: inline-block;
+	width: 20px;
+	padding: 3px 0 2px;
+	color: #004E79;
+	text-decoration: none;
+	text-align: center;
+}
+
+#pagination li.selected {
+	background: #004E79;
+	color: #D8EEFA;
+}
+
+#pagination li:hover {
+	background: #80A3B7;
+	border-color: #004E79;
+}
+
+#pagination li:hover a,#pagination li.selected:hover a {
+	color: #004E79;
+}
+
+#pagination li.selected a {
+	color: #D8EEFA;
 }
 
 /*

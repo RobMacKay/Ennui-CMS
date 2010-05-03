@@ -62,7 +62,7 @@ class Comments
          */
         if ( !isset($id) )
         {
-            exit("Cannot display comments without an entry ID.<br />\n");
+            throw new Exception("Cannot display comments without an entry ID.");
         }
 
         /*

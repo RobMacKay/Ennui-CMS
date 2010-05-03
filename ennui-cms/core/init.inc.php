@@ -50,7 +50,7 @@ else
 }
 
 // Creates a database object
-$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+$dbo = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 // Creates the database tables if set to true
 if(CREATE_DB === TRUE)
@@ -86,7 +86,7 @@ if ( isset($menuPage['showFull']) && $menuPage['showFull']===FALSE )
 // Create a new object for the correct page type
 try
 {
-    $obj = new $menuPage['type']($mysqli, $url_array);
+    $obj = new $menuPage['type']($dbo, $url_array);
 }
 catch ( Exception $e )
 {

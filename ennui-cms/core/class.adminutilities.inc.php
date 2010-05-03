@@ -414,11 +414,6 @@ ADMIN_OPTIONS;
                     `is_admin`    TINYINT(1) DEFAULT '0',
                     INDEX(admin_v)
                 ) ENGINE=MYISAM CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";
-                INSERT INTO `".DB_NAME."`.`".DB_PREFIX."adminMgr`
-                    (`admin_u`, `admin_e`, `admin_p`, `admin_v`, `is_admin`)
-                VALUES
-                    ('$admin_u', '$admin_e', '$admin_p', '".sha1(time())."', '1')
-                ON DUPLICATE KEY UPDATE `is_admin`=1;
                 INSERT INTO `".DB_NAME."`.`".DB_PREFIX."entryMgr`
                     (`id`, `page`, `title`, `subhead`, `body`, `img`, `imgcap`,
                         `data1`, `data2`, `data3`, `data4`, `data5`, `data6`,
@@ -461,6 +456,15 @@ ADMIN_OPTIONS;
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                         'Jason Lengstorf', 1261511658)
                 ON DUPLICATE KEY UPDATE `created`=".time().";";
+
+        if ( DEV_PASS!='' )
+        {
+            $sql .= "INSERT INTO `".DB_NAME."`.`".DB_PREFIX."adminMgr`
+                    (`admin_u`, `admin_e`, `admin_p`, `admin_v`, `is_admin`)
+                VALUES
+                    ('$admin_u', '$admin_e', '$admin_p', '".sha1(time())."', '1')
+                ON DUPLICATE KEY UPDATE `is_admin`=1;";
+        }
 
         if(array_key_exists('blog', $menuPages))
         {

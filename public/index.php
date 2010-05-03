@@ -24,7 +24,7 @@
     /*
      * Initialize classes used in the sidebar or in widgets
      */
-    $sidebar = new Single(NULL, array('sidebar'));
+    $sidebar = new Single($dbo, array('sidebar'));
 ?>
 <!DOCTYPE html>
 
@@ -107,7 +107,7 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
     <footer>
         <p class="credits">
             All content &copy; <?php echo Utilities::copyrightYear(SITE_CREATED_YEAR), ' ', SITE_NAME; ?> |
-            <a href="<?php echo SITE_URL ?>/contact">Contact Us</a> |
+            <a href="<?php echo SITE_URL ?>contact">Contact Us</a> |
             <a href="http://ennuidesign.com" rel="external">Website by Ennui Design</a>
         </p>
     </footer>
@@ -174,7 +174,7 @@ echo "<!-- Page rendered by Ennui CMS in ",
 </html>
 <?php
 
-$mysqli->close();
+$dbo->close();
 
 /*
  * Clean the buffer

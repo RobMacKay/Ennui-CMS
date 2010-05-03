@@ -2,7 +2,6 @@
     <h2>Photo Gallery</h2>
     <p>
         <a href="/{page-url}">{page-name}</a> &raquo;
-        <a href="{category-url}">{category-name}</a> &raquo;
         <strong>{title}</strong>
     </p>
     <div>

@@ -3,7 +3,8 @@
     <ul class="categories">
 {loop}
         <li>
-            <a href="{category-url}">{category-name}</a> ({count} albums)
+            <a href="{category-url}">{category-name}</a>
+            ({count} photo galleries)
         </li>
 {/loop}
     </ul>

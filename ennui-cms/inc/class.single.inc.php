@@ -112,7 +112,7 @@ class Single extends Page
             /*
              * Set default values if no entries are found
              */
-            $entries[0][] = array(
+            $entries[0] = array(
                     'admin' => $admin,
                     'title' => "No Entry Found",
                     'body' => "<p>That entry doesn't appear to exist.</p>"
@@ -136,5 +136,3 @@ class Single extends Page
     }
 
 }
-
-?>

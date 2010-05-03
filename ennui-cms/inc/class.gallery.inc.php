@@ -24,7 +24,6 @@ class Gallery extends Multi
 
         $markup = $form['start'];
         $markup .= $this->createFormInput('title', 'Album Title', $id);
-        $markup .= $this->createFormInput('data2', 'Category', $id);
         $markup .= $this->createFormInput('body', 'Additional Info', $id);
         $markup .= '<input type="hidden" name="data7" value="'.$d7.'" />';
         $markup .= $form['end'];
@@ -98,13 +97,6 @@ class Gallery extends Multi
                 $e['photo-count'] = count($gal);
 
                 /*
-                 * Store the category name and URL
-                 */
-                $e['category-url'] = "/$this->url0/category/"
-                        . Utilities::makeUrl($e['data2']);
-                $e['category-name'] = $e['data2'];
-
-                /*
                  * Grab the first image
                  */
                 $image = array_shift($gal);
@@ -135,7 +127,6 @@ class Gallery extends Multi
                 /*
                  * Text options
                  */
-                $e['text-full'] = Utilities::textPreview($e['body'], 45);
                 $e['text-preview'] = Utilities::textPreview($e['body'], 45);
 
                 $entry_array[] = $e;
@@ -146,6 +137,7 @@ class Gallery extends Multi
         else
         {
             $entry_array[] = array(
+                    'admin' => NULL,
                     'title' => 'No Entry Found',
                     'body' => "<p>That entry doesn't appear to exist.</p>"
                 );
@@ -163,6 +155,11 @@ class Gallery extends Multi
             $extra = array(
                 'header' => array(
                     'title' => "Viewing Category: $name ($count $gal)"
+                ),
+                'footer' => array(
+                    'backlink' => '<p><a href="/'
+                            . $this->url0
+                            . '">&laquo; Back to All Photos</a></p>'
                 )
             );
         }
@@ -171,6 +168,9 @@ class Gallery extends Multi
             $extra = array(
                 'header' => array(
                     'title' => 'Latest Galleries'
+                ),
+                'footer' => array(
+                    'backlink' => NULL
                 )
             );
         }
