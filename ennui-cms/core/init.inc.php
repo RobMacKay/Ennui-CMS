@@ -1,30 +1,35 @@
 <?php
 
-/*
- * Initialize the session
- */
+// Enable sessions
 session_start();
 
-/*
- * Includes configuration files
- */
+// Create a token if one doesn't exist or has timed out
+if ( !isset($_SESSION['token']) && $_SESSION['TTL']<=time() )
+{
+    $_SESSION['token'] = sha1(uniqid(mt_rand(), TRUE));
+    $_SESSION['TTL'] = time()+36000; // Time out in 10 minutes
+}
+
+// Include configuration files
 include_once CMS_PATH . 'config/config.inc.php';
 include_once CMS_PATH . 'config/database.inc.php';
 include_once CMS_PATH . 'config/menu.inc.php';
 include_once CMS_PATH . 'config/admin.inc.php';
 
-/*
- * Define site-wide constants
- */
+// Include core classes
+include_once CMS_PATH . 'core/class.utilities.inc.php';
+include_once CMS_PATH . 'core/class.adminutilities.inc.php';
+include_once CMS_PATH . 'core/class.imagecontrol.inc.php';
+include_once CMS_PATH . 'core/class.page.inc.php';
+
+// FirePHP class for debugging (requires Firefox)
+include_once CMS_PATH . 'debug/fb.php';
+
+// Define site-wide constants
 foreach($_CONSTANTS as $key=>$value)
 {
-	define($key, $value);
+    define($key, $value);
 }
-
-/*
- * Include the FirePHP class for debugging
- */
-include_once CMS_PATH . 'debug/fb.php';
 
 /*
  * Handles debugging. If set to TRUE, displays all errors and enables logging 
@@ -32,104 +37,107 @@ include_once CMS_PATH . 'debug/fb.php';
  */
 if( ACTIVATE_DEBUG_MODE===TRUE )
 {
-	ini_set("display_errors",1);
-	ERROR_REPORTING(E_ALL);
-	FB::setEnabled(TRUE);
-	FB::warn("FirePHP logging enabled.");
+    ini_set("display_errors",1);
+    ERROR_REPORTING(E_ALL);
+    FB::setEnabled(TRUE);
+    FB::warn("FirePHP logging enabled.");
 }
 else
 {
-	ini_set("display_errors",0);
-	error_reporting(0);
-	FB::setEnabled(FALSE);
+    ini_set("display_errors",0);
+    error_reporting(0);
+    FB::setEnabled(FALSE);
 }
 
-/*
- * Includes core classes
- */
-include_once CMS_PATH . 'core/class.utilities.inc.php';
-include_once CMS_PATH . 'core/class.adminutilities.inc.php';
-include_once CMS_PATH . 'core/class.imagecontrol.inc.php';
-include_once CMS_PATH . 'core/class.page.inc.php';
-
-/*
- * Creates a database object
- */
-$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
-/*
- * Checks if the user is logged in
- */
-AdminUtilities::isLoggedIn();
-
-/*
- * Creates the database tables if set to true
- */
-if(CREATE_DB === TRUE)
-{
-	AdminUtilities::buildDB($menuPages);
-}
-
-/*
- * URL Parsing - Read the URL and break it apart for processing
- */
+// URL Parsing - Read the URL and break it apart for processing
 $url_array = Utilities::readUrl();
 
-/*
- * Load the page attributes from the menu array
- */
+FB::log($url_array, "URL Array");
+
+if ( !is_array($url_array) && file_exists($url_array) )
+{
+    require_once $url_array;
+}
+
+// Creates a database object
+$dbo = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+
+// Creates the database tables if set to true
+if(CREATE_DB === TRUE)
+{
+    AdminUtilities::buildDB($menuPages);
+}
+
+// Load the page attributes from the menu array
 $menuPage = Utilities::getPageAttributes($menuPages, $url_array[0]);
 
-/*
- * Check if the admin page is being accessed
- */
+// Check if the admin page is being accessed
 if ( $url_array[0]=='admin' )
 {
-	$menuPage = array('display'=>'Administrative Controls', 'type'=>'admin');
+    $menuPage = array('display'=>'Administrative Controls', 'type'=>'admin');
 }
 
-/*
- * If the supplied URL doesn't match any menu items, direct to the 404 page
- */
+// If the supplied URL doesn't match any menu items, direct to the 404 page
 if ( $menuPage===FALSE )
 {
-	$menuPage = array('display'=>'Invalid URL', 'type'=>'missing');
+    $menuPage = array('display'=>'Invalid URL', 'type'=>'missing');
 }
 
-/*
- * If the menu item has an index called "showFull" that's FALSE, use the default
- */
+// If the menu item has an index called "showFull" that's FALSE, use the default
 if ( isset($menuPage['showFull']) && $menuPage['showFull']===FALSE )
 {
-	header("Location: /".DEFAULT_PAGE);
-	exit;
+    header("Location: /".DEFAULT_PAGE);
+    exit;
 }
 
-// Build the Page Content
-include_once CMS_PATH . 'inc/class.'.$menuPage['type'].'.inc.php';
-$obj = new $menuPage['type']($mysqli, $url_array);
+// Create a new object for the correct page type
+try
+{
+    $obj = new $menuPage['type']($dbo, $url_array);
+}
+catch ( Exception $e )
+{
+    FB::error($e);
+    die( $e->getMessage() );
+}
 
-$entry = $obj->displayPublic($url_array);
-
-/*
- * Define an autoload function for classes
- */
+// Define an autoload function for classes
 function __autoload($classname)
 {
-	$file = CMS_PATH . 'inc/class.' . strtolower($classname) . '.inc.php';
-	if ( file_exists($file) )
-	{
-		require_once $file;
-	}
+    // File names are always lowercase
+    $class = strtolower($classname);
+
+    // First, check if a plugin class exists
+    if ( file_exists("assets/plugins/$class/ecms.$class.inc.php") )
+    {
+        $path = "assets/plugins/$class/ecms.$class.inc.php";
+    }
+
+    // If not, check the inc folder
+    elseif ( file_exists(CMS_PATH . 'inc/class.' . $class . '.inc.php') )
+    {
+        $path = CMS_PATH . 'inc/class.' . $class . '.inc.php';
+    }
+
+    // As a last resort, check the core folder
+    elseif ( file_exists(CMS_PATH . 'core/class.' . $class . '.inc.php') )
+    {
+        $path = CMS_PATH . 'core/class.' . $class . '.inc.php';
+    }
+
+    else
+    {
+        throw new Exception("That class does not exist.");
+    }
+
+    // Include the file
+    require_once $path;
+    FB::log($path, "Class File");
 }
 
 /*
- * This builds the content for the title tag. This should probably be moved to 
- * the Utilities class and cleaned up.
- * 
- * TODO Move to Utilities class
+ * Load the page title
  */
-$entrytitle = (isset($obj->url1)) ? ucfirst(urldecode($obj->url1)) . ' | ' : NULL;
-$title = $entrytitle . $menuPage['display'] . ' | ' . SITE_TITLE;
+$title = $obj->getPageTitle($menuPage);
 
 ?>

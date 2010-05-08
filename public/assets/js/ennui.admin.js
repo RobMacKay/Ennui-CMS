@@ -1,19 +1,67 @@
 <!--//
 
 // This variable is the serialized divs in the admin gallery
-$order = null;
+var $order = null,
+    tinymcefile = '/assets/js/tiny_mce/tiny_mce.js',
+    processfile = '/assets/inc/update.inc.php',
+    uploadifyfile = '/assets/inc/uploadify.inc.php';
+
+$.ajaxSetup({
+		"type" : "POST",
+		"url" : processfile,
+        "error" : function(e) { alert(e); }
+});
+
+jQuery(function($){
+
+// Handler for edit button
+$(".ecms-edit").live("click", function(e){
+        e.preventDefault();
+
+        var url_array = $(this).attr("href").split('/'),
+            page = url_array[1],
+            id = url_array[3]!=undefined ? url_array[3] : '';
+
+        showedit(page, 'showoptions', id);
+    });
+
+// Handler for gallery edit button
+$(".ecms-gallery").live("click", function(e){
+        e.preventDefault();
+
+        var url_array = $(this).attr("href").split('/'),
+            page = url_array[1],
+            id = url_array[3]!=undefined ? url_array[3] : '';
+
+        galleryEdit(page, id, '/assets/images/userPics/gallery/');
+    });
+
+});
 
 function showedit(page,option,id) {
-	var url = "/inc/update.inc.php";
 	var params = "page=" + page + "&action=" + option + "&id=" + id;
+	$.fancybox.showActivity();
 
 	$.ajax({
-		type: "POST",
-		url: url,
 		data: params,
 		success: function(response)
 			{
-				$('#'+page).html(response).height('auto');
+				//$('#'+page).html(response).height('auto');
+				$.fancybox({
+					'content': response,
+					'width': 700,
+					'height': 'auto',
+					'scrolling': 'no',
+					'autoDimensions': false,
+					'overlayOpacity': 0.6,
+					'overlayColor': '#000',
+					'transitionIn': 'elastic',
+					'transitionOut': 'elastic',
+					'speedIn': 500,
+					'speedOut': 400,
+					'easingIn': 'easeInQuad',
+					'easingOut': 'easeOutBounce'
+				});
 				$('input.nl_preview')
 					.bind("click", function(){return newsletterPreview("newsletter");});
 				setTimeout("textEdit();", 500);
@@ -22,7 +70,6 @@ function showedit(page,option,id) {
 }
 
 function reorderEntry(page, pos, direction, id) {
-	var url = "/inc/update.inc.php";
 	var params = "page="
 		+ page
 		+ "&action=reorderEntry&pos="
@@ -33,8 +80,6 @@ function reorderEntry(page, pos, direction, id) {
 		+ direction;
 
 	$.ajax({
-		type: "POST",
-		url: url,
 		data: params,
 		success: function()
 			{
@@ -44,13 +89,10 @@ function reorderEntry(page, pos, direction, id) {
 }
 
 function galleryEdit(page, id, dir) {
-	var url = "/inc/update.inc.php",
-		folder = dir+page+id,
+	var folder = dir+page+id,
 		params = "page=" + page + "&id=" + id + "&action=galleryEdit";
 
 	$.ajax({
-		type: "POST",
-		url: url,
 		data: params,
 		success: function(response)
 			{
@@ -74,8 +116,6 @@ function galleryLoading(dir, page, id)
 
 	$('#sortbtn').bind('click', function(){
 		$.ajax({
-			type: "POST",
-			url: "/inc/update.inc.php",
 			data: "page="+page+"&id="+id+"&action=galleryOrder&"+$order,
 			success: function(msg){
 				$("#"+page).html(msg);
@@ -86,16 +126,13 @@ function galleryLoading(dir, page, id)
 }
 
 function addPhotoCaption(page, album_id, image_id, image_cap) {
-	var url = "/inc/update.inc.php",
-		params = "page=" + page
+	var params = "page=" + page
 			+ "&album_id=" + album_id
 			+ "&image_id=" + image_id
 			+ "&image_cap=" + image_cap
 			+ "&action=galleryAddCaption";
 
 	$.ajax({
-		type: "POST",
-		url: url,
 		data: params,
 		success: function(response)
 			{
@@ -106,12 +143,9 @@ function addPhotoCaption(page, album_id, image_id, image_cap) {
 }
 
 function deletePhoto(page, id, img) {
-	var url = "/inc/update.inc.php",
-		params = "page="+page+"&id="+id+"&image="+img+"&action=galleryDeletePhoto";
+	var params = "page="+page+"&id="+id+"&image="+img+"&action=galleryDeletePhoto";
 
 	$.ajax({
-		type: "POST",
-		url: url,
 		data: params,
 		success: function(response)
 			{
@@ -123,7 +157,7 @@ function deletePhoto(page, id, img) {
 
 function textEdit() {
 	$('textarea#body').tinymce({
-		script_url : '/assets/js/tiny_mce/tiny_mce.js',
+		script_url : tinymcefile,
 		theme : "advanced",
 		plugins : "safari,iespell,inlinepopups,spellchecker,paste,advimage,media",
 		theme_advanced_toolbar_location : "top",
@@ -141,9 +175,9 @@ function galleryUpload(dir, page, id)
 {
 	$("#fileUpload").fileUpload({
 		'uploader': '/assets/swf/uploader.swf',
-		'cancelImg': '/images/cancel.png',
-		'script': '/inc/uploadify.inc.php',
-		'folder': dir+page+id,
+		'cancelImg': '/assets/images/cancel.png',
+		'script': uploadifyfile,
+		'folder': '/'+dir+page+id,
 		'fileDesc': 'Image Files',
 		'buttonText': 'Select Photos',
 		'fileExt': '*.jpg;*.jpeg;*.gif;*.png',
@@ -185,16 +219,9 @@ function newsletterPreview(page)
 			+ $subject + "&body=" + $body;
 
 	$.ajax({
-		type: "POST",
-		url: "/inc/update.inc.php",
 		data: params,
-		success: function(response)
-			{
+		success: function(response){
 				$preview.append(response);
-			},
-		error: function(e)
-			{
-				alert(e);
 			}
 	
 	});

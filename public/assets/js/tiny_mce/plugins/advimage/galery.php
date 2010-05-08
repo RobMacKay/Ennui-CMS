@@ -19,8 +19,8 @@
 global $GDok,$IMGFOLDER,$IMGURL,$AUDIOICON,$VIDEOICON,$siteName;
 $GDok = TRUE;
 // ------------ config section --------------------
-$IMGFOLDER = dirname($_SERVER['SCRIPT_FILENAME']).'/images/userPics/tinymce';
-$IMGURL = 'http://'.$_SERVER['SERVER_NAME'].'/images/userPics/tinymce';
+$IMGFOLDER = dirname($_SERVER['SCRIPT_FILENAME']).'/assets/images/userPics/tinymce';
+$IMGURL = 'http://'.$_SERVER['SERVER_NAME'].'/assets/images/userPics/tinymce';
 $VIDEOICON = 'video.jpg';
 $AUDIOICON = 'audio.jpg';
 // language setting   en
@@ -65,8 +65,8 @@ function make_thumb($img_name,$filename,$new_w,$new_h) {
   if (isset($src_img)) {
     if ($src_img != '') {
       //gets the dimmensions of the image
-      $old_x=imageSX($src_img);
-      $old_y=imageSY($src_img);
+      $old_x=imagesx($src_img);
+      $old_y=imagesy($src_img);
       if (($old_x > $new_w) | ($old_y > $new_h)) {
 	      $ratio1=$old_x/$new_w;
 	      $ratio2=$old_y/$new_h;
@@ -162,7 +162,7 @@ function maketable($dirname) {
                      $belyeg = './'.$AUDIOICON;
                      $belyegurl = './'.$AUDIOICON;
                 }
-                // ha még nincsbélyegkép akkor létrehozni
+                // ha mï¿½g nincsbï¿½lyegkï¿½p akkor lï¿½trehozni
                 if (!file_exists($belyeg)) {
                    if ($GDok) make_thumb($fnev,$belyeg,100,100);
 	            };
