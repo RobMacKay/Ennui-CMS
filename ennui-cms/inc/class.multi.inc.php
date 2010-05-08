@@ -171,7 +171,9 @@ class Multi extends Page
         }
         else
         {
+            $entry = NULL;
             $entry_array[] = array(
+                    'admin' => $this->admin_general_options($this->url0),
                     'title' => "No Entry Found",
                     'body' => "<p>That entry doesn't appear to exist.</p>"
                 );

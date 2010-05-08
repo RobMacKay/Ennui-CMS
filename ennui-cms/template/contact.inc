@@ -1,4 +1,4 @@
-<article>{admin}
+<div class="post">{admin}
     <h2>{title}</h2>
     {body}
     <form action="{form-processing}" method="post" id="contact">
@@ -18,4 +18,4 @@
                    value="Send This Message" />
         </fieldset>
     </form>
-</article>
+</div>

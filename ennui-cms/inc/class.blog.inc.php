@@ -66,15 +66,6 @@ class Blog extends Page
     {
         $entry = $this->admin_general_options($this->url0);
 
-        if(!isset($entries[0]))
-        {
-            return "
-                $admin<h2> No Entries Yet! </h2>
-                <p>
-                    Log in to create an entry.
-                </p>\n";
-        }
-
         $entry_array = array();
         if ( isset($entries[0]['title']) )
         {
@@ -101,7 +92,7 @@ class Blog extends Page
                 }
 
                 $e['comment-count'] = comments::getCommentCount($e['id']);
-                $e['comment-text'] = $e['comments']==1 ? "comment" : "comments";
+                $e['comment-text'] = $e['comment-count']==1 ? "comment" : "comments";
 
                 $e['url'] = !empty($e['data6']) ? $e['data6'] : urlencode($e['title']);
                 $e['tags'] = $this->_formatTags($e['data2']);
@@ -176,7 +167,7 @@ class Blog extends Page
                     $e['image-caption'] = "No image supplied for this entry!";
                 }
 
-                $e['url'] = !empty($e['data6']) ? $e['url6'] : urlencode($e['title']);
+                $e['url'] = !empty($e['data6']) ? $e['data6'] : urlencode($e['title']);
                 $e['permalink'] = SITE_URL . $this->url0 . "/" . $e['url'];
 
                 $e['tags'] = $this->_formatTags($e['data2']);
@@ -313,27 +304,91 @@ class Blog extends Page
         return $category_array;
     }
 
-    static function displayRecentPosts($num=8, $page='blog')
+    static function displayPosts($num=8, $page='blog', $filter="recent")
     {
+        // Determine which posts to retreive
+        if ( $filter=="recent" )
+        {
+            $filter_sql = "WHERE page='$page'";
+        }
+        elseif ( $filter=="featured" )
+        {
+            $filter_sql = "WHERE page='$page' AND data5='1'";
+        }
+
         //TODO: Convert to PDO
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-        $sql = "SELECT title
+        $sql = "SELECT title,data6
                 FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                WHERE page='$page'
+                $filter_sql
                 ORDER BY created DESC
                 LIMIT $num";
-        if($stmt = $db->prepare($sql))
+        try
         {
+            $stmt = $db->prepare($sql);
             $list = NULL;
             $stmt->execute();
-            $stmt->bind_result($title);
+            $stmt->bind_result($title, $data6);
             while($stmt->fetch())
             {
-                $url = SITE_URL . "/" . $page . "/" . urlencode($title);
-                $list .= "\n\t\t\t\t\t\t<li><a href=\"$url\">$title</a></li>";
+                $url = isset($data6) ? $data6 : urlencode($title);
+                $link = SITE_URL . $page . "/" . $url;
+                $list .= "
+                        <li><a href=\"$link\">$title</a></li>";
             }
             $stmt->close();
         }
-        return "\t\t\t\t\t<ul id=\"latest-blogs\">" . $list . "\t\t\t\t\t</ul>\n";
+        catch ( Exception $e )
+        {
+            FB::error($e);
+            throw new Exception ( "Could not load entries." );
+        }
+        return "
+                    <ul id=\"latest-blogs\">$list
+                    </ul>";
     }
+
+	static function displayMostCommented($db=NULL, $num=8, $page='blog')
+	{
+		if ( !isset($db) )
+		{
+			$db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+		}
+
+		/*
+		 * Load comment counts and titles for the
+		 */
+		$sql = "SELECT COUNT(blogCmnt.id) AS num_comments, title, data6
+				FROM blogCmnt
+				LEFT JOIN entryMgr
+					ON (blogCmnt.bid=entryMgr.id)
+				GROUP BY blogCmnt.bid
+				ORDER BY num_comments DESC
+				LIMIT 8";
+		try
+		{
+			$stmt = $db->query($sql);
+			$list = NULL;
+            if ( !is_object($stmt) )
+            {
+                throw new Exception ( "No entries found." );
+            }
+			while ( $entry = $stmt->fetch_object() )
+			{
+				$text = $entry->title;
+                $url = isset($entry->data6) ? $entry->data6 : urlencode($entry->title);
+				$link = "/$page/" . $url;
+				$list .= "
+                        <li><a href=\"$url\">$text</a></li>";
+			}
+			return "
+                    <ul id=\"most-commented\">$list
+                    </ul>";
+		}
+		catch ( Exception $e )
+		{
+			FB::log($e);
+            throw new Exception ( "Couldn't load popular entries." );
+		}
+	}
 }

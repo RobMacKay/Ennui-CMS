@@ -187,8 +187,14 @@ class Utilities
     {
         foreach($m as $p => $attr)
         {
-            if(strtolower($p)===$u) return $m[$u]['type'];
-            elseif(strtolower(isset($m[$p]['sub'][$u]))) return $m[$p]['sub'][$u]['type'];
+            if ( strtolower($p)===$u )
+            {
+                return $m[$u]['type'];
+            }
+            else if ( strtolower(isset($m[$p]['sub'][$u])) )
+            {
+                return $m[$p]['sub'][$u]['type'];
+            }
         }
         return DEFAULT_PAGE;
     }
@@ -446,7 +452,9 @@ class Utilities
                 {
                     $whitelist = $params['strip_tags_whitelist'];
                 }
-                $val = Utilities::strip_tags_attr($val, $whitelist);
+                $val = strip_tags($val, $whitelist);
+                //TODO: Finish the attribute stripping function
+//                $val = Utilities::strip_tags_attr($val, $whitelist);
             }
 
             // Create a text preview if one the parameter is set to TRUE
@@ -486,12 +494,13 @@ class Utilities
             {
                 $tag_match = '/<([a-z]+)(?:\[([a-z|]*)\])?>/i';
                 preg_match_all($tag_match, $allowable_tags, $tags);
-                FB::log($tags, "Tags w/Attributes");
 
                 for ( $i=0, $c=count($tags[0]); $i<=$c; ++$i )
                 {
                     $whitelist .= "<{$tags[1][$i]}>";
                     $attrs = !empty($tags[2][$i]) ? explode("|", $tags[2][$i]) : NULL;
+                    FB::log($whitelist, "Whitelist");
+                    FB::log($attrs, "Attributes");
                 }
             }
         }
@@ -510,8 +519,7 @@ class Utilities
                 && ($script != $root.$request)
                 && ($request!="/")) {
             $url = $request;
-            include($root.$url);
-            exit();
+            return $root.$url;
         } else {
             $url = strip_tags($request);
             $url_array=explode("/",$url);

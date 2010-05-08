@@ -49,6 +49,16 @@ else
     FB::setEnabled(FALSE);
 }
 
+// URL Parsing - Read the URL and break it apart for processing
+$url_array = Utilities::readUrl();
+
+FB::log($url_array, "URL Array");
+
+if ( !is_array($url_array) && file_exists($url_array) )
+{
+    require_once $url_array;
+}
+
 // Creates a database object
 $dbo = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
@@ -57,9 +67,6 @@ if(CREATE_DB === TRUE)
 {
     AdminUtilities::buildDB($menuPages);
 }
-
-// URL Parsing - Read the URL and break it apart for processing
-$url_array = Utilities::readUrl();
 
 // Load the page attributes from the menu array
 $menuPage = Utilities::getPageAttributes($menuPages, $url_array[0]);

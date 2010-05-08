@@ -24,60 +24,60 @@ THE SOFTWARE.
 */
 
 if (!empty($_FILES)) {
-    $tempFile = $_FILES['Filedata']['tmp_name'];
-    $targetPath = dirname($_SERVER['SCRIPT_FILENAME']) . $_GET['folder'] . '/';
-    if ( !$ext=getExtension($_FILES['Filedata']['type']) )
-        echo 'Uploaded file is not an image. Type: '.$_FILES['Filedata']['type']."<br />\nExtension: ".$ext;
+	$tempFile = $_FILES['Filedata']['tmp_name'];
+	$targetPath = dirname($_SERVER['SCRIPT_FILENAME']) . $_GET['folder'] . '/';
+	if ( !$ext=getExtension($_FILES['Filedata']['type']) )
+		echo 'Uploaded file is not an image. Type: '.$_FILES['Filedata']['type']."<br />\nExtension: ".$ext;
 
-    $imgnum = getNumImages($targetPath);
-    $filename = $imgnum.'_'.$imgnum.'_'.time().$ext;
-    $targetFile =  str_replace('//','/',$targetPath) . $filename;
-
-    // Makes the directory if it doesn't exist
-    if(!is_dir($targetPath)&&strlen($targetPath)>0)
-    {
-        mkdir(str_replace('//','/',$targetPath), 0755, TRUE);
-    }
-
-    move_uploaded_file($tempFile,$targetFile);
+	$imgnum = getNumImages($targetPath);
+	$filename = $imgnum.'_'.$imgnum.'_'.time().$ext;
+	$targetFile =  str_replace('//','/',$targetPath) . $filename;
+	
+	// Makes the directory if it doesn't exist
+	if(!is_dir($targetPath)&&strlen($targetPath)>0)
+	{
+		mkdir(str_replace('//','/',$targetPath), 0755, TRUE);
+	}
+	
+	move_uploaded_file($tempFile,$targetFile);
 }
 echo $targetFile;
 
 function getExtension($type)
 {
-    $extArr = array(
-            'image/gif' => '.gif',
-            'image/jpeg' => '.jpg',
-            'image/pjpeg' => '.jpg',
-            'image/png' => '.png',
-            'application/octet-stream' => '.jpg'
-        );
+	$extArr = array(
+			'image/gif' => '.gif',
+			'image/jpeg' => '.jpg',
+			'image/pjpeg' => '.jpg',
+			'image/png' => '.png',
+			'application/octet-stream' => '.jpg'
+		);
 
-    return isset($extArr[$type]) ? $extArr[$type] : FALSE;
+	return isset($extArr[$type]) ? $extArr[$type] : FALSE;
 }
 
 function getNumImages($dir)
 {
-    $i = 0;
-    if(is_dir($dir))
-    {
-        if($folder = opendir($dir))
-        {
-            while( false !== $file = readdir($folder) )
-            {
-                /*
-                 * Verifies that the current value of $file
-                 * refers to an existing file and that the
-                 * file is big enough not to throw an error.
-                 */
-                if( is_file($dir.$file) && filesize($dir.$file) > 11 )
-                {
-                    ++$i;
-                }
-            }
-        }
-    }
-    return sprintf("%02d", $i);
+	$i = 0;
+	if(is_dir($dir))
+	{
+		if($folder = opendir($dir))
+		{
+			while( false !== $file = readdir($folder) )
+			{
+				/*
+				 * Verifies that the current value of $file
+				 * refers to an existing file and that the 
+				 * file is big enough not to throw an error.
+				 */
+				if( is_file($dir.$file) && filesize($dir.$file) > 11 )
+				{
+					++$i;
+				}
+			}
+		}
+	}
+	return sprintf("%02d", $i);
 }
 
 ?>

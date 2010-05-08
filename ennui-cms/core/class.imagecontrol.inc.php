@@ -248,16 +248,15 @@ class ImageControl
                 {
                     $new[0] = $this->max_dims[0];
                     $new[1] = $this->max_dims[1];
-                    if($src_w>$src_h) {
-                        // 140 / 800*600-70
+					if($src_w>$src_h) {
                         $to_x = round($this->max_dims[0]/$src_h*($src_w-$this->max_dims[0])/2);
-                        $to_y = 0;
-                        $src_w = $src_h;
-                    } else {
-                        $to_x = 0;
-                        $to_y = round($this->max_dims[0]/$src_w*($src_h-$this->max_dims[0])/2);
-                        $src_h = $src_w;
-                    }
+						$to_y = 0;
+						$src_w = $src_h;
+					} else {
+						$to_x = 0;
+						$to_y = round($this->max_dims[0]/$src_w*($src_h-$this->max_dims[0])/2);
+						$src_h = $src_w;
+					}
                 }
 
                 /*
@@ -290,12 +289,12 @@ class ImageControl
                 /*
                  * Sets the array to return
                  */
-                $imgDims = array($new[0], $new[1], $src_w, $src_h, $to_x, $to_y);
-            } else {
-                $imgDims = array($src_w, $src_h, $src_w, $src_h, 0, 0);
+                return array($new[0], $new[1], $src_w, $src_h, $to_x, $to_y);
             }
-
-            return $imgDims;
+            else
+            {
+                return array($src_w, $src_h, $src_w, $src_h, 0, 0);
+            }
         }
     }
 

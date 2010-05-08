@@ -315,7 +315,9 @@ ________________EOD;
             $robot_input = $challenge;
         }
 
-        $allowed_tags = htmlentities(COMMENT_WHITELIST, ENT_QUOTES);
+        $form_action = FORM_ACTION;
+
+        $allowed_tags = htmlentities(STRIP_TAGS_WHITELIST, ENT_QUOTES);
 
         /*
          * Creates the markup. Remove the JavaScript at the bottom of the XHTML
@@ -324,7 +326,7 @@ ________________EOD;
         $commentform = <<<____________CMNT
 
             $c_errortext
-            <form id="cmnt"  method="post" action="/inc/update.inc.php">
+            <form id="cmnt"  method="post" action="$form_action">
                 <div class="commentform">
                     <label for="cmnt_name">Name (required)</label>
                     <input type="text" id="cmnt_name" name="cmnt_name"
@@ -392,33 +394,42 @@ ____________CMNT;
         }
     }
 
-    public function postComment($p)
+    public function postComment()
     {
         /*
          * Set session variables
          */
-        $_SESSION['cmnt_name'] = $p['cmnt_name'];
-        $_SESSION['cmnt_email'] = $p['cmnt_email'];
-        $_SESSION['cmnt_link'] = $p['cmnt_link'];
-        $_SESSION['cmnt_txt'] = $p['cmnt_txt'];
+        $_SESSION['cmnt_name'] = $_POST['cmnt_name'];
+        $_SESSION['cmnt_email'] = $_POST['cmnt_email'];
+        $_SESSION['cmnt_link'] = $_POST['cmnt_link'];
+        $_SESSION['cmnt_txt'] = $_POST['cmnt_txt'];
 
         /*
          * Check if required fields are filled out properly
          */
-        if($p['cmnt_name']==''||$p['cmnt_name']=='Name (Required)'
-            ||$p['cmnt_email']==''||$p['cmnt_email']=='Email Address (Required, Not Displayed)'
-            ||$p['cmnt_txt']==''||$p['cmnt_txt']=='Enter your comment here.') {
+        if ( $_POST['cmnt_name']==''
+                || $_POST['cmnt_name']=='Name (Required)'
+                || $_POST['cmnt_email']==''
+                || $_POST['cmnt_email']=='Email Address (Required, Not Displayed)'
+                || $_POST['cmnt_txt']==''
+                || $_POST['cmnt_txt']=='Enter your comment here.' )
+        {
             $error = 1;
-        } else if(!isset($_COOKIE['cmnt_human'])&&!$this->verifyResponse($p['s_q'])) {
+        }
+        else if ( !isset($_COOKIE['cmnt_human'])
+                && !$this->verifyResponse($_POST['s_q']) )
+        {
             $error = 2;
-        } else {
+        }
+        else
+        {
             $error = 0;
         }
 
         /*
          * Load the author's name and title of the entry
          */
-        $a_info = $this->getEntryTitleAndAuthor($p['cmnt_bid']);
+        $a_info = $this->getEntryTitleAndAuthor($_POST['cmnt_bid']);
         $author = $a_info['author'];
         $title = stripslashes($a_info['title']);
         $link = !empty($a_info['url']) ? $a_info['url'] : urlencode($title);
@@ -427,39 +438,48 @@ ____________CMNT;
         $pattern = "/<(pre|tt)>(.+)<\/(pre|tt)>/i";
         function escapeTags($matches)
         {
-            return "<tt>" . str_replace(" ", "&nbsp;", htmlentities($matches[2], ENT_QUOTES)) . "</tt>";
+            return "<tt>"
+                . str_replace(" ", "&nbsp;", htmlentities($matches[2], ENT_QUOTES))
+                . "</tt>";
         }
-        $p['cmnt_txt'] = preg_replace_callback($pattern, 'escapeTags', $p['cmnt_txt']);
+
+        $_POST['cmnt_txt'] = preg_replace_callback($pattern, 'escapeTags', $_POST['cmnt_txt']);
         if($error==0) {
             /*
              * Save the comment
              */
-            $this->saveComment($p);
+            $this->saveComment($_POST);
 
             /*
              * Set cookies
              */
             $expire = time()+2592000; // Set cookies to expire in 30 days
-            setcookie('cmnt_name', $p['cmnt_name'], $expire, '/');
-            setcookie('cmnt_email', $p['cmnt_email'], $expire, '/');
-            setcookie('cmnt_link', $p['cmnt_link'], $expire, '/');
+            setcookie('cmnt_name', $_POST['cmnt_name'], $expire, '/');
+            setcookie('cmnt_email', $_POST['cmnt_email'], $expire, '/');
+            setcookie('cmnt_link', $_POST['cmnt_link'], $expire, '/');
             setcookie('cmnt_human', 1, $expire, '/');
 
             /*
              * Pull the author email and comment subscribers
              */
             $author_email = $this->getAuthorEmail($author);
-            $subscribers = $this->getSubscribers($p['cmnt_bid']);
+            $subscribers = $this->getSubscribers($_POST['cmnt_bid']);
 
             /*
              * Using the loaded info, send notification emails
              */
-            if(!$this->sendCommentNotification($p, $author, $author_email, $title, $p['cmnt_bid'], $subscribers)) {
+            if ( !$this->sendCommentNotification($_POST, $author, $author_email, $title, $_POST['cmnt_bid'], $subscribers) )
+            {
                 return "Location: /blog/$link/error/";
-            } else {
+            }
+            else
+            {
                 return "Location: /blog/$link/#comments";
             }
-        } else {
+        }
+
+        else
+        {
             /*
              * If we found an error earlier, go back to the comment form and
              * display the corresponding error
@@ -643,7 +663,7 @@ HEADERS;
          */
         $msg = <<<MESSAGE
 $c[cmnt_name] posted a new comment on the blog entry "$title"
-$siteName/blog/$link/#comments
+{$siteName}blog/$link/#comments
 
 
 Comment:
@@ -652,7 +672,7 @@ $comment
 
 
 Join the discussion! Reply to this comment here: 
-$siteName/blog/$link/#comments
+{$siteName}blog/$link/#comments
 
 --
 $site_fullname
