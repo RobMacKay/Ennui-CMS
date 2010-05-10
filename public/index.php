@@ -26,6 +26,8 @@
      */
     $sidebar = new Single($dbo, array('sidebar'));
 
+    // This is a change in the feature-database branch
+
 ?>
 <!DOCTYPE html>
 
