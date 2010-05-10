@@ -25,6 +25,7 @@
      * Initialize classes used in the sidebar or in widgets
      */
     $sidebar = new Single($dbo, array('sidebar'));
+
 ?>
 <!DOCTYPE html>
 
