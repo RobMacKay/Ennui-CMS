@@ -212,6 +212,31 @@ INPUT;
         return $input;
     }
 
+    /**
+     * Creates a form input
+     *
+     * @param string $name
+     * @param string $label
+     * @param int $id
+     * @param bool $nocap
+     * @return string    The HTML for the field input
+     */
+    protected function createFormCheckbox($name, $label=NULL, $id=NULL, $val=NULL)
+    {
+        /*
+         * If an entry ID is supplied, load the entry and grab the element
+         * needed to populate the input
+         */
+        $entry = !empty($id) ? Page::getEntryById($id) : NULL;
+        $data = !empty($id) ? htmlentities($entry[0][$name], ENT_QUOTES) : NULL;
+
+        $checked = $data==$val ? ' checked="checked"' : NULL;
+
+        return '
+            <label><input type="checkbox" name="' . $name . '" id="' . $name
+            . '" value="' . $val . '"' . $checked . '/> ' . $label . '</label>';
+    }
+
     protected function admin_general_options($page)
     {
         if ( isset($_SESSION['user']) && $_SESSION['user']['clearance']>=1 )
@@ -334,6 +359,20 @@ ADMIN_OPTIONS;
 </span>
 
 ADMIN_OPTIONS;
+        }
+        else { return NULL; }
+    }
+
+    protected function admin_comment_options( $bid, $cid, $email )
+    {
+        $form_action = FORM_ACTION;
+        if ( isset($_SESSION['user']) && $_SESSION['user']['clearance']>=1 )
+        {
+            return "
+            [ <a href=\"mailto:$email\">email</a> |
+            <a href=\"$form_action?action=cmnt_delete&bid=$bid&cmntid=$cid\"
+                onclick=\"return confirm('Are you sure you want to delete this entry?')\">
+                delete</a> ]";
         }
         else { return NULL; }
     }

@@ -1,25 +1,25 @@
     <div id="comments">
         <h2> Comments for This Entry </h2>
-{loop [
-        "strip_tags" : true
-    ]}
-        <div id="comment-{id}">
-            <div class="comment-poster">
-                <p>
-                    {gravatar}
-                    Posted by <span class="poster">{poster}</span> on {date}.
-                    <a href="{site-url}{page}/{url}#comment-{id}">permalink</a>
-                </p>
-            </div>
-            <div class="comment-body">
-                {comment-body}
-            </div>
-        </div>
+        <ol>
+{loop}
+                <li id="comment-{id}">
+                    <!-- AVATAR -->
+                    {image}
+                    <!-- USER NAME -->
+                    <p class="user_name">
+                        <span class="user">{user}</span> says:
+                    </p>
+                    <!-- COMMENT -->
+                    <p class="comment">
+                        {comment}
+                    </p>
+                    <!-- COMMENT DATE -->
+                    <p class="comment_date">
+                        Posted on {date}
+                        [<a href="{site-url}{page}/{url}#comment-{id}">permalink</a>]
+                    </p>
+                </li>
 {/loop}
-        <h3> Post a Comment </h3>
-        <p class="get_gravatar">
-            Want to show your face?
-            <a href="http://gravatar.com" rel="external">Get a gravatar!</a>
-        </p>
-
+        </ol>
+        {comment-form}
     </div><!-- end comments -->

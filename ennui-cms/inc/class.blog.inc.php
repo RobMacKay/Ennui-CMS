@@ -57,6 +57,7 @@ class Blog extends Page
         $markup .= $this->createFormInput('img', 'Main Image', $id);
         $markup .= $this->createFormInput('body','Blog Entry',$id);
         $markup .= $this->createFormInput('data2','Tags',$id);
+        $markup .= $this->createFormCheckbox('data5', 'Feature This Entry', $id, '1');
         $markup .= $form['end'];
 
         return $markup;
@@ -243,32 +244,36 @@ class Blog extends Page
         return $markup;
     }
 
-    static function displayPopularCategories($n=10)
+    static function displayCategories($n=10, $page="blog", $class="categories", $twocol=FALSE)
     {
-        $cat = self::getPopularCategories();
-
-        echo "<ul class=\"cat-list\">\n";
+        $cat = self::_getPopularCategories();
 
         $i = 0;
+        $list = NULL;
         foreach ( $cat as $category => $number )
         {
             if ( ++$i>$n )
             {
                 break;
             }
-            else if ( $i%($n/2+1)==0 )
+            else if ( $i%($n/2+1)==0 && $twocol===TRUE )
             {
-                echo "\t\t\t\t\t</ul>\n\t\t\t\t\t<ul class=\"cat-list\">\n";
+                $list .= "
+                    </ul>
+                    <ul class=\"$class\">";
             }
 
-            echo "\t\t\t\t\t\t<li> <a href=\"/blog/category/", $category, "/\">\n",
-                str_replace('-', ' ', $category), "</a></li>";
+            $list .= "
+                        <li> <a href=\"/$page/category/$category\">"
+                . str_replace('-', ' ', $category) . "</a></li>";
         }
 
-        echo "\t\t\t\t\t</ul>\n";
+        return "
+                    <ul class=\"$class\">$list
+                    </ul>";
     }
 
-    private function getPopularCategories()
+    private function _getPopularCategories()
     {
         //TODO: Convert to PDO
         $category_array = array();
@@ -304,7 +309,7 @@ class Blog extends Page
         return $category_array;
     }
 
-    static function displayPosts($num=8, $page='blog', $filter="recent")
+    static function displayPosts($num=8, $page='blog', $filter="recent", $id="latest-blogs")
     {
         // Determine which posts to retreive
         if ( $filter=="recent" )
@@ -344,7 +349,7 @@ class Blog extends Page
             throw new Exception ( "Could not load entries." );
         }
         return "
-                    <ul id=\"latest-blogs\">$list
+                    <ul id=\"$id\">$list
                     </ul>";
     }
 
@@ -358,11 +363,14 @@ class Blog extends Page
 		/*
 		 * Load comment counts and titles for the
 		 */
-		$sql = "SELECT COUNT(blogCmnt.id) AS num_comments, title, data6
-				FROM blogCmnt
-				LEFT JOIN entryMgr
-					ON (blogCmnt.bid=entryMgr.id)
-				GROUP BY blogCmnt.bid
+		$sql = "SELECT
+                    COUNT(`".DB_PREFIX."blogCmnt`.`id`) AS num_comments,
+                    `title`,
+                    `data6`
+				FROM `".DB_PREFIX."blogCmnt`
+				LEFT JOIN `".DB_PREFIX."entryMgr`
+					ON (`".DB_PREFIX."blogCmnt`.`bid`=`".DB_PREFIX."entryMgr`.`id`)
+				GROUP BY `".DB_PREFIX."blogCmnt`.`bid`
 				ORDER BY num_comments DESC
 				LIMIT 8";
 		try
