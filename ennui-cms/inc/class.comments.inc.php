@@ -121,7 +121,7 @@ class Comments extends AdminUtilities
                     $c['user'] = "<a href=\"$c[link]\" rel=\"external\">$c[user]</a>";
                 } else {
                     $c['link'] = 'http://en.gravatar.com/';
-                    $c['image'] = "<a href=\"$c[link]\" title=\"Get a Gravatar!\" rel=\"external\">$c[gravatar]</a>";
+                    $c['image'] = "<a href=\"$c[link]\" title=\"Get a Gravatar!\" rel=\"external\">$gravatar</a>";
                 }
 
                 /*

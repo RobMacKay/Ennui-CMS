@@ -291,6 +291,11 @@ class Blog extends Page
                 $temp_array = explode(',', strtolower($categories));
                 foreach($temp_array as $category)
                 {
+                    if ( empty($category) )
+                    {
+                        continue;
+                    }
+
                     $c = str_replace(' ', '-', trim($category));
                     if(array_key_exists($c, $category_array))
                     {
