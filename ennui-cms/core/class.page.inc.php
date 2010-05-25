@@ -80,21 +80,19 @@ class Page extends AdminUtilities
                 'category', 'more'
             );
 
-        if ( in_array($this->url1, $lookup) )
+        if ( in_array($this->url1, $lookup) && isset($this->url2) )
         {
-            if ( isset($this->url2) )
-            {
-                $entry_title = $this->url2;
-            }
+            $entry_title = ucwords(str_replace("-", " ", $this->url2));
             $entry = ucwords(str_replace("-", " ", $this->url1))
-                    . ": " . ucwords($entry_title) . " $sep";
+                    . ": " .$entry_title;
         }
         else
         {
-            $entry = empty($this->url1) ? NULL : "$this->url1 $sep";
+            $arr = $this->getEntryByUrl($this->url1);
+            $entry = isset($arr[0]['title']) ? $arr[0]['title'] : NULL;
         }
 
-        return "$entry $page $sep $title";
+        return "$entry $sep $page $sep $title";
     }
 
     protected function getEntryCategories($entries)
