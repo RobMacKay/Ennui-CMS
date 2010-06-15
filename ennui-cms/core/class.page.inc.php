@@ -80,21 +80,19 @@ class Page extends AdminUtilities
                 'category', 'more'
             );
 
-        if ( in_array($this->url1, $lookup) )
+        if ( in_array($this->url1, $lookup) && isset($this->url2) )
         {
-            if ( isset($this->url2) )
-            {
-                $entry_title = $this->url2;
-            }
+            $entry_title = ucwords(str_replace("-", " ", $this->url2));
             $entry = ucwords(str_replace("-", " ", $this->url1))
-                    . ": " . ucwords($entry_title) . " $sep";
+                    . ": " .$entry_title;
         }
         else
         {
-            $entry = empty($this->url1) ? NULL : "$this->url1 $sep";
+            $arr = $this->getEntryByUrl($this->url1);
+            $entry = isset($arr[0]['title']) ? $arr[0]['title'] : NULL;
         }
 
-        return "$entry $page $sep $title";
+        return "$entry $sep $page $sep $title";
     }
 
     protected function getEntryCategories($entries)
@@ -209,6 +207,45 @@ class Page extends AdminUtilities
         $var = '%'.str_replace('-', ' ', $category).'%';
         $stmt->bind_param("ss", $this->url0, $var);
         return $this->loadEntryArray($stmt);
+    }
+
+    protected function getEntriesBySearch($search, $limit=MAX_ENTRIES_PER_PAGE, $offset=0)
+    {
+        $entries = array();
+
+        /*
+         * Prepare the statement and execute it
+         */
+        $sql = "SELECT
+					MATCH (`body`) AGAINST (?) AS Relevance,
+					id, page, title, subhead, body, img, imgcap, data1, data2,
+                    data3, data4, data5, data6, data7, data8, author, created
+                FROM entryMgr
+				WHERE page = ?
+                AND title LIKE ?
+                OR page = ?
+				AND  MATCH (`body`) AGAINST (? IN BOOLEAN MODE)
+				ORDER  BY Relevance DESC
+				LIMIT $offset, $limit";
+		try
+        {
+            $stmt = $this->mysqli->prepare($sql);
+        }
+        catch ( Exception $e )
+        {
+            die ( "Search Error: " . $e->getMessage() );
+        }
+
+        $query = htmlentities($search, ENT_QUOTES);
+        $keys = explode(' ', $query);
+        $key_search = NULL;
+        foreach ( $keys as $key )
+        {
+            $key_search .= empty($key_search) ? "+$key" : " +$key";
+        }
+        $like = "%$query%";
+        $stmt->bind_param("sssss", $query, $this->url0, $like, $this->url0, $key_search);
+        return $this->loadEntryArray($stmt, TRUE);
     }
 
     /**

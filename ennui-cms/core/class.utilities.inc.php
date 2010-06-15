@@ -8,9 +8,23 @@ class Utilities
         $preview = NULL;
 
         // Get rid of most tags to avoid an unclosed tag in the preview
-        $body = preg_replace('/<h(?:2|3)(.*?)>/', '<strong>', $body);
-        $body = preg_replace('/<\/h(?:2|3)>/', '</strong><br /><br />', $body);
-        $body = str_replace('<p>','',str_replace('</p>','<br /><br />',$body));
+        $pat = array(
+                "/\n++/is",
+                "/<h(?:2|3)(.*?)>/i",
+                "/<\/h(?:2|3)>/i",
+                "/<p>/i",
+                "/<\/p>(?:\n*)/is",
+                "/(?:<br \/>(?:\n*)){2,}+/is"
+            );
+        $rep = array(
+                "",
+                "<strong>",
+                "</strong><br /><br />",
+                "",
+                "<br /><br />",
+                "<br /><br />"
+            );
+        $body = preg_replace($pat, $rep, $body);
         $text = strip_tags($body,'<strong><br><a>');
 
         // Pull the text apart at the spaces

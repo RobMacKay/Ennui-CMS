@@ -85,14 +85,14 @@ class Contact extends Single
         return UTILITIES::parseTemplate($entries, $template);
     }
 
-    public function sendMessage($p)
+    public function sendMessage()
     {
         $msg_to = SITE_CONTACT_NAME." <".SITE_CONTACT_EMAIL.">";
         $msg_sub = "[".SITE_NAME."] New Message from the Contact Form";
         $siteUrl = SITE_URL;
 
         // Sanitize the form data and load into variables
-        list($name, $email, $website, $phone, $message) = $this->checkMessage($p);
+        list($name, $email, $phone, $msg) = $this->checkMessage();
 
         $headers = <<<MESSAGE_HEADER
 From: $name <$email>
@@ -101,12 +101,11 @@ MESSAGE_HEADER;
         $msg_body = <<<MESSAGE_BODY
 Name:  $name
 Email: $email
-URL:   $website
 Phone: $phone
 
 Message:
 
-$message
+$msg
 
 --
 This message was sent via the contact form on $siteUrl
@@ -117,45 +116,45 @@ MESSAGE_BODY;
         }
         else
         {
-            return $this->sendConfirmation($p);
+            return $this->sendConfirmation();
         }
     }
 
-    private function sendConfirmation($p)
+    private function sendConfirmation()
     {
         // Sanitize the form data and load into variables
-        list($name, $email, $website, $phone, $message) = $this->checkMessage($p);
+        list($name, $email, $phone, $message) = $this->checkMessage($p);
 
         // Set site-specific variables from constants
         $siteName = SITE_NAME;
         $siteUrl = SITE_URL;
+        $return_email = 'donotreply@' . str_replace('/', '', str_replace('http://', '', SITE_URL));
         $confMsg = SITE_CONFIRMATION_MESSAGE;
         $siteEmail = SITE_CONTACT_EMAIL;
 
         $conf_to  = "$name <$email>";
         $conf_sub = "Thank You for Contacting Us!";
         $conf_headers = <<<MESSAGE_HEADER
-From: $siteName <donotreply@$siteUrl>
+From: $siteName <$return_email>
 Content-Type: text/plain
 MESSAGE_HEADER;
         $conf_message = <<<MESSAGE_BODY
 $confMsg
 
 $siteEmail
-www.$siteUrl
+$siteUrl
 MESSAGE_BODY;
 
         return mail($conf_to,$conf_sub,$conf_message,$conf_headers);
     }
 
-    private function checkMessage($p)
+    private function checkMessage()
     {
         $msg[] = (isset($_POST['cf_n'])) ? htmlentities($_POST['cf_n']) : NULL;
         $msg[] = (isset($_POST['cf_e'])) ? htmlentities($_POST['cf_e']) : NULL;
-        $msg[] = (isset($_POST['cf_w']) && $_POST['cf_w'] != 'Website (optional)') ? htmlentities($_POST['cf_w']) : NULL;
-        $msg[] = (isset($_POST['cf_p']) && $_POST['cf_p'] != 'Phone Number (optional)') ? htmlentities($_POST['cf_p']) : NULL;
+        $msg[] = (isset($_POST['cf_p'])) ? htmlentities($_POST['cf_p']) : NULL;
         $msg[] = (isset($_POST['cf_m'])) ? htmlentities($_POST['cf_m']) : NULL;
 
-        return $msg;
+        return array_map('stripslashes', $msg);
     }
 }

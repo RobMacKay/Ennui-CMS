@@ -167,7 +167,8 @@ class Comments extends AdminUtilities
         $sql = "SELECT id, bid, user, email, link, comment, timestamp, subscribe
                 FROM `".DB_NAME."`.`".DB_PREFIX."blogCmnt`
                 WHERE bid=?
-                ORDER BY timestamp ASC";
+                ORDER BY timestamp ASC
+                LIMIT 2000";
         $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $c = array();
         if($stmt = $mysqli->prepare($sql)) {
@@ -184,7 +185,7 @@ class Comments extends AdminUtilities
                     'user' => htmlentities(strip_tags($user)),
                     'email' => htmlentities(strip_tags($email)),
                     'link' => htmlentities(strip_tags($link)),
-                    'comment' => $comment,
+                    'comment' => strip_tags($comment, "<em><bold>"),
                     'timestamp' => $timestamp,
                     'subscribe' => $subscribe
                 );

@@ -3,9 +3,9 @@
  */
 $(document).ready(function() {
 
-	/*
-	 * Technically valid workaround for target="_blank"
-	 */
-	$('a[rel="external"]').attr('target', '_blank');
+    /*
+     * Technically valid workaround for target="_blank"
+     */
+    $('a[rel="external"]').attr('target', '_blank');
 
 });

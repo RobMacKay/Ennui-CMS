@@ -343,6 +343,7 @@ class Blog extends Page
             {
                 $url = isset($data6) ? $data6 : urlencode($title);
                 $link = SITE_URL . $page . "/" . $url;
+                $title = stripslashes($title);
                 $list .= "
                         <li><a href=\"$link\">$title</a></li>";
             }
@@ -388,11 +389,11 @@ class Blog extends Page
             }
 			while ( $entry = $stmt->fetch_object() )
 			{
-				$text = $entry->title;
+				$text = stripslashes($entry->title);
                 $url = isset($entry->data6) ? $entry->data6 : urlencode($entry->title);
 				$link = "/$page/" . $url;
 				$list .= "
-                        <li><a href=\"$url\">$text</a></li>";
+                        <li><a href=\"$link\">$text</a></li>";
 			}
 			return "
                     <ul id=\"most-commented\">$list
