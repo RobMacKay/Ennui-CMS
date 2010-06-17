@@ -199,7 +199,6 @@ class Page extends AdminUtilities
                 id, page, title, subhead, body, img, imgcap, data1, data2,
                 data3, data4, data5, data6, data7, data8, author, created
                 FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                WHERE `page` = ?
                 AND LOWER(data2) LIKE ?
                 ORDER BY created DESC
                 LIMIT $offset, $limit";
@@ -211,41 +210,39 @@ class Page extends AdminUtilities
 
     protected function getEntriesBySearch($search, $limit=MAX_ENTRIES_PER_PAGE, $offset=0)
     {
-        $entries = array();
-
-        /*
-         * Prepare the statement and execute it
-         */
+        // Prepare the statement and execute it
         $sql = "SELECT
 					MATCH (`body`) AGAINST (?) AS Relevance,
 					id, page, title, subhead, body, img, imgcap, data1, data2,
                     data3, data4, data5, data6, data7, data8, author, created
-                FROM entryMgr
-				WHERE page = ?
-                AND title LIKE ?
-                OR page = ?
-				AND  MATCH (`body`) AGAINST (? IN BOOLEAN MODE)
+                FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
+                WHERE title LIKE ?
+                OR MATCH (`body`) AGAINST (? IN BOOLEAN MODE)
 				ORDER  BY Relevance DESC
 				LIMIT $offset, $limit";
 		try
         {
+            $query = htmlentities($search, ENT_QUOTES);
+            $keys = explode(' ', $query);
+            $key_search = NULL;
+            foreach ( $keys as $key )
+            {
+                $key_search .= empty($key_search) ? "+$key" : " +$key";
+            }
+            $like = "%$query%";
             $stmt = $this->mysqli->prepare($sql);
+            if ( !is_object($stmt) )
+            {
+                throw new Exception($this->mysqli->error);
+            }
+            $stmt->bind_param("sss", $query, $like, $key_search);
+            return $this->loadEntryArray($stmt, TRUE);
         }
         catch ( Exception $e )
         {
+            FB::log($this->mysqli->error, "MySQLi Error");
             die ( "Search Error: " . $e->getMessage() );
         }
-
-        $query = htmlentities($search, ENT_QUOTES);
-        $keys = explode(' ', $query);
-        $key_search = NULL;
-        foreach ( $keys as $key )
-        {
-            $key_search .= empty($key_search) ? "+$key" : " +$key";
-        }
-        $like = "%$query%";
-        $stmt->bind_param("sssss", $query, $this->url0, $like, $this->url0, $key_search);
-        return $this->loadEntryArray($stmt, TRUE);
     }
 
     /**
@@ -277,12 +274,21 @@ class Page extends AdminUtilities
         }
     }
 
-    private function loadEntryArray($stmt)
+    private function loadEntryArray($stmt, $search=FALSE)
     {
         $stmt->execute();
-        $stmt->bind_result($id, $page, $title, $subhead, $body, $img, $imgcap,
-            $data1, $data2, $data3, $data4, $data5, $data6, $data7, $data8,
-            $author, $created);
+        if ( $search===TRUE )
+        {
+            $stmt->bind_result($rel, $id, $page, $title, $subhead, $body, $img,
+                    $imgcap, $data1, $data2, $data3, $data4, $data5, $data6,
+                    $data7, $data8, $author, $created);
+        }
+        else
+        {
+            $stmt->bind_result($id, $page, $title, $subhead, $body, $img,
+                    $imgcap, $data1, $data2, $data3, $data4, $data5, $data6,
+                    $data7, $data8, $author, $created);
+        }
 
         /*
          * Cycle through the results and load each into an array element
@@ -347,99 +353,149 @@ class Page extends AdminUtilities
         return $data7;
     }
 
-    protected function paginateEntries()
+    protected function getEntryCountByCategory()
     {
-        $url0 = empty($this->url0) ? 'blog' : $this->url0;
+        $param1 = $page = empty($this->url0) ? 'blog' : $this->url0;
         $url1 = empty($this->url1) ? 'category' : $this->url1;
-        $url2 = empty($this->url2) ? 'recent' : $this->url2;
-        $url3 = empty($this->url3) ? 1 : $this->url3;
-
-        $span = 6; // How many pages shown adjacent to current page
-
-        $sql = "SELECT COUNT(*)
-                AS theCount
+        $param2 = empty($this->url2) ? 'recent' : $this->url2;
+        $param2 = $param2!='recent' ? '%'.str_replace('-', ' ', $param2).'%' : '%';
+        $link = "$url1/$param2";
+        $num = empty($this->url3) ? 1 : $this->url3;
+        $sql = "SELECT
+                    COUNT(title) AS theCount
                 FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
                 WHERE page=?
                 AND data2 LIKE ?";
-        if($stmt = $this->mysqli->prepare($sql))
+        FB::log($sql);
+        try
         {
-            $pagination = "<ul id=\"pagination\">";
-
-            $category = ($url2!='recent') ? '%'.str_replace('-', ' ', $url2).'%' : '%';
-
-            $stmt->bind_param("ss", $url0, $category);
+            $stmt = $this->mysqli->prepare($sql);
+            $stmt->bind_param("ss", $param1, $param2);
             $stmt->execute();
             $stmt->bind_result($c);
             $stmt->fetch();
-
-            /*
-             * Determine minimum and maximum page numbers
-             */
-            $pages = ceil($c/BLOG_PREVIEW_NUM);
-
-            $prev_page = $url3-1;
-            if($url3==1)
-            {
-                $pagination .= "
-                    <li class=\"off\">
-                        <span>&#171;</span>
-                    </li>
-                    <li class=\"off\">
-                        <span>&#139;</span>
-                    </li>";
-            }
-            else
-            {
-                $pagination .= "
-                    <li>
-                        <a href=\"/$url0/$url1/$url2/1/\">&#171;</a>
-                    </li>
-                    <li>
-                        <a href=\"/$url0/$url1/$url2/$prev_page/\">&#139;</a>
-                    </li>";
-            }
-
-            $mod = ($span>$url3) ? $span-$url3 : 0;
-            $max_mod = ($url3+$span>$pages) ? $span-($pages-$url3) : 0;
-            $max = ($url3+$span<=$pages) ? $url3+$span+$mod : $pages;
-            $max_num = ($max>$pages) ? $pages : $max;
-            $min = ($max_num>$span*2) ? $url3-$span-$max_mod : 1;
-            $min_num = ($min<1) ? 1 : $min;
-
-            for($i=$min_num; $i<=$max_num; ++$i)
-            {
-                $sel = ($i==$url3) ? ' class="selected"' : NULL;
-                $pagination .= "
-                    <li$sel>
-                        <a href=\"/$url0/$url1/$url2/$i/\">$i</a>
-                    </li>";
-            }
             $stmt->close();
-
-            $next_page = $url3+1;
-            if($next_page>$pages)
-            {
-                $pagination .= "
-                    <li class=\"off\">
-                        <span>&#155;</span>
-                    </li>
-                    <li class=\"off\">
-                        <span>&#187;</span>
-                    </li>";
-            }
-            else
-            {
-                $pagination .= "
-                    <li>
-                        <a href=\"/$url0/$url1/$url2/$next_page/\">&#155;</a>
-                    </li>
-                    <li>
-                        <a href=\"/$url0/$url1/$url2/$pages/\">&#187;</a>
-                    </li>";
-            }
-
-            return $pagination."</ul>";
         }
+        catch ( Exception $e )
+        {
+            FB::log($e->getMessage());
+            return 1;
+        }
+        return $c;
+    }
+
+    protected function getEntryCountBySearch($search)
+    {
+        $query = htmlentities($search, ENT_QUOTES);
+        $keys = explode(' ', $query);
+        $param2 = NULL;
+        foreach ( $keys as $key )
+        {
+            $param2 .= empty($param2) ? "+$key" : " +$key";
+        }
+        $param1 = "%$query%";
+
+        $sql = "SELECT
+                    COUNT(title) AS theCount
+                FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
+                WHERE title LIKE ?
+                OR MATCH (`body`) AGAINST (? IN BOOLEAN MODE)";
+        try
+        {
+            $stmt = $this->mysqli->prepare($sql);
+            $stmt->bind_param("ss", $param1, $param2);
+            $stmt->execute();
+            $stmt->bind_result($c);
+            $stmt->fetch();
+            $stmt->close();
+        }
+        catch ( Exception $e )
+        {
+            FB::log($e->getMessage());
+            return 1;
+        }
+        return $c;
+    }
+
+    protected function paginateEntries($preview=BLOG_PREVIEW_NUM)
+    {
+        if ( $this->url0=="search" )
+        {
+            $page = 'search';
+            $link = $this->url1;
+            $num = empty($this->url2) ? 1 : $this->url2;
+            $c = $this->getEntryCountBySearch($link);
+        }
+        else
+        {
+            $param1 = $page = empty($this->url0) ? 'blog' : $this->url0;
+            $url1 = empty($this->url1) ? 'category' : $this->url1;
+            $url2 = empty($this->url2) ? 'recent' : $this->url2;
+            $link = "$url1/$url2";
+            $num = empty($this->url3) ? 1 : $this->url3;
+            $c = $this->getEntryCountByCategory();
+            FB::log($c, "Entry count");
+        }
+
+        $span = 6; // How many pages shown adjacent to current page
+
+        $pagination = "<ul id=\"pagination\">";
+
+        /*
+         * Determine minimum and maximum page numbers
+         */
+        $pages = ceil($c/$preview);
+
+        $prev_page = $num-1;
+        if($num==1)
+        {
+            $pagination .= "";
+        }
+        else
+        {
+            $pagination .= "
+                <li>
+                    <a href=\"/$page/$link/1/\">&#171;</a>
+                </li>
+                <li>
+                    <a href=\"/$page/$link/$prev_page/\">&#139;</a>
+                </li>";
+        }
+
+        $mod = ($span>$num) ? $span-$num : 0;
+        $max_mod = ($num+$span>$pages) ? $span-($pages-$num) : 0;
+        $max = ($num+$span<=$pages) ? $num+$span+$mod : $pages;
+        $max_num = ($max>$pages) ? $pages : $max;
+        $min = ($max_num>$span*2) ? $num-$span-$max_mod : 1;
+        $min_num = ($min<1) ? 1 : $min;
+
+        for($i=$min_num; $i<=$max_num; ++$i)
+        {
+            $sel = ($i==$num) ? ' class="selected"' : NULL;
+            $pagination .= "
+                <li$sel>
+                    <a href=\"/$page/$link/$i/\">$i</a>
+                </li>";
+        }
+
+        $next_page = $num+1;
+        if($next_page>$pages)
+        {
+            $pagination .= "";
+        }
+        else
+        {
+            $pagination .= "
+                <li>
+                    <a href=\"/$page/$link/$next_page/\">&#155;</a>
+                </li>
+                <li>
+                    <a href=\"/$page/$link/$pages/\">&#187;</a>
+                </li>";
+        }
+
+        return $pagination . "
+            </ul>\n";
     }
 
     public function reorderEntries($id, $pos, $direction)

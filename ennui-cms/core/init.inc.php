@@ -3,6 +3,14 @@
 // Enable sessions
 session_start();
 
+// Start a timer
+$start_time = microtime(TRUE);
+
+// Starts output buffering
+ob_start();
+
+// TODO: Check for a cached version of the requested page
+
 // Create a token if one doesn't exist or has timed out
 if ( !isset($_SESSION['token']) && $_SESSION['TTL']<=time() )
 {
@@ -52,8 +60,6 @@ else
 // URL Parsing - Read the URL and break it apart for processing
 $url_array = Utilities::readUrl();
 
-FB::log($url_array, "URL Array");
-
 if ( !is_array($url_array) && file_exists($url_array) )
 {
     require_once $url_array;
@@ -75,6 +81,12 @@ $menuPage = Utilities::getPageAttributes($menuPages, $url_array[0]);
 if ( $url_array[0]=='admin' )
 {
     $menuPage = array('display'=>'Administrative Controls', 'type'=>'admin');
+}
+
+// Check if the search page is being accessed
+if ( $url_array[0]=='search' )
+{
+    $menuPage = array('display'=>'Search', 'type'=>'search');
 }
 
 // If the supplied URL doesn't match any menu items, direct to the 404 page

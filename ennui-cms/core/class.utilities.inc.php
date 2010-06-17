@@ -13,19 +13,32 @@ class Utilities
                 "/<h(?:2|3)(.*?)>/i",
                 "/<\/h(?:2|3)>/i",
                 "/<p>/i",
-                "/<\/p>(?:\n*)/is",
-                "/(?:<br \/>(?:\n*)){2,}+/is"
+                "/<\/p>(?:\n*)/is"
             );
         $rep = array(
                 "",
                 "<strong>",
                 "</strong><br /><br />",
                 "",
-                "<br /><br />",
                 "<br /><br />"
             );
         $body = preg_replace($pat, $rep, $body);
+
         $text = strip_tags($body,'<strong><br><a>');
+
+        $pat2 = array(
+                "/<([A-Z][A-Z0-9]*)\b[^>]*>\s*?<\/\\1>/is",
+                "/<([A-Z][A-Z0-9]*)\b[^>]*>\s*?<\\1>/is",
+                "/^(?:<br ?\/>)*\s*/is",
+                "/(?:<br ?\/>(?:\n|&nbsp;)*){2,}+/is"
+            );
+        $rep2 = array(
+                "",
+                "",
+                "",
+                "<br /><br />");
+        $text = preg_replace($pat2, $rep2, $text);
+
 
         // Pull the text apart at the spaces
         $words = explode(' ', $text);
@@ -522,7 +535,6 @@ class Utilities
 
     static function readUrl()
     {
-        // TODO: Make sure this works in all situations before pushing to master
         $root = dirname($_SERVER['SCRIPT_FILENAME']);
         $uri = $_SERVER['REQUEST_URI'];
         $uri = explode('?',$uri);
@@ -563,10 +575,22 @@ class Utilities
         else { return NULL; }
     }
 
-    public static function generatePageTitle($page, $title=NULL)
-    {
-        $sep = SITE_TITLE_SEPARATOR;
-        $title = SITE_TITLE;
-    }
+	public static function displaySearchBox($page='blog')
+	{
+		$page = htmlentities($page, ENT_QUOTES);
+        $form_action = FORM_ACTION;
+		return "
+                <form method=\"post\"
+                      action=\"$form_action\">
+                    <fieldset>
+                        <input type=\"text\" name=\"search_string\" />
+                        <input type=\"hidden\" name=\"page\"
+                               value=\"$page\" />
+                        <input type=\"hidden\" name=\"action\"
+                               value=\"entry_search\" />
+                        <input type=\"submit\" value=\"Search\" />
+                    </fieldset>
+                </form>";
+	}
 
 }
