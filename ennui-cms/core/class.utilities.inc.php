@@ -575,22 +575,4 @@ class Utilities
         else { return NULL; }
     }
 
-	public static function displaySearchBox($page='blog')
-	{
-		$page = htmlentities($page, ENT_QUOTES);
-        $form_action = FORM_ACTION;
-		return "
-                <form method=\"post\"
-                      action=\"$form_action\">
-                    <fieldset>
-                        <input type=\"text\" name=\"search_string\" />
-                        <input type=\"hidden\" name=\"page\"
-                               value=\"$page\" />
-                        <input type=\"hidden\" name=\"action\"
-                               value=\"entry_search\" />
-                        <input type=\"submit\" value=\"Search\" />
-                    </fieldset>
-                </form>";
-	}
-
 }
