@@ -1,29 +1,12 @@
 <?php
 
-    /*
-     * Start a timer
-     */
-     $start_time = microtime(TRUE);
-
-    /*
-     * Starts output buffering
-     * TODO: Check for a cached version of the requested page
-     */
-    ob_start();
-
-    /*
-     * Define a path for loading the CMS. Default is ../ennui-cms/
-     */
+    // Define a path for loading the CMS. Default is ../ennui-cms/
     define('CMS_PATH', '../ennui-cms/');
 
-    /*
-     * Initializes the core functionality of the CMS
-     */
+    // Initializes the core functionality of the CMS
     require_once CMS_PATH . 'core/init.inc.php';
 
-    /*
-     * Initialize classes used in the sidebar or in widgets
-     */
+    // Initialize classes used in the sidebar or in widgets
     $sidebar = new Single($dbo, array('sidebar'));
 
 ?>
@@ -48,9 +31,7 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
 <?php
     endif;
 
-    /*
-     * If the user is logged in, load stylesheets for the admin controls
-     */
+    // If the user is logged in, load stylesheets for the admin controls
     if ( isset($_SESSION['user']) && $_SESSION['user']['clearance']>=1 ):
 ?>
 
@@ -84,6 +65,7 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
         <h1 id="header_title"> <a href="/"><?php echo SITE_NAME; ?></a> </h1>
         <nav>
 <?php echo Utilities::buildMenu($url_array, $menuPages); ?>
+
         </nav>
 
     </header>
@@ -91,10 +73,12 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
     <div id="content">
         <section class="entrydisplay" id="<?php echo $obj->url0 ?>">
 
-<!-- Generated content -->
+<!-- BEGIN GENERATED CONTENT -->
+
 <?php echo $obj->displayPublic() ?>
 
-<!-- End generated content -->
+
+<!-- END GENERATED CONTENT -->
 
         </section><!-- end .entrydisplay -->
         <aside>
@@ -107,12 +91,15 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
 
     <footer>
         <p class="credits">
-            All content &copy; <?php echo Utilities::copyrightYear(SITE_CREATED_YEAR), ' ', SITE_NAME; ?> |
+            All content &copy;
+<?php echo Utilities::copyrightYear(SITE_CREATED_YEAR), ' ', SITE_NAME; ?> |
             <a href="<?php echo SITE_URL ?>contact">Contact Us</a> |
-            <a href="http://ennuidesign.com" rel="external">Website by Ennui Design</a>
+            <a href="http://ennuidesign.com"
+               rel="external">Website by Ennui Design</a>
         </p>
     </footer>
 
+    <!-- Load jQuery and jQuery UI -->
     <script type="text/javascript"
             src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
@@ -120,14 +107,12 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
         google.load("jqueryui", "1");
     </script>
 <?php
-
-/*
- * If the user is logged in, load JavaScript for the admin controls
- */
-if($obj->url0=="admin" || isset($_SESSION['user']) && $_SESSION['user']['clearance']>=1 ):
-
+    // If the user is logged in, load JavaScript for the admin controls
+    if($obj->url0=="admin" || isset($_SESSION['user'])
+            && $_SESSION['user']['clearance']>=1 ):
 ?>
 
+    <!-- Admin JS Files -->
     <script type="text/javascript"
             src="/assets/js/tiny_mce/jquery.tinymce.js"></script>
     <script type="text/javascript"
@@ -140,48 +125,36 @@ if($obj->url0=="admin" || isset($_SESSION['user']) && $_SESSION['user']['clearan
             src="/assets/js/jquery.uploadify.js"></script>
 <?php endif; ?>
 
+    <!-- Initialization JS File -->
     <script type="text/javascript"
             src="/assets/js/ennui.init.js"></script>
 <?php
-    /*
-     * If a Google Analytics user is set, include the Google Analytics code
-     */
+    // If a Google Analytics user is set, include the Google Analytics code
     if( GOOGLE_ANALYTICS_USER != "" ):
 ?>
 
-    <!--// Google Analytics //-->
+    <!-- Google Analytics -->
     <script type="text/javascript" src="http://www.google-analytics.com/ga.js"></script>
     <script type="text/javascript">
         var pageTracker = _gat._getTracker("<?php echo GOOGLE_ANALYTICS_USER; ?>");
         pageTracker._trackPageview();
     </script>
-    <!--// End Google Analytics //-->
 <?php endif; ?>
 
 
 </body>
 
 <?php
-
-/*
- * Generate a quick note to let geeks know how long the page render took
- */
-echo "<!-- Page rendered by Ennui CMS in ",
-        round((microtime(TRUE)-$start_time)*1000), " milliseconds -->";
-
+    // Generate a quick note to let geeks know how long the page render took
+    echo "<!-- Page rendered by Ennui CMS in ",
+            round((microtime(TRUE)-$start_time)*1000), " milliseconds -->";
 ?>
 
 
 </html>
 <?php
+    // Clean the buffer
+    $cache = ob_get_clean();
 
-$dbo->close();
-
-/*
- * Clean the buffer
- *
- * TODO: Save cache if none exists
- */
-$cache = ob_get_clean();
-
-echo $cache;
+    // TODO: Save cache if none exists
+    echo $cache;
