@@ -11,6 +11,7 @@ class AdminUtilities
 	 * @return array	The beginning and end of the form HTML in format:
 	 * 						'start' => Beginning of the form,
 	 * 						'end' => End of the form HTML + hidden elements
+	 * @TODO - Move this into form class on develop-forms branch.
 	 */
 	protected function createForm($action, $id=NULL, $caption=NULL, $showcap=TRUE)
 	{
@@ -196,7 +197,10 @@ INPUT;
 
 		return $input;
 	}
-
+	/**
+	  * @TODO - Remove inline JS event handlers and dependency.
+	  *
+	  */
 	protected function admin_general_options($page)
 	{
 		if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn']==1)
@@ -282,7 +286,9 @@ ADMIN_OPTIONS;
 			return NULL;
 		}
 	}
-
+	/**
+	  * @TODO - Remove inline JS and attach event handlers instead.
+	  */
 	protected function admin_gallery_options($page, $id, $n, $i)
 	{
 		$dir = GAL_SAVE_DIR;
@@ -333,7 +339,10 @@ ADMIN_OPTIONS;
 	{
 		$_SESSION['loggedIn'] = (isset($_SESSION['loggedIn'])&&$_SESSION['loggedIn']==1) ? 1 : 0;
 	}
-
+	
+	/**
+	  * @TODO - The cake is a lie. Needs a salt unless this has been patched on a different branch.
+	  */
 	static function createSaltedHash($val)
 	{
 		return sha1($val);
