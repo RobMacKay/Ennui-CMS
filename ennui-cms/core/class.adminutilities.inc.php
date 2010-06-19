@@ -313,35 +313,37 @@ ADMIN_OPTIONS;
 </span>
 
 ADMIN_OPTIONS;
-        }
-        else
-        {
-            return NULL;
-        }
-    }
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+	/**
+	  * @TODO - Remove inline JS and attach event handlers instead.
+	  */
+	protected function admin_gallery_options($page, $id, $n, $i)
+	{
+		$dir = GAL_SAVE_DIR;
+		if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn']==1)
+		{
+			if($i==1)
+			{
+				$up = "move up";
+				$down = "<a href=\"javascript:reorderEntry('$this->url0', '$i','down','$id');\">move down</a>";
+			}
+			elseif($i==$n)
+			{
+				$up = "<a href=\"javascript:reorderEntry('$this->url0', '$i','up','$id');\">move up</a>";
+				$down = "move down";
+			}
+			else
+			{
+				$up = "<a href=\"javascript:reorderEntry('$this->url0', '$i','up','$id');\">move up</a>";
+				$down = "<a href=\"javascript:reorderEntry('$this->url0', '$i','down','$id');\">move down</a>";
+			}
 
-    protected function admin_gallery_options($page, $id, $n, $i)
-    {
-        $dir = GAL_SAVE_DIR;
-        if ( isset($_SESSION['user']) && $_SESSION['user']['clearance']>=1 )
-        {
-            if($i==1)
-            {
-                $up = "move up";
-                $down = "<a href=\"javascript:reorderEntry('$this->url0', '$i','down','$id');\">move down</a>";
-            }
-            elseif($i==$n)
-            {
-                $up = "<a href=\"javascript:reorderEntry('$this->url0', '$i','up','$id');\">move up</a>";
-                $down = "move down";
-            }
-            else
-            {
-                $up = "<a href=\"javascript:reorderEntry('$this->url0', '$i','up','$id');\">move up</a>";
-                $down = "<a href=\"javascript:reorderEntry('$this->url0', '$i','down','$id');\">move down</a>";
-            }
-
-            return <<<ADMIN_OPTIONS
+			return <<<ADMIN_OPTIONS
 
 <span class="adminsimpleoptions">
     [
@@ -542,6 +544,7 @@ ADMIN_OPTIONS;
         $mysqli->close();
         return true;
     }
+
 }
 
 ?>
