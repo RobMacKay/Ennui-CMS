@@ -153,3 +153,6 @@ $_CONSTANTS['GRAVATAR_BORDER_COLOR'] = "222222";
  * Tags to allow in filtered posts
  */
 $_CONSTANTS['STRIP_TAGS_WHITELIST'] = "<strong><em><p><img[src|alt|title]><a[href|title]>";
+
+$_CONSTANTS['CACHE_DIR'] = '../ennui-cms/cache/';
+$_CONSTANTS['CACHE_EXPIRES'] = 86400;

@@ -575,4 +575,63 @@ class Utilities
         else { return NULL; }
     }
 
+    /**
+     * Checks for the existence of a cached file with the ID passed
+     *
+     * @param string $cache_id  A string by which the cache is identified
+     * @return mixed            The cached data if saved, else boolean FALSE
+     */
+    public static function checkCache($cache_id)
+    {
+        $cachefile = CACHE_DIR . md5($cache_id) . '.cache';
+
+        if ( isset($_SESSION['loggedIn']) && $_SESSION['loggedIn']>=1 )
+        {
+            return FALSE;
+        }
+
+		/*
+		 * If the cached file exists and is within the time limit defined in
+         * CACHE_EXPIRES, load the cached data. Does not apply if the user is
+         * logged in
+		 */
+		if ( file_exists($cachefile)
+                && time()-filemtime($cachefile)<=CACHE_EXPIRES )
+		{
+			$cache = file_get_contents($cachefile);
+			FB::log("Data loaded from cache at $cachefile");
+            return unserialize($cache);
+		}
+        else { return FALSE; }
+    }
+
+    /**
+     * Caches data for future reuse
+     * 
+     * @param string $handle    The ID with which to identify the cached data
+     * @param mixed $data       The cached data (usually an array)
+     * @return string           The name of the cache file
+     */
+    public static function saveCache($handle, $data)
+    {
+        // Log a message and don't cache if the user is logged in
+        if ( isset($_SESSION['loggedIn']) && $_SESSION['loggedIn']>=1 )
+        {
+            FB::log("Caching disabled for logged in users.");
+            return FALSE;
+        }
+
+        // Create a unique file handle for the data
+        $cachefile = CACHE_DIR . md5($handle) . '.cache';
+
+        // Cache the images for vast speed improvements
+        $fp = fopen($cachefile, "w");
+        fwrite($fp, serialize($data));
+        fclose($fp);
+
+        FB::log("Cache saved at $cachefile");
+
+        return $cachefile;
+    }
+
 }

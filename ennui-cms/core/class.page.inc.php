@@ -58,16 +58,17 @@ class Page extends AdminUtilities
      */
     public function __construct($mysqli=NULL, $url_array=NULL)
     {
-        // TODO: Migrate to PDO
-        if(isset($mysqli)) {
-            $this->mysqli = $mysqli;
-        } else {
-            $this->mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        // Creates a database object
+        parent::__construct();
+
+        for ( $i=0, $c=count($url_array); $i<$c; ++$i )
+        {
+            if ( !empty($url_array[$i]) )
+            {
+                $prop = "url$i";
+                $this->$prop = $url_array[$i];
+            }
         }
-        $this->url0 = (isset($url_array[0]) && !empty($url_array[0])) ? $url_array[0] : NULL;
-        $this->url1 = (isset($url_array[1]) && !empty($url_array[1])) ? $url_array[1] : NULL;
-        $this->url2 = (isset($url_array[2]) && !empty($url_array[2])) ? $url_array[2] : NULL;
-        $this->url3 = (isset($url_array[3]) && !empty($url_array[3])) ? $url_array[3] : NULL;
     }
 
     public function getPageTitle($menuPage)
@@ -84,15 +85,19 @@ class Page extends AdminUtilities
         {
             $entry_title = ucwords(str_replace("-", " ", $this->url2));
             $entry = ucwords(str_replace("-", " ", $this->url1))
-                    . ": " .$entry_title;
+                    . ": " .$entry_title .  $sep;
+        }
+        else if ( isset($this->url1) )
+        {
+            $arr = $this->getEntryByUrl($this->url1);
+            $entry = isset($arr[0]['title']) ? $arr[0]['title'] . $sep : NULL;
         }
         else
         {
-            $arr = $this->getEntryByUrl($this->url1);
-            $entry = isset($arr[0]['title']) ? $arr[0]['title'] : NULL;
+            $entry = NULL;
         }
 
-        return "$entry $sep $page $sep $title";
+        return "$entry $page $sep $title";
     }
 
     protected function getEntryCategories($entries)
@@ -148,48 +153,6 @@ class Page extends AdminUtilities
         return $a['count']<$b['count'] ? 1 : -1;
     }
 
-    /**
-     * Returns an entry by its ID
-     *
-     * @param int $id
-     * @return array    The entry as an associative array
-     */
-    protected function getEntryById($id)
-    {
-        /*
-         * Prepare the query and execute it
-         */
-        $sql = "SELECT
-                id, page, title, subhead, body, img, imgcap, data1, data2,
-                data3, data4, data5, data6, data7, data8, author, created
-                FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                WHERE id=?
-                LIMIT 1";
-        $stmt = $this->mysqli->prepare($sql);
-        $stmt->bind_param("i", $id);
-        return $this->loadEntryArray($stmt);
-    }
-
-    protected function getEntryByUrl($url)
-    {
-        $title = urldecode($url);
-
-        /*
-         * Prepare the query and execute it
-         */
-        $sql = "SELECT
-                id, page, title, subhead, body, img, imgcap, data1, data2,
-                data3, data4, data5, data6, data7, data8, author, created
-                FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                WHERE title LIKE ?
-                OR data6=?
-                LIMIT 1";
-        $stmt = $this->mysqli->prepare($sql);
-        $var = '%'.$title.'%';
-        $stmt->bind_param("ss", $var, $title);
-        return $this->loadEntryArray($stmt);
-    }
-
     protected function getEntriesByCategory($category, $limit=10, $offset=0)
     {
         /*
@@ -243,82 +206,6 @@ class Page extends AdminUtilities
             FB::log($this->mysqli->error, "MySQLi Error");
             die ( "Search Error: " . $e->getMessage() );
         }
-    }
-
-    /**
-     * Retrieves all values for the given page from the database
-     *
-     * @param int $offset
-     * @param int $limit
-     * @return array    A multi-dimensional array of entries
-     */
-    protected function getAllEntries($limit=10, $offset=0, $orderby="created DESC")
-    {
-        $entries = array();
-
-        /*
-         * Prepare the statement and execute it
-         */
-        $sql = "SELECT
-                id, page, title, subhead, body, img, imgcap, data1, data2,
-                data3, data4, data5, data6, data7, data8, author, created
-                FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                WHERE page=?
-                ORDER BY $orderby
-                LIMIT $offset, $limit";
-        if($stmt = $this->mysqli->prepare($sql)) {
-            $stmt->bind_param("s", $this->url0);
-            return $this->loadEntryArray($stmt);
-        } else {
-            exit('Database query failed. '.$this->mysqli->error);
-        }
-    }
-
-    private function loadEntryArray($stmt, $search=FALSE)
-    {
-        $stmt->execute();
-        if ( $search===TRUE )
-        {
-            $stmt->bind_result($rel, $id, $page, $title, $subhead, $body, $img,
-                    $imgcap, $data1, $data2, $data3, $data4, $data5, $data6,
-                    $data7, $data8, $author, $created);
-        }
-        else
-        {
-            $stmt->bind_result($id, $page, $title, $subhead, $body, $img,
-                    $imgcap, $data1, $data2, $data3, $data4, $data5, $data6,
-                    $data7, $data8, $author, $created);
-        }
-
-        /*
-         * Cycle through the results and load each into an array element
-         */
-        $entries = array();
-        while($stmt->fetch()) {
-            $img = (substr($img,0,1)!='/') ? $img = "/$img" : $img;
-            $entries[] = array(
-                'id' => stripslashes($id),
-                'page' => stripslashes($page),
-                'title' => stripslashes($title),
-                'subhead' => stripslashes($subhead),
-                'body' => stripslashes($body),
-                'img' => stripslashes($img),
-                'imgcap' => stripslashes($imgcap),
-                'data1' => stripslashes($data1),
-                'data2' => stripslashes($data2),
-                'data3' => stripslashes($data3),
-                'data4' => stripslashes($data4),
-                'data5' => stripslashes($data5),
-                'data6' => stripslashes($data6),
-                'data7' => stripslashes($data7),
-                'data8' => stripslashes($data8),
-                'author' => stripslashes($author),
-                'created' => stripslashes($created)
-            );
-        }
-        $stmt->close();
-
-        return $entries;
     }
 
     protected function countEntries($page)

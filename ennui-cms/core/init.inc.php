@@ -26,6 +26,8 @@ include_once CMS_PATH . 'config/admin.inc.php';
 
 // Include core classes
 include_once CMS_PATH . 'core/class.utilities.inc.php';
+include_once CMS_PATH . 'core/class.db_connect.inc.php';
+include_once CMS_PATH . 'core/class.db_actions.inc.php';
 include_once CMS_PATH . 'core/class.adminutilities.inc.php';
 include_once CMS_PATH . 'core/class.imagecontrol.inc.php';
 include_once CMS_PATH . 'core/class.page.inc.php';
@@ -151,5 +153,3 @@ function __autoload($classname)
  * Load the page title
  */
 $title = $obj->getPageTitle($menuPage);
-
-?>

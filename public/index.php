@@ -146,8 +146,9 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
 
 <?php
     // Generate a quick note to let geeks know how long the page render took
-    echo "<!-- Page rendered by Ennui CMS in ",
-            round((microtime(TRUE)-$start_time)*1000), " milliseconds -->";
+    $time = round((microtime(TRUE)-$start_time)*1000);
+    echo "<!-- Page rendered by Ennui CMS in ", $time, " milliseconds -->";
+    FB::log("Page rendered by Ennui CMS in $time milliseconds")
 ?>
 
 

@@ -1,6 +1,6 @@
 <?php
 
-class AdminUtilities
+class AdminUtilities extends DB_Actions
 {
 
     /**
