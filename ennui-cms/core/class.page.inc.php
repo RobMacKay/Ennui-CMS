@@ -5,6 +5,17 @@
  * 
  * This class handles database interaction and file uploads for most publicly
  * displayed pages built on the EnnuiCMS platform.
+ * A class to perform all common database actions
+ *
+ * PHP version 5
+ *
+ * LICENSE: This source file is subject to the MIT License, available at
+ * http://www.opensource.org/licenses/mit-license.html
+ *
+ * @author     Jason Lengstorf <jason.lengstorf@ennuidesign.com>
+ * @author     Drew Douglass <drew.douglass@ennuidesign.com>
+ * @copyright  2010 Ennui Design
+ * @license    http://www.opensource.org/licenses/mit-license.html  MIT License
  *
  */
 class Page extends AdminUtilities
@@ -60,8 +71,9 @@ class Page extends AdminUtilities
     {
         // Creates a database object
         parent::__construct();
-
-        for ( $i=0, $c=count($url_array); $i<$c; ++$i )
+		
+		$arr_count = count($url_array);
+        for ( $i=0, $i<$arr_count; ++$i )
         {
             if ( !empty($url_array[$i]) )
             {
@@ -144,13 +156,13 @@ class Page extends AdminUtilities
         }
     }
 
-    static function cmp($a, $b)
+    static function cmp($val_a, $val_b)
     {
-        if ( $a['count']===$b['count'] )
+        if ( $val_a['count']===$val_b['count'] )
         {
             return 0;
         }
-        return $a['count']<$b['count'] ? 1 : -1;
+        return $val_a['count']<$val_b['count'] ? 1 : -1;
     }
 
     protected function getEntriesByCategory($category, $limit=10, $offset=0)
