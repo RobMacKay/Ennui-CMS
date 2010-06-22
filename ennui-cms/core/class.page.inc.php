@@ -5,7 +5,6 @@
  * 
  * This class handles database interaction and file uploads for most publicly
  * displayed pages built on the EnnuiCMS platform.
- * A class to perform all common database actions
  *
  * PHP version 5
  *
