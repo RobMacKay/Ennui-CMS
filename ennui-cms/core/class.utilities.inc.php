@@ -381,18 +381,16 @@ class Utilities
         }
 
         /*
-         * Loop through each passed entry and insert its values into the
-         * layout defined in the looped section of the template
-         */
-        $markup = NULL;
-        for ( $i=0, $c=min($p['max_entries'],count($entries)); $i<$c; ++$i )
-        {
-            $markup .= preg_replace_callback(
-                            $pattern,
-                            $callback($entries[$i], $p),
-                            $entry_template
-                        );
-        }
+		 * Loop through each passed entry and insert its values into the
+		 * layout defined in the looped section of the template
+		 */
+		$markup = NULL;
+		for ( $i=0, $c=min($p['max_entries'], count($entries)); $i<$c; ++$i )
+		{
+			$entries[$i]['first'] = $i==0 ? 'first' : NULL;
+			$entries[$i]['last'] = $i==$c-1 ? 'last' : NULL;
+			$markup .= preg_replace_callback($pattern,$callback($entries[$i], $p),$entry_template);
+		} 
 
         // Return the formatted data and append the footer if a match is made
         return $header . $markup . $footer;
