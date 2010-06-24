@@ -71,8 +71,7 @@ class Page extends AdminUtilities
         // Creates a database object
         parent::__construct();
 		
-		$arr_count = count($url_array);
-        for ( $i=0, $i<$arr_count; ++$i )
+        for ( $i=0, $c=count($url_array); $i<$c; ++$i )
         {
             if ( !empty($url_array[$i]) )
             {
