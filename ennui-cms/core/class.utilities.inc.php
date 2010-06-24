@@ -504,7 +504,16 @@ class Utilities
         $current = date('Y', time());
         return ($current>$created) ? $created.'-'.$current : $current;
     }
-
+    
+	/**
+	  * IMPORTANT! This method is now deprecated and will eventually
+	  * be phased out, do NOT use this method!
+	  *
+	  * Instead, use the Validate class that has the same method name.
+	  * Like so, <?php var_dump(Validation::isValidEmail($email));?>
+	  * See the Validate class for more information and methods.
+	  *
+	  */
     static function isValidEmail($email)
     {
         // Define a regex pattern to validate the email address
