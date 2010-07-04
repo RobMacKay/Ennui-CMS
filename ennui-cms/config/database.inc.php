@@ -6,7 +6,7 @@
 $_CONSTANTS['DB_HOST'] = 'localhost';
 $_CONSTANTS['DB_USER'] = 'root';
 $_CONSTANTS['DB_PASS'] = '';
-$_CONSTANTS['DB_NAME'] = 'ennui-cms_db';
+$_CONSTANTS['DB_NAME'] = 'ecms_new-db';
 
 /*
  * Assign a custom prefix for all database tables to avoid conflicts

@@ -317,7 +317,8 @@ class Utilities
             "strip_tags" => FALSE,
             "strip_tags_whitelist" => STRIP_TAGS_WHITELIST,
             "text_preview" => FALSE,
-            "text_preview_length" => 25
+            "text_preview_length" => 25,
+            "add_first_entry_class" => FALSE
         );
 
         // If parameters were passed, decode them here
@@ -385,8 +386,10 @@ class Utilities
          * layout defined in the looped section of the template
          */
         $markup = NULL;
-        for ( $i=0, $c=min($p['max_entries'],count($entries)); $i<$c; ++$i )
+        for ( $i=0, $c=min($p['max_entries'], count($entries)); $i<$c; ++$i )
         {
+            $entries[$i]['first'] = $i==0 ? 'first' : NULL;
+            $entries[$i]['last'] = $i==$c-1 ? 'last' : NULL;
             $markup .= preg_replace_callback(
                             $pattern,
                             $callback($entries[$i], $p),
@@ -614,13 +617,6 @@ class Utilities
      */
     public static function saveCache($handle, $data)
     {
-        // Log a message and don't cache if the user is logged in
-        if ( isset($_SESSION['loggedIn']) && $_SESSION['loggedIn']>=1 )
-        {
-            FB::log("Caching disabled for logged in users.");
-            return FALSE;
-        }
-
         // Create a unique file handle for the data
         $cachefile = CACHE_DIR . md5($handle) . '.cache';
 

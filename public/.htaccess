@@ -7,4 +7,5 @@ FileETag None
 RewriteEngine on
 RewriteBase /
 Options -MultiViews +FollowSymLinks
-RewriteRule !\.(html?|gif|jpe?g|png|css|ico|swf|js|pdf|mp3|mp4|woff|tff|otf|svg|eot|galery\.php)$ index.php [NC]
+RewriteRule test.php - [L]
+RewriteRule !\.(?:html?|gif|j(?:pe?g|s)|p(?:ng|df)|css|ico|s(?:wf|vg)|mp[34]|woff|tff|otf|eot|galery\.php)$ index.php [NC]

@@ -110,6 +110,9 @@ $_CONSTANTS['IMG_QUALITY'] = 8; // Range: 0-9, 9 is highest quality
  */
 $_CONSTANTS['MAX_ENTRIES_PER_PAGE'] = 20;
 
+// Number of pages to display to the left and right of the current page
+$_CONSTANTS['ENTRY_PAGINATION_SPAN'] = 6;
+
 /*
  ******************************************************************************
  * Blog configuration
