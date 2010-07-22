@@ -1,7 +1,7 @@
 <!--//
 
 // This variable is the serialized divs in the admin gallery
-var $order = null,
+var order = null,
     tinymcefile = '/assets/js/tiny_mce/tiny_mce.js',
     processfile = '/assets/inc/update.inc.php',
     uploadifyfile = '/assets/inc/uploadify.inc.php';
@@ -38,8 +38,11 @@ $(".ecms-gallery").live("click", function(e){
 
 });
 
-function showedit(page,option,id) {
-	var params = "page=" + page + "&action=" + option + "&id=" + id;
+function showedit(page,option,entry_id,token) {
+	var params = "page=" + page
+            + "&action=" + option
+            + "&entry_id=" + entry_id
+            + "&token=" + token;
 	$.fancybox.showActivity();
 
 	$.ajax({
@@ -110,13 +113,13 @@ function galleryLoading(dir, page, id)
 	galleryUpload(dir, page, id);
 	$('#admin_gal').append($sort_btn).sortable({
     	update: function(){
-			$order = $(this).sortable('serialize');
+			order = $(this).sortable('serialize');
 		}
 	});
 
 	$('#sortbtn').bind('click', function(){
 		$.ajax({
-			data: "page="+page+"&id="+id+"&action=galleryOrder&"+$order,
+			data: "page="+page+"&id="+id+"&action=galleryOrder&"+order,
 			success: function(msg){
 				$("#"+page).html(msg);
 			}

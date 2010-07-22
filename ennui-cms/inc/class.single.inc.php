@@ -41,15 +41,11 @@ class Single extends Page
             return $this->displayAdmin($id);
         }
 
-        /*
-         * Load the entries
-         */
-        $entries = $this->getAllEntries(1);
+        // Load the entries
+        $this->getAllEntries(1);
 
-        /*
-         * Output the markup
-         */
-        return $this->displayEntry($entries);
+        // Organize the data and pass to a template for markup
+        return $this->displayEntry();
     }
 
     /**
@@ -76,63 +72,43 @@ class Single extends Page
      * @param array $entries an array of entries to be formatted
      * @return string HTML markup to display the entry
      */
-    protected function displayEntry($entries)
+    protected function displayEntry()
     {
-        /*
-         * Extracts the ID of the entry if one was supplied
-         */
-        $id = isset($entries[0]['id']) ? $entries[0]['id'] : NULL;
+        // Extracts the ID of the entry if one was supplied
+        $id = isset($this->entries[0]->entry_id) ? $this->entries[0]->entry_id : NULL;
 
-        /*
-         * If logged in, loads the admin options for the entry
-         */
+        // If logged in, loads the admin options for the entry
         $admin = $this->admin_entry_options($this->url0, $id, false);
 
-        /*
-         * If an entry exists, load the template and insert the data into it
-         */
-        if( isset($entries[0]['title']) )
+        // If an entry exists, load the template and insert the data into it
+        if( isset($this->entries[0]->title) )
         {
-            /*
-             * Store the entries in the entry array for templating purposes
-             */
-            $entries[0]['admin'] = $admin;
+            // Store the entries in the entry array for templating purposes
+            $this->entries[0]->admin = $admin;
 
-            /*
-             * Set the template file
-             */
+            // Set the template file
             $template_file = $this->url0 . '.inc';
         }
 
-        /*
-         * If no entry exists, output some default text to avoid a broken layout
-         */
+        // If no entry exists, output some default text to avoid a broken layout
         else
         {
-            /*
-             * Set default values if no entries are found
-             */
-            $entries[0] = array(
-                    'admin' => $admin,
-                    'title' => "No Entry Found",
-                    'body' => "<p>That entry doesn't appear to exist.</p>"
-                );
+            // Set default values if no entries are found
+            $default = new Entry();
+            $default->admin = $admin;
+            $default->title = "No Entry Found";
+            $default->entry = "<p>That entry doesn't appear to exist.</p>";
+            $this->entries[0] = $default;
 
-            /*
-             * Load the default template
-             */
+            // Load the default template
             $template_file = $this->url0 . '.inc';
         }
 
-        /*
-         * Load the template into a variable
-         */
+        // Load the template into a variable
         $template = UTILITIES::loadTemplate($template_file);
 
-        /*
-         * Return the entry as formatted by the template
-         */
-        return UTILITIES::parseTemplate($entries, $template);
+        // Return the entry as formatted by the template
+        return UTILITIES::parseTemplate($this->entries, $template);
     }
 
 }

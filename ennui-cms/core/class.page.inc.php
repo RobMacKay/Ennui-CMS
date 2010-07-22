@@ -59,7 +59,7 @@ class Page extends AdminUtilities
      * @param object $mysqli
      * @param array $url_array
      */
-    public function __construct($mysqli=NULL, $url_array=NULL)
+    public function __construct($url_array=NULL)
     {
         // Creates a database object
         parent::__construct();
@@ -101,6 +101,23 @@ class Page extends AdminUtilities
         }
 
         return "$entry $page $sep $title";
+    }
+
+    public function getPageDescription()
+    {
+        if ( isset($this->entries[0]->excerpt) )
+        {
+            return strip_tags($this->entries[0]->excerpt);
+        }
+        else if ( isset($this->entries[0]->entry) )
+        {
+            $preview = Utilities::textPreview($this->entries[0]->entry, 25);
+            return strip_tags($preview);
+        }
+        else
+        {
+            return SITE_DESCRIPTION;
+        }
     }
 
     protected function getEntriesByCategory($category, $limit=10, $offset=0)

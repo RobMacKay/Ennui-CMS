@@ -20,6 +20,17 @@ class DB_Actions extends DB_Connect
 //------------------------------------------------------------------------------
 
     /**
+     * An array to store any loaded entries
+     *
+     * @var array   The entries
+     */
+    public $entries = array();
+
+//------------------------------------------------------------------------------
+// CLASS CONSTANTS
+//------------------------------------------------------------------------------
+
+    /**
      * A string containing all the fields available in the entry database
      *
      * NOTE: If this changes, the write function may need to be updated!
@@ -27,9 +38,8 @@ class DB_Actions extends DB_Connect
      * @var string  The fields available in the database
      */
     const ENTRY_FIELDS = "
-                    `id`,`page`,`title`,`subhead`,`body`,`img`,`imgcap`,`data1`,
-                    `data2`,`data3`,`data4`,`data5`,`data6`,`data7`,`data8`,
-                    `author`,`created`";
+                    `entry_id`,`page_id`,`title`,`entry`,`excerpt`,`slug`,
+                    `tags`,`extra`,`author`,`created`";
 
 //------------------------------------------------------------------------------
 // PUBLIC METHODS
@@ -59,14 +69,26 @@ class DB_Actions extends DB_Connect
     public function write()
     {
         // Initialize all variables to prevent any notices
-        $id = ''; $title = NULL; $subhead = NULL; $body = NULL; $imgcap = NULL;
-        $data1 = NULL; $data2 = NULL; $data3 = NULL; $data4 = NULL;
-        $data5 = NULL; $data6 = NULL; $data7 = NULL; $data8 = NULL;
+        $entry_id = '';
+        $page_id = '';
+        $title = NULL;
+        $entry = NULL;
+        $excerpt = NULL;
+        $slug = "";
+        $tags = NULL;
+        $extra = array();
+
+        $var_names = array('entry_id', 'page_id', 'title', 'entry', 'excerpt',
+                'slug', 'tags', 'author', 'created');
 
         // Loop through the POST array and define all variables
         foreach ( $_POST as $key => $val )
         {
-            if ( $key=="body" )
+            if ( !in_array($key, $var_names) )
+            {
+                $extra[$key] = $val;
+            }
+            else if ( $key==="entry" || $key==="excerpt" )
             {
                 $$key = $val;
             }
@@ -77,111 +99,52 @@ class DB_Actions extends DB_Connect
             }
         }
 
-        // If a value wasn't passed for data6, save a URL version of the title
-        $data6 = !empty($data6) ? UTILITIES::makeUrl($title) : $data6;
-
-        // Checks for and processes the image and returns the file path
-        $img = isset($_FILES['img']) ? $this->checkIMG($_FILES['img']) : NULL;
-        if ( $img===FALSE )
-        {
-            $img = isset($stored_img) ? $stored_img : NULL;
-        }
-
-        /*
-         * PDF uploads go through the data8 field. If the $_FILES superglobal
-         * isn't set, handle the input as a string. Otherwise, process as a PDF
-         *
-         * TODO: Adjust this to accept more file types
-         */
-        if ( isset($_FILES['data8']) && $_FILES['data8']['size']>0 )
-        {
-            $data8check = $this->uploadPDF($_FILES['data8'],$title);
-            $data8 = ($data8check===false) ? NULL : $data8;
-        }
+        // If a slug wasn't set, save a URL version of the title
+        $slug = empty($slug) ? Utilities::makeUrl($title) : $slug;
 
         // Store the author's name and a timestamp
-        $author = $_SESSION['admin_u'];
+        $author = $_SESSION['user']['name'];
         $created = time();
 
         // Set up the query to insert or update the entry
-        $sql = "INSERT INTO `".DB_NAME."`.`".DB_PREFIX."entryMgr`
+        $sql = "INSERT INTO `".DB_NAME."`.`".DB_PREFIX."entries`
                 (" . self::ENTRY_FIELDS . "
                 )
                 VALUES
                 (
-                    `id`=:id, `page`=:page, `title`=:title, `subhead`=:subhead,
-                    `body`=:body, `data1`=:data1, `data2`=:data2,
-                    `data3`=:data3, `data4`=:data4, `data5`=:data5,
-                    `data6`=:data6, `data7`=:data7, `data8`=:data8,
-                    `author`=:author, `created`=:created
+                    :entry_id, :page_id, :title, :entry, :excerpt, :slug, :tags, 
+                    :extra, :author, :created
                 )
                 ON DUPLICATE KEY UPDATE
-                    `id`=:id, `page`=:page, `title`=:title, `subhead`=:subhead,
-                    `body`=:body, `data1`=:data1, `data2`=:data2,
-                    `data3`=:data3, `data4`=:data4, `data5`=:data5,
-                    `data6`=:data6, `data7`=:data7, `data8`=:data8
-                LIMIT 1;";
+                    `title`=:title,
+                    `entry`=:entry,
+                    `excerpt`=:excerpt,
+                    `slug`=:slug,
+                    `tags`=:tags,
+                    `extra`=:extra;";
 
         try
         {
             $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(":id", $id, PDO::PARAM_INT);
-            $stmt->bindParam(":page", $page, PDO::PARAM_INT);
-            $stmt->bindParam(":title", $title, PDO::PARAM_INT);
-            $stmt->bindParam(":subhead", $subhead, PDO::PARAM_INT);
-            $stmt->bindParam(":img", $img, PDO::PARAM_INT);
-            $stmt->bindParam(":imgcap", $imgcap, PDO::PARAM_INT);
-            $stmt->bindParam(":body", $body, PDO::PARAM_INT);
-            $stmt->bindParam(":data1", $data1, PDO::PARAM_INT);
-            $stmt->bindParam(":data2", $data2, PDO::PARAM_INT);
-            $stmt->bindParam(":data3", $data3, PDO::PARAM_INT);
-            $stmt->bindParam(":data4", $data4, PDO::PARAM_INT);
-            $stmt->bindParam(":data5", $data5, PDO::PARAM_INT);
-            $stmt->bindParam(":data6", $data6, PDO::PARAM_INT);
-            $stmt->bindParam(":data7", $data7, PDO::PARAM_INT);
-            $stmt->bindParam(":data8", $data8, PDO::PARAM_INT);
-            $stmt->bindParam(":author", $author, PDO::PARAM_INT);
-            $stmt->bindParam(":created", $created, PDO::PARAM_INT);
-            return $this->loadEntryArray($stmt);
+            $stmt->bindParam(":entry_id", $entry_id, PDO::PARAM_INT);
+            $stmt->bindParam(":page_id", $page, PDO::PARAM_INT);
+            $stmt->bindParam(":title", $title, PDO::PARAM_STR);
+            $stmt->bindParam(":entry", $entry, PDO::PARAM_STR);
+            $stmt->bindParam(":excerpt", $excerpt, PDO::PARAM_STR);
+            $stmt->bindParam(":slug", $slub, PDO::PARAM_STR);
+            $stmt->bindParam(":tags", $tags, PDO::PARAM_STR);
+            $stmt->bindParam(":extra", serialize($extra), PDO::PARAM_STR);
+            $stmt->bindParam(":author", $author, PDO::PARAM_STR);
+            $stmt->bindParam(":created", $created, PDO::PARAM_STR);
+            $stmt->execute();
+            $stmt->closeCursor();
+
+            return TRUE;
         }
         catch ( Exception $e )
         {
             $this->_logException($e);
         }
-
-        if ( $id )
-        {
-            $sql = "UPDATE `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                    SET
-                        title=?, subhead=?, body=?, img=?, imgcap=?,
-                        data1=?, data2=?, data3=?, data4=?,
-                        data5=?, data6=?, data7=?, data8=?
-                    WHERE id=?
-                    LIMIT 1";
-            $stmt = $this->mysqli->prepare($sql);
-            $stmt->bind_param("sssssssssssssi",$title, $subhead, $body, $img,
-                    $imgcap, $data1, $data2, $data3, $data4, $data5, $data6,
-                    $data7, $data8, $id);
-        }
-
-        /*
-         * Otherwise, save a new entry
-         */
-        else {
-            $sql = "INSERT INTO `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                        (page, title, subhead, body, img, imgcap,
-                        data1, data2, data3, data4, data5, data6, data7, data8,
-                        author, created)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt = $this->mysqli->prepare($sql);
-            $stmt->bind_param("ssssssssssssssss", $page, $title, $subhead, $body,
-                    $img, $imgcap, $data1, $data2, $data3, $data4, $data5, $data6,
-                    $data7, $data8, $author, $created);
-        }
-        $success = $stmt->execute();
-        $stmt->close();
-
-        return $success;
     }
 
     /**
@@ -219,8 +182,8 @@ class DB_Actions extends DB_Connect
          * Prepare the query and execute it
          */
         $sql = "SELECT " . self::ENTRY_FIELDS . "
-                FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                WHERE id=:id
+                FROM `".DB_NAME."`.`".DB_PREFIX."entries`
+                WHERE `entry_id`=:id
                 LIMIT 1";
 
         // Check for a cached file
@@ -232,6 +195,7 @@ class DB_Actions extends DB_Connect
 
         try
         {
+            FB::log($sql);
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(":id", $id, PDO::PARAM_INT);
             return $this->loadEntryArray($stmt);
@@ -349,8 +313,12 @@ class DB_Actions extends DB_Connect
     {
         // Prepare the statement and execute it
         $sql = "SELECT" . self::ENTRY_FIELDS . "
-                FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                WHERE `page`=:page
+                FROM `".DB_NAME."`.`".DB_PREFIX."entries`
+                WHERE `page_id`= (
+                        SELECT `page_id`
+                        FROM `".DB_NAME."`.`".DB_PREFIX."pages`
+                        WHERE `page_slug`=:page_slug
+                    )
                 ORDER BY $ord
                 LIMIT $offset, $lim";
 
@@ -358,15 +326,16 @@ class DB_Actions extends DB_Connect
         $cache = Utilities::checkCache($sql.$this->url0);
         if ( $cache!==FALSE )
         {
-            return $cache;
+            $this->entries = $cache;
+            return;
         }
 
         try
         {
             // Execute the query and store the result
             $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(":page", $this->url0, PDO::PARAM_STR);
-            $data = $this->loadEntryArray($stmt);
+            $stmt->bindParam(":page_slug", $this->url0, PDO::PARAM_STR);
+            $this->loadEntryArray($stmt);
         }
         catch ( Exception $e )
         {
@@ -374,9 +343,7 @@ class DB_Actions extends DB_Connect
         }
 
         // Cache the data
-        $file = Utilities::saveCache($sql.$this->url0, $data);
-
-        return $data;
+        $file = Utilities::saveCache($sql.$this->url0, $this->entries);
     }
 
     protected function getEntryCountByCategory()
@@ -568,12 +535,10 @@ class DB_Actions extends DB_Connect
         $stmt->closeCursor();
 
         // Load the entries into a usable array
-        $entries = array();
         foreach ( $result as $entry )
         {
-            $entries[] = array_map('stripslashes', $entry);
+            $this->entries[] = new Entry(array_map('stripslashes', $entry));
         }
-        return $entries;
     }
 
     /**
@@ -582,8 +547,7 @@ class DB_Actions extends DB_Connect
      */
     private function _logException($e)
     {
-        FB::log($e);
-        die ( "PDO Statement Error: " . $e->getMessage() );
+        Error::logException($e);
     }
 
 //------------------------------------------------------------------------------
@@ -620,7 +584,7 @@ class DB_Actions extends DB_Connect
                     INDEX(`slug`),
                     FULLTEXT(`entry`,`excerpt`)
                 ) ENGINE=MYISAM CHARACTER SET ".DEFAULT_CHARACTER_SET."
-                    COLLATE ".DEFAULT_COLLATION.";
+                    COLLATE ".DEFAULT_COLLATION.";";
     }
 
 }

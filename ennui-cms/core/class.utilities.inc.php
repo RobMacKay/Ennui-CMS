@@ -388,11 +388,11 @@ class Utilities
         $markup = NULL;
         for ( $i=0, $c=min($p['max_entries'], count($entries)); $i<$c; ++$i )
         {
-            $entries[$i]['first'] = $i==0 ? 'first' : NULL;
-            $entries[$i]['last'] = $i==$c-1 ? 'last' : NULL;
+            $entries[$i]->first = $i==0 ? 'first' : NULL;
+            $entries[$i]->last = $i==$c-1 ? 'last' : NULL;
             $markup .= preg_replace_callback(
                             $pattern,
-                            $callback($entries[$i], $p),
+                            $callback(serialize($entries[$i]), $p),
                             $entry_template
                         );
         }
@@ -427,7 +427,8 @@ class Utilities
      * @param int $arity The number of arguments the function accepts
      * @return mixed A curried function or the return of the original function
      */
-    public static function curry($func, $arity) {
+    public static function curry($func, $arity)
+    {
         return create_function('', "
             // Store the passed arguments in an array
             \$args = func_get_args();
@@ -459,14 +460,15 @@ class Utilities
         ");
     }
 
-    static function replaceTags($entries, $params, $matches)
+    static function replaceTags($entry, $params, $matches)
     {
-        /*
-         * Make sure the template tag has a matching array element
-         */
-        if ( array_key_exists(strtolower($matches[1]), $entries) )
+        $entry = unserialize($entry);
+
+        // Make sure the template tag has a matching array element
+        $prop = strtolower($matches[1]);
+        if ( $entry->$prop!==NULL )
         {
-            $val = $entries[strtolower($matches[1])];
+            $val = $entry->$prop;
 
             // Run htmlentities() is the parameter is set to TRUE
             if ( $params['htmlentities']===TRUE )
@@ -635,6 +637,7 @@ class Utilities
         fclose($fp);
 
         FB::log("Cache saved at $cachefile");
+        FB::log($data, "Data saved");
 
         return $cachefile;
     }

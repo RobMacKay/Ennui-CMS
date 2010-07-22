@@ -15,13 +15,17 @@
 class Form
 {
 
-    public $action = FORM_ACTION,
-           $legend = "Create a New Entry",
-           $class = "ecms-form",
-           $name = "ecms-form",
-           $enctype = "multipart/form-data",
-           $include_default_inputs = TRUE,
-           $method = "post";
+    public $page = DEFAULT_PAGE,
+           $action = "",
+           $entry_id = "";
+
+    protected $form_action = FORM_ACTION,
+              $legend = "Create a New Entry",
+              $class = "ecms-form",
+              $name = "ecms-form",
+              $enctype = "multipart/form-data",
+              $include_default_inputs = TRUE,
+              $method = "post";
 
     private $_inputs = array();
 
@@ -40,22 +44,29 @@ class Form
                 $this->$key = htmlentities($val, ENT_QUOTES);
             }
         }
-
-        // If $include_default_inputs is set to TRUE, adds them to the array
-        $this->_inputs[] = new Input(array("type"=>"hidden"));
     }
 
-    public function input($config=array())
+    public function input()
     {
-        if ( !is_array($config) )
-        {
-            throw new Exception('Var $config must be an array.');
-        }
-
         // Add the new input to the input array after sanitizing
         try
         {
-            $this->_inputs[] = new Input($config);
+            // Get the arguments passed to the method
+            $args = func_get_args();
+
+            // If the arguments were passed in an array, execute accordingly
+            if ( is_array($args[0]) )
+            {
+                $this->_inputs[] = new Input($args[0]);
+                return;
+            }
+
+            // Otherwise call the method with individual arguments
+            else
+            {
+                list($typ, $lab, $val, $nam, $id, $cls) = $args;
+                $this->_inputs[] = new Input($typ, $lab, $val, $nam, $id, $cls);
+            }
         }
         catch ( Exception $e )
         {
@@ -65,13 +76,16 @@ class Form
 
     public function output()
     {
+        // Check if default inputs should be added
+        $this->_generateDefaultInputs();
+
         // Load inputs for the form
         $inputs = $this->_generateInputs($input);
 
         return <<<FORM
 
 <!-- Begin .$this->class -->
-<form action="$this->action"
+<form action="$this->form_action"
       method="$this->method"
       enctype="$this->enctype"
       class="$this->class"
@@ -127,5 +141,44 @@ FORM;
             }
         }
         return $inputs;
+    }
+
+    private function _generateDefaultInputs()
+    {
+        // If $include_default_inputs is set to TRUE, adds them to the array
+        if ( $this->include_default_inputs===TRUE )
+        {
+            // Hidden page identifier input
+            $page_config = array(
+                    'type' => 'hidden',
+                    'name' => 'page',
+                    'value' => $this->page
+                );
+            $this->_inputs[] = new Input($page_config);
+
+            // Hidden action identifier input
+            $action_config = array(
+                    'type' => 'hidden',
+                    'name' => 'action',
+                    'value' => $this->action
+                );
+            $this->_inputs[] = new Input($action_config);
+
+            // Hidden ID identifier input
+            $id_config = array(
+                    'type' => 'hidden',
+                    'name' => 'entry_id',
+                    'value' => $this->entry_id
+                );
+            $this->_inputs[] = new Input($id_config);
+
+            // Hidden token identifier input
+            $token_config = array(
+                    'type' => 'hidden',
+                    'name' => 'token',
+                    'value' => $_SESSION['token']
+                );
+            $this->_inputs[] = new Input($token_config);
+        }
     }
 }

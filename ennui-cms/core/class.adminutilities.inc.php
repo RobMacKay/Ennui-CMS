@@ -282,7 +282,7 @@ EXTRA_OPTIONS;
 
 <!--// BEGIN ADMIN OPTIONS //-->
 <div class="admintopopts">
-    You are logged in as {$_SESSION['admin_u']}.<br />
+    You are logged in as {$_SESSION['user']['name']}.<br />
     [ <a href="/$page/admin/$id" class="ecms-edit">edit this entry</a>
     |$extra_options
     <a href="$form_action?action=logout">logout</a> ]

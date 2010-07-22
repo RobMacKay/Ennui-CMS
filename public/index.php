@@ -7,7 +7,7 @@
     require_once CMS_PATH . 'core/init.inc.php';
 
     // Initialize classes used in the sidebar or in widgets
-    $sidebar = new Single($dbo, array('sidebar'));
+    $sidebar = new Single(array('sidebar'));
 
 ?>
 <!DOCTYPE html>
@@ -17,7 +17,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title><?php echo $title; ?></title>
-    <meta name="description" content="<?php echo SITE_DESCRIPTION; ?>" />
+    <meta name="description" content="<?php echo $description; ?>" />
 
     <!-- CSS File Includes -->
     <link rel="stylesheet" type="text/css" media="screen,projection"
@@ -75,7 +75,7 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
 
 <!-- BEGIN GENERATED CONTENT -->
 
-<?php echo $obj->displayPublic() ?>
+<?php echo $content; ?>
 
 
 <!-- END GENERATED CONTENT -->

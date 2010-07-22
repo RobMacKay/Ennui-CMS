@@ -22,18 +22,29 @@ class Input
            $id="",
            $class="";
 
-    public function __construct($config=array(), $options=NULL)
+    public function __construct( $config_or_type=array(), $label=NULL,
+            $value=NULL, $name=NULL, $id=NULL, $class=NULL )
     {
-        if ( !is_array($config) )
+        // If the configuration was passed in individual variables, store them
+        if ( !is_array($config_or_type) )
         {
-            throw new Exception('The value passed in $config must be an array.');
+            $this->type = htmlentities($config_or_type, ENT_QUOTES);
+            $this->label = htmlentities($label, ENT_QUOTES);
+            $this->value = htmlentities($value, ENT_QUOTES);
+            $this->name = htmlentities($name, ENT_QUOTES);
+            $this->id = htmlentities($id, ENT_QUOTES);
+            $this->class = htmlentities($class, ENT_QUOTES);
         }
-
-        foreach( $config as $key=>$val )
+        else
         {
-            if ( isset($this->$key) )
+            // Loop through the array and store the values
+            foreach( $config_or_type as $key=>$val )
             {
-                $this->$key = htmlentities($val, ENT_QUOTES);
+                // Make sure the property exists before storing a value
+                if ( isset($this->$key) )
+                {
+                    $this->$key = htmlentities($val, ENT_QUOTES);
+                }
             }
         }
     }

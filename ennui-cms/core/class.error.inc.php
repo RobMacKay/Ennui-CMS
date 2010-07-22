@@ -4,7 +4,10 @@ class Error
 {
     public static function logException($exception_object)
     {
-        FB::log($exception_object);
+        if ( class_exists('FB') )
+        {
+            FB::log($exception_object);
+        }
 
         // Generates an error message
         $trace = array_pop($exception_object->getTrace());

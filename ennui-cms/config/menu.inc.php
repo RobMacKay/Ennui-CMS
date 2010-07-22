@@ -93,6 +93,10 @@ $menuPages = array(
         'display' => 'Contact',
         'type' => 'contact'
     ),
+    'test-page' => array(
+        'display' => "Test Page",
+        'type' => 'test'
+    ),
     'home' => array(
         'display' => 'Home',
         'type' => 'single',
