@@ -33,35 +33,43 @@ class Test extends Single
 
             // Load form values
             $values = array_shift($this->getEntryById($id));
-            FB::log($values);
 
-            $form->input(array(
+            // Set up input information
+            $input_arr = array(
+                array(
                     'name'=>'title',
                     'label'=>'Entry Title',
                     'value' => $values['title']
-                ));
-            $form->input(array(
+                ),
+                array(
                     'name'=>'extra-field',
                     'label'=>'Extra Information',
                     'value' => $values['extra-field']
-                ));
-            $form->input(array(
+                ),
+                array(
                     'type' => 'textarea',
                     'name'=>'entry',
                     'label'=>'Entry Body',
                     'value' => $values['entry']
-                ));
-            $form->input(array(
+                ),
+                array(
                     'type' => 'textarea',
                     'name'=>'excerpt',
                     'label'=>'Excerpt (Meta Description)',
                     'value' => $values['excerpt']
-                ));
-            $form->input(array(
+                ),
+                array(
                     'type' => 'submit',
                     'name' => 'form-submit',
                     'value' => 'Save Entry'
-                ));
+                )
+            );
+
+            // Build the inputs
+            foreach ( $input_arr as $input )
+            {
+                $form->input($input);
+            }
         }
         catch ( Exception $e )
         {

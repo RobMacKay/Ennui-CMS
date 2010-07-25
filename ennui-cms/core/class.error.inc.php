@@ -2,7 +2,7 @@
 
 class Error
 {
-    public static function logException($exception_object)
+    public static function logException($exception_object, $is_fatal=TRUE)
     {
         if ( class_exists('FB') )
         {
@@ -23,7 +23,10 @@ class Error
         // Logs the error message
         self::writeLog($err);
 
-        die( $exception_object->getMessage() );
+        if ( $is_fatal===TRUE )
+        {
+            die( $exception_object->getMessage() );
+        }
     }
 
     private static function writeLog($message)

@@ -76,37 +76,39 @@ class Utilities
         return "<p>" . wordwrap($preview) . "</p>";
     }
 
-    public static function formatImageThumb($e)
+    /**
+     * Checks for an image and returns thumbnail, preview, and full-size URLs
+     *
+     * The entry object is passed by reference, so no return value is necessary
+     *
+     * @param object $e
+     */
+    public static function imageOptions(&$e)
     {
-        if ( isset($e['img']) && strlen($e['img'])>4 )
-        {
-            $thumbURL = str_replace('userPics/', 'userPics/thumbs/', $e['img']);
-            $cap = isset($e['imgcap']) ? $e['imgcap'] : $e['title'];
-            return "<img src=\"$thumbURL\" alt=\"$cap\" class=\"thumb\" />";
-        }
-        else return NULL;
-    }
+        // Get the file path
+        $filepath = dirname($_SERVER['SCRIPT_FILENAME']).$e->img;
 
-    public static function formatImageSimple($e)
-    {
-        if ( isset($e['img']) && strlen($e['img'])>4 )
+        // If the image exists, set up image URLs
+        if ( !empty($e->img) && file_exists($filepath) && is_file($filepath) )
         {
-            $cap = isset($e['imgcap']) ? $e['imgcap'] : $e['title'];
-            return "<img src=\"$e[img]\" alt=\"$cap\" class=\"simple\" />";
-        }
-        else return NULL;
-    }
+            // Extract the file basename
+            $bn = basename($e->img);
 
-    public static function formatImage($e)
-    {
-        if ( isset($e['img']) && strlen($e['img'])>4 )
-        {
-            $cap = isset($e['imgcap']) ? $e['imgcap'] : $e['title'];
-            return "\n\t\t\t\t<div id=\"main_image\">\n\t\t\t\t\t<img "
-                . "src=\"$e[img]\" alt=\"$cap\" title=\"$cap\" />\n\t\t\t\t\t"
-                . "<p class=\"cap\">$cap</p>\n\t\t\t\t</div>\n";
+            // Display the latest two galleries
+            $e->image = $e->img;
+            $e->preview = str_replace($bn, 'preview/'.$bn, $e->img);
+            $e->thumb = str_replace($bn, 'thumbs/'.$bn, $e->img);
+            $e->caption = isset($e->imgcap) ? $e->imgcap : $e->title;
         }
-        else return NULL;
+
+        // Otherwise, return default image URLs
+        else
+        {
+            $e->image = '/assets/images/no-image.jpg';
+            $e->preview = '/assets/images/no-image.jpg';
+            $e->thumb = '/assets/images/no-image-thumb.jpg';
+            $e->caption = 'No image';
+        }
     }
 
     static function buildMenu($url_array, $menu_array, $is_sub=FALSE, $subid=NULL)
@@ -613,7 +615,9 @@ class Utilities
                 && time()-filemtime($cachefile)<=CACHE_EXPIRES )
 		{
 			$cache = file_get_contents($cachefile);
+
 			FB::log("Data loaded from cache at $cachefile");
+
             return unserialize($cache);
 		}
         else { return FALSE; }
@@ -637,7 +641,6 @@ class Utilities
         fclose($fp);
 
         FB::log("Cache saved at $cachefile");
-        FB::log($data, "Data saved");
 
         return $cachefile;
     }

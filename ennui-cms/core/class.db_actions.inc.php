@@ -26,6 +26,8 @@ class DB_Actions extends DB_Connect
      */
     public $entries = array();
 
+    protected $entry_limit = MAX_ENTRIES_PER_PAGE;
+
 //------------------------------------------------------------------------------
 // CLASS CONSTANTS
 //------------------------------------------------------------------------------
@@ -101,6 +103,9 @@ class DB_Actions extends DB_Connect
 
         // If a slug wasn't set, save a URL version of the title
         $slug = empty($slug) ? Utilities::makeUrl($title) : $slug;
+
+        // If an excerpt wasn't set, create a text preview
+        $excerpt = empty($excerpt) ? Utilities::textPreview($entry) : $excerpt;
 
         // Store the author's name and a timestamp
         $author = $_SESSION['user']['name'];
@@ -221,9 +226,9 @@ class DB_Actions extends DB_Connect
 
         // Prepare the query and execute it
         $sql = "SELECT" . self::ENTRY_FIELDS . "
-                FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
+                FROM `".DB_NAME."`.`".DB_PREFIX."entries`
                 WHERE `title` LIKE :title
-                OR `data6`=:url
+                OR `slug`=:url
                 LIMIT 1";
 
         // Check for a cached file
@@ -261,21 +266,21 @@ class DB_Actions extends DB_Connect
      * @param string $category  The category by which to filter entries
      * @param int $limit        The query limit
      * @param int $offset       The query offset
-     * @return array            An array of entries
+     *
+     * @return void
      */
-    protected function getEntriesByCategory($category, $limit=10, $offset=0)
+    protected function getEntriesByCategory($category, $offset=0)
     {
-        /*
-         * Prepare the query and execute it
-         */
+        // Prepare the query and execute it
         $sql = "SELECT" . self::ENTRY_FIELDS . "
-                FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                AND LOWER(data2) LIKE :category
+                FROM `".DB_NAME."`.`".DB_PREFIX."entries`
+                AND LOWER(`tags`) LIKE :category
                 ORDER BY created DESC
-                LIMIT $offset, $limit";
+                LIMIT $offset, $this->entry_limit";
 
         // Check for a cached file
-        $cache = Utilities::checkCache($sql.$url);
+        $cache_id = $sql . $category . $offset . $this->entry_limit;
+        $cache = Utilities::checkCache($cache_id);
         if ( $cache!==FALSE && strlen($cache)>0 )
         {
             return $cache;
@@ -289,7 +294,7 @@ class DB_Actions extends DB_Connect
             // Execute the query and store the result
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(":category", $cat, PDO::PARAM_STR);
-            $data = $this->loadEntryArray($stmt);
+            $this->loadEntryArray($stmt);
         }
         catch ( Exception $e )
         {
@@ -297,9 +302,52 @@ class DB_Actions extends DB_Connect
         }
 
         // Cache the data
-        $file = Utilities::saveCache($sql.$url, $data);
+        $file = Utilities::saveCache($cache_id);
+    }
 
-        return $data;
+    /**
+     * Retrieves entries based on a search string
+     *
+     * @param string $search    The search term(s)
+     * @param int $offset       Entry offset for paginations
+     * 
+     * @return void
+     */
+    protected function getEntriesBySearch( $search, $offset=0 )
+    {
+        // Prepare the statement and execute it
+        $sql = "SELECT
+					MATCH (`title`,`entry`,`excerpt`) AGAINST (?) AS Relevance,"
+                . self::ENTRY_FIELDS . "
+                FROM `".DB_NAME."`.`".DB_PREFIX."entries`
+                WHERE `title` LIKE ?
+                OR MATCH (`title`,`entry`,`excerpt`) AGAINST (? IN BOOLEAN MODE)
+				ORDER  BY Relevance DESC
+				LIMIT $offset, $this->entry_limit";
+
+		try
+        {
+            $query = htmlentities($search, ENT_QUOTES);
+            $keys = explode(' ', $query);
+            $key_search = NULL;
+            foreach ( $keys as $key )
+            {
+                $key_search .= empty($key_search) ? "+$key" : " +$key";
+            }
+            $like = "%$query%";
+            $stmt = $this->mysqli->prepare($sql);
+            if ( !is_object($stmt) )
+            {
+                throw new Exception($this->mysqli->error);
+            }
+            $stmt->bind_param("sss", $query, $like, $key_search);
+            $this->loadEntryArray($stmt, TRUE);
+        }
+        catch ( Exception $e )
+        {
+            FB::log($this->mysqli->error, "MySQLi Error");
+            die ( "Search Error: " . $e->getMessage() );
+        }
     }
 
     /**
@@ -309,7 +357,7 @@ class DB_Actions extends DB_Connect
      * @param int $limit
      * @return array    A multi-dimensional array of entries
      */
-    protected function getAllEntries($lim=10, $offset=0, $ord="`created` DESC")
+    protected function getAllEntries($offset=0, $ord="`created` DESC")
     {
         // Prepare the statement and execute it
         $sql = "SELECT" . self::ENTRY_FIELDS . "
@@ -320,7 +368,7 @@ class DB_Actions extends DB_Connect
                         WHERE `page_slug`=:page_slug
                     )
                 ORDER BY $ord
-                LIMIT $offset, $lim";
+                LIMIT $offset, $this->entry_limit";
 
         // Check for a cached file
         $cache = Utilities::checkCache($sql.$this->url0);

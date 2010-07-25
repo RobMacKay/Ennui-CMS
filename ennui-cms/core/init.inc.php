@@ -146,11 +146,11 @@ function __autoload($classname)
     FB::log($path, "Class File");
 }
 
-/*
- * Load the page title
- */
+// Load the page title
 $title = $obj->getPageTitle($menuPage);
 
+// Load main content
 $content = $obj->displayPublic();
 
+// Load the meta description
 $description = $obj->getPageDescription();

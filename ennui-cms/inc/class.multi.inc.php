@@ -23,86 +23,70 @@ class Multi extends Page
      */
     public function displayPublic()
     {
-        /*
-         * Lookup array for reserved values in $this->url1
-         */
-        $reserved = array(
-                'more', 'admin', 'category'
-            );
+        // Lookup array for reserved values in $this->url1
+        $reserved = array( 'more', 'admin', 'category' );
 
-        /*
-         * If an entry URL is passed, load that entry only and output it
-         */
+        // If an entry URL is passed, load that entry only and output it
         if ( isset($this->url1) && !in_array($this->url1, $reserved) )
         {
+            // Load the entry by its URL
             $entries = $this->getEntryByUrl($this->url1);
+
+            // Return the full display markup
             return $this->displayFull($entries);
         }
 
-        /*
-         * If admin options are being requested, verify that the user is cleared
-         * before displaying them
-         */
-        elseif ( isset($this->url1) && $this->url1=='admin'
+        // If logged in, show the admin options (if JavaScript is disabled)
+        else if ( isset($this->url1) && $this->url1=='admin'
             && isset($_SESSION['user']) && $_SESSION['user']['clearance']>=1 )
         {
+            // Extract the entry ID if one was passed
             $id = isset($this->url2) ? (int) $this->url2 : NULL;
+
+            // Return the admin form markup
             return $this->displayAdmin($id);
         }
 
-        /*
-         * Displays the entries for the page
-         */
+        // Displays the entries for the page
         else
         {
             $limit = MAX_ENTRIES_PER_PAGE; // Number of entries per page
 
-            /*
-             * If the entries are paginated, this determines what page to show
-             */
+            // If the entries are paginated, this determines what page to show
             if ( isset($this->url1) && $this->url1=='more' )
             {
-                $offset = (isset($this->url2)) ? $limit*($this->url2-1) : 0;
+                $offset = isset($this->url2) ? $limit*($this->url2-1) : 0;
             }
             else
             {
                 $offset = 0;
             }
 
-            /*
-             * If loading by category, get the proper number of entries from the
-             * given category
-             */
-            if ( isset($this->url1)
-                    && $this->url1==='category'
+            // If loading by category, get the proper number of entries
+            if ( isset($this->url1) && $this->url1==='category'
                     && isset($this->url2) )
             {
                 $offset = isset($this->url3) ? $limit*($this->url3-1) : 0;
                 $cat = htmlentities($this->url2, ENT_QUOTES);
 
-                /*
-                 * If no category was passed, go back to the main page
-                 */
+                // If no category was passed, go back to the main page
                 if ( empty($cat) )
                 {
                     header("Location: /$this->url0");
                     exit;
                 }
 
-                /*
-                 * Load entries by category
-                 */
-                $entries = $this->getEntriesByCategory($cat, $limit, $offset);
+                // Load entries by category
+                $entries = $this->getEntriesByCategory($cat, $offset);
             }
 
-            /*
-             * Load most recent entries otherwise
-             */
+            // Load most recent entries for a preview if no entry was selected
             else
             {
                 $entries = $this->getAllEntries($limit, $offset);
             }
 
+            // Return markup for entry previews
             return $this->displayPreview($entries);
         }
     }
@@ -115,14 +99,60 @@ class Multi extends Page
      */
     public function displayAdmin($id)
     {
-        $form = $this->createForm('write', $id);
+        try
+        {
+            // Create a new form object and set submission properties
+            $form = new Form(array('legend'=>'Create a New Entry'));
+            $form->page = 'test-page';
+            $form->action = 'entry_write';
+            $form->entry_id = $id;
 
-        $markup = $form['start'];
-        $markup .= $this->createFormInput('title', 'Headline', $id);
-        $markup .= $this->createFormInput('body','Description',$id);
-        $markup .= $form['end'];
+            // Load form values
+            $values = array_shift($this->getEntryById($id));
 
-        return $markup;
+            // Set up input information
+            $input_arr = array(
+                array(
+                    'name'=>'title',
+                    'label'=>'Entry Title',
+                    'value' => $values['title']
+                ),
+                array(
+                    'type' => 'textarea',
+                    'name'=>'entry',
+                    'label'=>'Entry Body',
+                    'value' => $values['entry']
+                ),
+                array(
+                    'type' => 'textarea',
+                    'name'=>'excerpt',
+                    'label'=>'Excerpt (Meta Description)',
+                    'value' => $values['excerpt']
+                ),
+                array(
+                    'name'=>'slug',
+                    'label'=>'URL',
+                    'value' => $values['extra-field']
+                ),
+                array(
+                    'type' => 'submit',
+                    'name' => 'form-submit',
+                    'value' => 'Save Entry'
+                )
+            );
+
+            // Build the inputs
+            foreach ( $input_arr as $input )
+            {
+                $form->input($input);
+            }
+        }
+        catch ( Exception $e )
+        {
+            Error::logException($e);
+        }
+
+        return $form;
     }
 
     /**
@@ -142,7 +172,7 @@ class Multi extends Page
         /*
          * If at least one entry exists, loop through entries and format them
          */
-        if ( isset($entries[0]['title']) )
+        if ( isset($this->entries[0]->title) )
         {
             $entry_array = array(); // Initialize the variable to avoid a notice
 
@@ -153,18 +183,18 @@ class Multi extends Page
             foreach ( $entries as $e )
             {
                 // Entry options for the admin, if logged in
-                $e['admin'] = $this->admin_simple_options($this->url0, $e['id']);
+                $e->admin = $this->admin_simple_options($this->url0, $e->entry_id);
 
                 // Rename the URL for use in the template
-                $e['url'] = empty($e['data6']) ? urlencode($e['title']) : $e['data6'];
+                if ( empty($e->slug) )
+                {
+                    $e->slug = Utilities::makeUrl($e->title);
+                }
 
                 // Format the image if one exists
-                $e['image'] = isset($e['img']) ? Utilities::formatImageSimple($e) : NULL;
+                $e->image = isset($e->img) ? Utilities::imageOptions($e) : NULL;
 
-                // Create a text preview for the entry
-                $e['preview'] = UTILITIES::textPreview($e['body'], 45);
-
-                $entry_array[] = $e;
+                $this->entries[] = $e;
             }
 
             $template_file = $this->url0.'-preview.inc';
@@ -172,21 +202,14 @@ class Multi extends Page
         else
         {
             $entry = NULL;
-            $entry_array[] = array(
-                    'admin' => $this->admin_general_options($this->url0),
-                    'title' => "No Entry Found",
-                    'body' => "<p>That entry doesn't appear to exist.</p>"
-                );
-
-            $template_file = 'default.inc';
+            $admin = $this->admin_general_options($this->url0);
+            $template_file = $this->setDefaultEntry($admin);
         }
 
-        /*
-         * Load the template into a variable
-         */
+        // Load the template into a variable
         $template = UTILITIES::loadTemplate($template_file);
 
-        $entry .= UTILITIES::parseTemplate($entry_array, $template);
+        $entry .= UTILITIES::parseTemplate($this->entries, $template);
 
         return $entry;
     }
@@ -200,16 +223,15 @@ class Multi extends Page
         foreach($entries as $e)
         {
             // Entry options for the admin, if logged in
-            $e['admin'] = $this->admin_simple_options($this->url0, $e['id']);
+            $e->admin = $this->admin_simple_options($this->url0, $e->entry_id);
 
-            $e['image'] = isset($e['img']) ? Utilities::formatImageSimple($e) : NULL;
+            // Format the image if one exists
+            $e->image = isset($e->img) ? Utilities::imageOptions($e) : NULL;
 
             $entry_array[] = $e;
         }
 
-        /*
-         * Load the template into a variable
-         */
+        // Load the template into a variable
         $template = UTILITIES::loadTemplate($this->url0.'-full.inc');
 
         $entry .= UTILITIES::parseTemplate($entry_array, $template);

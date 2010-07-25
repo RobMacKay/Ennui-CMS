@@ -19,6 +19,11 @@
  */
 class Page extends AdminUtilities
 {
+    /**
+     * Image dimensions
+     * 
+     * @var array 
+     */
     public $img_dims = array(
         'w' => IMG_MAX_WIDTH,
         'h' => IMG_MAX_HEIGHT,
@@ -138,44 +143,7 @@ class Page extends AdminUtilities
         return $this->loadEntryArray($stmt);
     }
 
-    protected function getEntriesBySearch($search, $limit=MAX_ENTRIES_PER_PAGE, $offset=0)
-    {
-        // Prepare the statement and execute it
-        $sql = "SELECT
-					MATCH (`body`) AGAINST (?) AS Relevance,
-					id, page, title, subhead, body, img, imgcap, data1, data2,
-                    data3, data4, data5, data6, data7, data8, author, created
-                FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                WHERE title LIKE ?
-                OR MATCH (`body`) AGAINST (? IN BOOLEAN MODE)
-				ORDER  BY Relevance DESC
-				LIMIT $offset, $limit";
-		try
-        {
-            $query = htmlentities($search, ENT_QUOTES);
-            $keys = explode(' ', $query);
-            $key_search = NULL;
-            foreach ( $keys as $key )
-            {
-                $key_search .= empty($key_search) ? "+$key" : " +$key";
-            }
-            $like = "%$query%";
-            $stmt = $this->mysqli->prepare($sql);
-            if ( !is_object($stmt) )
-            {
-                throw new Exception($this->mysqli->error);
-            }
-            $stmt->bind_param("sss", $query, $like, $key_search);
-            return $this->loadEntryArray($stmt, TRUE);
-        }
-        catch ( Exception $e )
-        {
-            FB::log($this->mysqli->error, "MySQLi Error");
-            die ( "Search Error: " . $e->getMessage() );
-        }
-    }
-
-    protected function getEntryOrder($id)
+    protected function getEntryOrder( $id )
     {
         $sql = "SELECT data7
                 FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
@@ -191,7 +159,20 @@ class Page extends AdminUtilities
         return $data7;
     }
 
-    public function reorderEntries($id, $pos, $direction)
+    protected function setDefaultEntry( $admin )
+    {
+        // Set default values if no entries are found
+        $default = new Entry();
+        $default->admin = $admin;
+        $default->title = "No Entry Found";
+        $default->entry = "<p>That entry doesn't appear to exist.</p>";
+        $this->entries = array($default);
+
+        // Load the default template
+        return 'default.inc';
+    }
+
+    public function reorderEntries( $id, $pos, $direction )
     {
         $newpos = ($direction=="up") ? $pos-1 : $pos+1;
         $sql = "UPDATE `".DB_NAME."`.`".DB_PREFIX."entryMgr`

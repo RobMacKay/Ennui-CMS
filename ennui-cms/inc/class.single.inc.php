@@ -56,14 +56,55 @@ class Single extends Page
      */
     public function displayAdmin($id)
     {
-        $form = $this->createForm('write', $id);
+        try
+        {
+            // Create a new form object and set submission properties
+            $form = new Form(array('legend'=>'Create a New Entry'));
+            $form->page = 'test-page';
+            $form->action = 'entry_write';
+            $form->entry_id = $id;
 
-        $markup = $form['start'];
-        $markup .= $this->createFormInput('title', 'Page Title', $id);
-        $markup .= $this->createFormInput('body', 'Body Text', $id);
-        $markup .= $form['end'];
+            // Load form values
+            $values = array_shift($this->getEntryById($id));
 
-        return $markup;
+            // Set up input information
+            $input_arr = array(
+                array(
+                    'name'=>'title',
+                    'label'=>'Entry Title',
+                    'value' => $values['title']
+                ),
+                array(
+                    'type' => 'textarea',
+                    'name'=>'entry',
+                    'label'=>'Entry Body',
+                    'value' => $values['entry']
+                ),
+                array(
+                    'type' => 'textarea',
+                    'name'=>'excerpt',
+                    'label'=>'Excerpt (Meta Description)',
+                    'value' => $values['excerpt']
+                ),
+                array(
+                    'type' => 'submit',
+                    'name' => 'form-submit',
+                    'value' => 'Save Entry'
+                )
+            );
+
+            // Build the inputs
+            foreach ( $input_arr as $input )
+            {
+                $form->input($input);
+            }
+        }
+        catch ( Exception $e )
+        {
+            Error::logException($e);
+        }
+
+        return $form;
     }
 
     /**
@@ -93,15 +134,8 @@ class Single extends Page
         // If no entry exists, output some default text to avoid a broken layout
         else
         {
-            // Set default values if no entries are found
-            $default = new Entry();
-            $default->admin = $admin;
-            $default->title = "No Entry Found";
-            $default->entry = "<p>That entry doesn't appear to exist.</p>";
-            $this->entries[0] = $default;
-
-            // Load the default template
-            $template_file = $this->url0 . '.inc';
+            // Set default values if no entries are found and load a template
+            $template_file = $this->setDefaultEntry($admin);
         }
 
         // Load the template into a variable
