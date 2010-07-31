@@ -35,22 +35,52 @@ class Admin extends Page
 
     private function loginForm()
     {
-        if($this->url1=='error') {
-            $errTxt = "
-        <span>There was an error logging you in. Please check your username and
-        password and try again.</span>";
-        } else {
+        if ( $this->url1=='error' )
+        {
+            $errTxt = "<span>There was an error logging you in. Please check "
+                    ."your username and password and try again.</span>";
+        }
+        else
+        {
             $errTxt = NULL;
         }
 
-        $form = $this->createForm('login', NULL, "Administrator Login");
-        $markup = $form['start'];
-        $markup .= $errTxt;
-        $markup .= $this->createFormInput('admin_u', "Username");
-        $markup .= $this->createFormInput('admin_p', "Password");
-        $markup .= $form['end'];
+        try
+        {
+            // Create a new form object and set submission properties
+            $form = new Form(array('legend'=>'Administrator Login'));
+            $form->page = 'admin';
+            $form->action = 'user-login';
 
-        return $markup;
+            // Set up input information
+            $input_arr = array(
+                array(
+                    'name'=>'uname',
+                    'label'=>'Username'
+                ),
+                array(
+                    'name'=>'pword',
+                    'label'=>'Password'
+                ),
+                array(
+                    'type' => 'submit',
+                    'name' => 'form-submit',
+                    'value' => 'Login'
+                )
+            );
+
+            // Build the inputs
+            foreach ( $input_arr as $input )
+            {
+                $form->input($input);
+            }
+        }
+        catch ( Exception $e )
+        {
+            Error::logException($e);
+        }
+
+        return $errTxt.$form;
     }
 
     public function createUser($user, $email)
@@ -200,6 +230,14 @@ EMAIL;
                 FROM `".DB_NAME."`.`".DB_PREFIX."adminMgr`
                 WHERE admin_u=?
                 LIMIT 1";
+        try
+        {
+
+        }
+        catch ( Exception $e )
+        {
+
+        }
         if($stmt = $this->mysqli->prepare($sql)) {
             $stmt->bind_param("s", $user);
             $stmt->execute();
@@ -228,11 +266,6 @@ EMAIL;
 
     public function logout()
     {
-        unset($_SESSION['user']);
-        unset($_SESSION['loggedIn']);
-        unset($_SESSION['admin_u']);
-        unset($_SESSION['admin_e']);
-        session_destroy();
-        return TRUE;
+        return session_regenerate_id(TRUE);
     }
 }

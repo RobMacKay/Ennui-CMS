@@ -80,7 +80,7 @@ class Form
         $this->_generateDefaultInputs();
 
         // Load inputs for the form
-        $inputs = $this->_generateInputs($input);
+        $inputs = $this->_generateInputs();
 
         return <<<FORM
 
@@ -92,7 +92,7 @@ class Form
       name="$this->name">
     <fieldset>
         <legend>$this->legend</legend>
-        $inputs$defaults
+        $inputs
     </fieldset>
 </form><!-- End .$this->class -->
 

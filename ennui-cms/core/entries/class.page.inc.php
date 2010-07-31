@@ -159,11 +159,11 @@ class Page extends AdminUtilities
         return $data7;
     }
 
-    protected function setDefaultEntry( $admin )
+    protected function setDefaultEntry( $admin=NULL )
     {
         // Set default values if no entries are found
         $default = new Entry();
-        $default->admin = $admin;
+        $default->admin = isset($admin) ? $admin : '';
         $default->title = "No Entry Found";
         $default->entry = "<p>That entry doesn't appear to exist.</p>";
         $this->entries = array($default);

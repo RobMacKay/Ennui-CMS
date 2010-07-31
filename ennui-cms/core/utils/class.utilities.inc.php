@@ -299,8 +299,6 @@ class Utilities
      */
     public static function parseTemplate($entries, $template, $extra=array())
     {
-        FB::log($entries, "Entry Array");
-
         // Remove any comments from the template
         $comment_pattern = array('/\/\*(.*)?\*\//s', '/(?<!:)(?:\/\/).*/');
         $template = preg_replace($comment_pattern, array('', ''), $template);
@@ -462,14 +460,24 @@ class Utilities
         ");
     }
 
+    /**
+     *
+     *
+     * @param object $entry     The entry object
+     * @param array $params     Parameters for replacement
+     * @param array $matches    The matches from preg_replace_callback()
+     *
+     * @return string           The replaced template value
+     */
     static function replaceTags($entry, $params, $matches)
     {
         $entry = unserialize($entry);
 
         // Make sure the template tag has a matching array element
         $prop = strtolower($matches[1]);
-        if ( $entry->$prop!==NULL )
+        if ( isset($entry->$prop) )
         {
+            // Grab the value from the Entry object
             $val = $entry->$prop;
 
             // Run htmlentities() is the parameter is set to TRUE
@@ -500,9 +508,7 @@ class Utilities
             return $val;
         }
 
-        /*
-         * Otherwise, simply return the tag as is
-         */
+        // Otherwise, simply return the tag as is
         else { return "{".$matches[1]."}"; }
     }
 
@@ -513,14 +519,13 @@ class Utilities
     }
     
 	/**
-	  * IMPORTANT! This method is now deprecated and will eventually
-	  * be phased out, do NOT use this method!
-	  *
-	  * Instead, use the Validate class that has the same method name.
-	  * Like so, <?php var_dump(Validation::isValidEmail($email));?>
-	  * See the Validate class for more information and methods.
-	  *
-	  */
+     * IMPORTANT! This method is now deprecated and will eventually
+     * be phased out, do NOT use this method!
+     *
+     * Instead, use the Validate class that has the same method name.
+     * Like so, <?php var_dump(Validation::isValidEmail($email));?>
+     * See the Validate class for more information and methods.
+     */
     static function isValidEmail($email)
     {
         // Define a regex pattern to validate the email address
@@ -589,6 +594,49 @@ class Utilities
             return preg_replace($pattern, $replace, trim(strtolower($string)));
         }
         else { return NULL; }
+    }
+
+    public static function checkSession()
+    {
+        // Create a token if one doesn't exist or has timed out
+        if ( !isset($_SESSION['ecms']) || $_SESSION['ecms']['ttl']<=time() )
+        {
+            $_SESSION['ecms'] = array(
+                    'token' => uniqid('php-sess_', TRUE),
+                    'ttl' => time()+600,
+                    'address' => $_SERVER['REMOTE_ADDR'],
+                    'user-agent' => $_SERVER['HTTP_USER_AGENT']
+                );
+            return TRUE;
+        }
+
+        // If user agent and/or IP don't match, assume hostility: harakiri
+        else if ( $_SESSION['ecms']['user-agent']!==$_SERVER['HTTP_USER_AGENT']
+                || $_SESSION['ecms']['address']!==$_SERVER['REMOTE_ADDR'] )
+        {
+            // Destroy the session to avoid fixation and other such nonsense
+            session_regenerate_id(TRUE);
+            return FALSE;
+        }
+
+        // If a valid session exists, update the timeout and return TRUE
+        else if ( is_array($_SESSION['ecms']) )
+        {
+            $_SESSION['ecms']['ttl'] = time()+600;
+            return TRUE;
+        }
+
+        // If none of the above conditions are met, something's screwy
+        else
+        {
+            session_regenerate_id(TRUE);
+            return FALSE;
+        }
+    }
+
+    public static function checkClearance( $clearance=1 )
+    {
+
     }
 
     /**

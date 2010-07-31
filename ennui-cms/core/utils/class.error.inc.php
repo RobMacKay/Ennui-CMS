@@ -32,7 +32,7 @@ class Error
     private static function writeLog($message)
     {
         // Creates a pointer to the log
-        $log = fopen('../ennui-cms/log/exception.log', 'a');
+        $log = fopen(CMS_PATH . 'log/exception.log', 'a');
 
         // Appends the message to the log
         fwrite($log, $message);

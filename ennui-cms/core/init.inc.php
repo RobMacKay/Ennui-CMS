@@ -11,29 +11,38 @@ ob_start();
 
 // TODO: Check for a cached version of the requested page
 
-// Create a token if one doesn't exist or has timed out
-if ( !isset($_SESSION['token']) && $_SESSION['TTL']<=time() )
-{
-    $_SESSION['token'] = sha1(uniqid(mt_rand(), TRUE));
-    $_SESSION['TTL'] = time()+36000; // Time out in 10 minutes
-}
-
 // Include configuration files
 include_once CMS_PATH . 'config/config.inc.php';
 include_once CMS_PATH . 'config/database.inc.php';
 include_once CMS_PATH . 'config/menu.inc.php';
 include_once CMS_PATH . 'config/admin.inc.php';
 
-// Include core classes
-include_once CMS_PATH . 'core/class.utilities.inc.php';
-include_once CMS_PATH . 'core/class.db_connect.inc.php';
-include_once CMS_PATH . 'core/class.db_actions.inc.php';
-include_once CMS_PATH . 'core/class.adminutilities.inc.php';
-include_once CMS_PATH . 'core/class.imagecontrol.inc.php';
-include_once CMS_PATH . 'core/class.page.inc.php';
+// Include utility classes
+include_once CMS_PATH . 'core/utils/class.utilities.inc.php';
+include_once CMS_PATH . 'core/utils/class.error.inc.php';
+include_once CMS_PATH . 'core/utils/class.validate.inc.php';
+
+// Include database classes
+include_once CMS_PATH . 'core/entries/class.db_connect.inc.php';
+include_once CMS_PATH . 'core/entries/class.db_actions.inc.php';
+
+// Include admin class
+include_once CMS_PATH . 'core/admin/class.adminutilities.inc.php';
+
+// Include entry classes
+include_once CMS_PATH . 'core/entries/class.page.inc.php';
+include_once CMS_PATH . 'core/entries/class.entry.inc.php';
+
+// Include form classes
+include_once CMS_PATH . 'core/forms/class.form.inc.php';
+include_once CMS_PATH . 'core/forms/class.input.inc.php';
+
+// Include image classes
+include_once CMS_PATH . 'core/images/class.imagecontrol.inc.php';
+include_once CMS_PATH . 'core/images/class.imagegallery.inc.php';
 
 // FirePHP class for debugging (requires Firefox)
-include_once CMS_PATH . 'debug/fb.php';
+include_once CMS_PATH . 'core/debug/fb.php';
 
 // Define site-wide constants
 foreach($_CONSTANTS as $key=>$value)
@@ -41,10 +50,7 @@ foreach($_CONSTANTS as $key=>$value)
     define($key, $value);
 }
 
-/*
- * Handles debugging. If set to TRUE, displays all errors and enables logging 
- * through FirePHP.
- */
+// Handles debugging. If TRUE, displays all errors and enables FirePHP logging
 if( ACTIVATE_DEBUG_MODE===TRUE )
 {
     ini_set("display_errors",1);
@@ -59,13 +65,15 @@ else
     FB::setEnabled(FALSE);
 }
 
+// Check for a valid session
+if ( !Utilities::checkSession() )
+{
+    FB::log("Session found.");
+}
+FB::log($_SESSION['ecms'], "Session Info");
+
 // URL Parsing - Read the URL and break it apart for processing
 $url_array = Utilities::readUrl();
-
-if ( !is_array($url_array) && file_exists($url_array) )
-{
-    require_once $url_array;
-}
 
 // Creates the database tables if set to true
 if(CREATE_DB === TRUE)
@@ -109,7 +117,7 @@ try
 catch ( Exception $e )
 {
     FB::error($e);
-    die( $e->getMessage() );
+    Error::logException($e);
 }
 
 // Define an autoload function for classes
@@ -118,22 +126,16 @@ function __autoload($classname)
     // File names are always lowercase
     $class = strtolower($classname);
 
-    // First, check if a plugin class exists
+    // First, check if a custom plugin exists
     if ( file_exists("assets/plugins/$class/ecms.$class.inc.php") )
     {
         $path = "assets/plugins/$class/ecms.$class.inc.php";
     }
 
-    // If not, check the inc folder
-    elseif ( file_exists(CMS_PATH . 'inc/class.' . $class . '.inc.php') )
+    // If not, check the class folder
+    elseif ( file_exists(CMS_PATH . 'class/class.' . $class . '.inc.php') )
     {
-        $path = CMS_PATH . 'inc/class.' . $class . '.inc.php';
-    }
-
-    // As a last resort, check the core folder
-    elseif ( file_exists(CMS_PATH . 'core/class.' . $class . '.inc.php') )
-    {
-        $path = CMS_PATH . 'core/class.' . $class . '.inc.php';
+        $path = CMS_PATH . 'class/class.' . $class . '.inc.php';
     }
 
     else
@@ -143,7 +145,7 @@ function __autoload($classname)
 
     // Include the file
     require_once $path;
-    FB::log($path, "Class File");
+    FB::log($path, "Class File Location");
 }
 
 // Load the page title

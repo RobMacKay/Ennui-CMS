@@ -44,13 +44,18 @@ class Entry
         }
     }
 
-    public function __set($name, $val)
+    public function __set( $name, $val )
     {
         $this->extra[$name] = $val;
     }
 
-    public function __get($name)
+    public function __get( $name )
     {
-        return isset($this->extra[$name]) ? $this->extra[$name] : "No property!";
+        return isset($this->extra[$name]) ? $this->extra[$name] : NULL;
+    }
+
+    public function __isset( $name )
+    {
+        return isset($this->extra[$name]);
     }
 }
