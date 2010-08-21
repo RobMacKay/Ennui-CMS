@@ -1,13 +1,33 @@
 <?php
 
+/**
+ * A set of utility functions
+ *
+ * PHP version 5
+ *
+ * LICENSE: This source file is subject to the MIT License, available at
+ * http://www.opensource.org/licenses/mit-license.html
+ *
+ * @author     Jason Lengstorf <jason.lengstorf@ennuidesign.com>
+ * @copyright  2010 Ennui Design
+ * @license    http://www.opensource.org/licenses/mit-license.html  MIT License
+ */
 class Utilities
 {
 
-    public static function textPreview($body, $limit='45')
+    /**
+     * Generates an excerpt of a given number of words
+     *
+     * @param string $body  The text to excerpt
+     * @param int $limit    The number of words to include in the excerpt
+     * @return string       The excerpt
+     */
+    public static function textPreview( $body, $limit=45, $wrap_ptags=TRUE )
     {
-        $preview = NULL;
-
-        // Get rid of most tags to avoid an unclosed tag in the preview
+        /*
+         * Remove newlines, replace heading tags with strong tags, and swap out
+         * paragraph tags for line breaks
+         */
         $pat = array(
                 "/\n++/is",
                 "/<h(?:2|3)(.*?)>/i",
@@ -24,13 +44,18 @@ class Utilities
             );
         $body = preg_replace($pat, $rep, $body);
 
+        // Get rid of other tags to avoid an unclosed tag in the preview
         $text = strip_tags($body,'<strong><br><a>');
 
+        /*
+         * Check for empty tags, leading line breaks, and any instances of more
+         * than two line breaks to avoid broken layouts
+         */
         $pat2 = array(
                 "/<([A-Z][A-Z0-9]*)\b[^>]*>\s*?<\/\\1>/is",
                 "/<([A-Z][A-Z0-9]*)\b[^>]*>\s*?<\\1>/is",
                 "/^(?:<br ?\/>)*\s*/is",
-                "/(?:<br ?\/>(?:\n|&nbsp;)*){2,}+/is"
+                "/(?:<br ?\/>(?:\n|&nbsp;)*){3,}+/is"
             );
         $rep2 = array(
                 "",
@@ -43,15 +68,23 @@ class Utilities
         // Pull the text apart at the spaces
         $words = explode(' ', $text);
 
-        if($limit<count($words))
+        // Make sure the text has enough words to warrant a preview
+        if ( $limit<count($words) )
         {
             // Run a loop and build a preview with the specified number of words
-            for ($i=0; $i<$limit-1; ++$i)
+            for ($i=0, $w=array(); $i<$limit-1; ++$i)
             {
-                $preview .= $words[$i] . ' ';
+                array_push($w, $words[$i]);
             }
-            $preview .= str_replace('.','',str_replace(',','',$words[$i])) . '...';
+
+            // Remove trailing punctuation and add the last word
+            array_push($w, strtr($words[$i], array('.'=>'', ','=>'')));
+
+            // Create the string and add an ellipsis
+            $preview = implode(' ', $w) . '...';
         }
+
+        // Otherwise set the full text as the preview
         else
         {
             $preview = $text;
@@ -73,7 +106,8 @@ class Utilities
             $preview .= "</a>";
         }
 
-        return "<p>" . wordwrap($preview) . "</p>";
+        // If the flag is set, wrap the output in a paragraph tag
+        return $wrap_ptags===TRUE ? "<p>".wordwrap($preview)."</p>" : $preview;
     }
 
     /**
@@ -594,49 +628,6 @@ class Utilities
             return preg_replace($pattern, $replace, trim(strtolower($string)));
         }
         else { return NULL; }
-    }
-
-    public static function checkSession()
-    {
-        // Create a token if one doesn't exist or has timed out
-        if ( !isset($_SESSION['ecms']) || $_SESSION['ecms']['ttl']<=time() )
-        {
-            $_SESSION['ecms'] = array(
-                    'token' => uniqid('php-sess_', TRUE),
-                    'ttl' => time()+600,
-                    'address' => $_SERVER['REMOTE_ADDR'],
-                    'user-agent' => $_SERVER['HTTP_USER_AGENT']
-                );
-            return TRUE;
-        }
-
-        // If user agent and/or IP don't match, assume hostility: harakiri
-        else if ( $_SESSION['ecms']['user-agent']!==$_SERVER['HTTP_USER_AGENT']
-                || $_SESSION['ecms']['address']!==$_SERVER['REMOTE_ADDR'] )
-        {
-            // Destroy the session to avoid fixation and other such nonsense
-            session_regenerate_id(TRUE);
-            return FALSE;
-        }
-
-        // If a valid session exists, update the timeout and return TRUE
-        else if ( is_array($_SESSION['ecms']) )
-        {
-            $_SESSION['ecms']['ttl'] = time()+600;
-            return TRUE;
-        }
-
-        // If none of the above conditions are met, something's screwy
-        else
-        {
-            session_regenerate_id(TRUE);
-            return FALSE;
-        }
-    }
-
-    public static function checkClearance( $clearance=1 )
-    {
-
     }
 
     /**

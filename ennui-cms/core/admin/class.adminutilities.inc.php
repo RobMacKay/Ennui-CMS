@@ -10,7 +10,7 @@ class AdminUtilities extends DB_Actions
      */
     const SALT_LENGTH = 14;
 
-    protected function admin_general_options($page)
+    protected function admin_general_options( $page )
     {
         if ( isset($_SESSION['user']) && $_SESSION['user']['clearance']>=1 )
         {
@@ -189,14 +189,76 @@ ADMIN_OPTIONS;
     }
 
     /**
-     * Checks the administrative clearance
+     * DEPRECATED: Checks the administrative clearance
+     *
+     * @deprecated  Use checkClearance() instead
      *
      * @param int   $clearance  Required clearance level
      * @return bool             Whether or not the user is logged in
      */
     protected function isLoggedIn($clearance=1)
     {
-        if ( isset($_SESSION['user'])
+        return self::checkClearance($clearance);
+    }
+
+    /**
+     * Checks for a valid session
+     *
+     * Runs a few checks to make sure the same user agent and IP are used in
+     * addition to the check for a token and timeout. Any failure results in a
+     * full-on self-destruct for the session.
+     *
+     * @return boolean  Whether or not a valid session is present
+     */
+    public static function checkSession()
+    {
+        // Create a token if one doesn't exist or has timed out
+        if ( !isset($_SESSION['ecms']) || $_SESSION['ecms']['ttl']<=time() )
+        {
+            $_SESSION['ecms'] = array(
+                    'token' => uniqid('php-sess_', TRUE),
+                    'ttl' => time()+600,
+                    'address' => $_SERVER['REMOTE_ADDR'],
+                    'user-agent' => $_SERVER['HTTP_USER_AGENT']
+                );
+            return TRUE;
+        }
+
+        // If user agent and/or IP don't match, assume hostility: harakiri
+        else if ( $_SESSION['ecms']['user-agent']!==$_SERVER['HTTP_USER_AGENT']
+                || $_SESSION['ecms']['address']!==$_SERVER['REMOTE_ADDR'] )
+        {
+            // Destroy the session to avoid fixation and other such nonsense
+            session_regenerate_id(TRUE);
+            return FALSE;
+        }
+
+        // If a valid session exists, update the timeout and return TRUE
+        else if ( is_array($_SESSION['ecms']) )
+        {
+            $_SESSION['ecms']['ttl'] = time()+600;
+            return TRUE;
+        }
+
+        // If none of the above conditions are met, something's screwy
+        else
+        {
+            session_regenerate_id(TRUE);
+            return FALSE;
+        }
+    }
+
+    /**
+     * Checks if a user has a given clearance level
+     *
+     * @param int $clearance    The clearance level
+     * @return boolean          Whether or not the user has clearance
+     */
+    public static function checkClearance( $clearance=1 )
+    {
+        // Check for a valid session, logged in user, and proper clearance
+        if ( self::checkSession()
+                && isset($_SESSION['user'])
                 && $_SESSION['user']['clearance']>=$clearance )
         {
             return TRUE;
@@ -207,30 +269,29 @@ ADMIN_OPTIONS;
         }
     }
 
-    static function createSaltedHash($string, $salt=NULL)
+    /**
+     * Generates a salted hash
+     *
+     * @param string $string    A string to hash
+     * @param string $salt      An optional salted hash
+     * @return string           The salted hash
+     */
+    public static function createSaltedHash($string, $salt=NULL)
     {
-        /*
-         * Generate a salt if no salt is passed
-         */
+        // Generate a salt if no salt is passed
         if ( $salt==NULL )
         {
             $salt = substr(md5(time()), 0, self::SALT_LENGTH);
         }
 
-        /*
-         * Extract the salt from the string if one is passed
-         */
+        // Extract the salt from the string if one is passed
         else
         {
             $salt = substr($salt, 0, self::SALT_LENGTH);
         }
 
-        /*
-         * Add the salt to the hash and return it
-         */
+        // Add the salt to the hash and return it
         return $salt . sha1($salt . $string);
     }
 
 }
-
-?>

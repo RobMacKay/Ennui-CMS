@@ -50,8 +50,6 @@ class Multi extends Page
         // Displays the entries for the page
         else
         {
-            $limit = MAX_ENTRIES_PER_PAGE; // Number of entries per page
-
             // If the entries are paginated, this determines what page to show
             if ( isset($this->url1) && $this->url1=='more' )
             {
@@ -77,17 +75,17 @@ class Multi extends Page
                 }
 
                 // Load entries by category
-                $entries = $this->getEntriesByCategory($cat, $offset);
+                $this->getEntriesByCategory($cat, $offset);
             }
 
             // Load most recent entries for a preview if no entry was selected
             else
             {
-                $entries = $this->getAllEntries($limit, $offset);
+                $this->getAllEntries($offset);
             }
 
             // Return markup for entry previews
-            return $this->displayPreview($entries);
+            return $this->displayPreview();
         }
     }
 
@@ -161,7 +159,7 @@ class Multi extends Page
      * @param array $entries an array of entries to be formatted
      * @return string HTML markup to display the entry previews
      */
-    protected function displayPreview($entries)
+    protected function displayPreview( )
     {
         /*
          * Initialize the $entry variable by loading admin options if the user
@@ -180,7 +178,7 @@ class Multi extends Page
              * Loop through entries and create special pieces of information in
              * the entry array for the template
              */
-            foreach ( $entries as $e )
+            foreach ( $this->entries as &$e )
             {
                 // Entry options for the admin, if logged in
                 $e->admin = $this->admin_simple_options($this->url0, $e->entry_id);
@@ -193,8 +191,9 @@ class Multi extends Page
 
                 // Format the image if one exists
                 $e->image = isset($e->img) ? Utilities::imageOptions($e) : NULL;
+                $e->preview = Utilities::textPreview($e->entry, 20);
 
-                $this->entries[] = $e;
+//                $this->entries[] = $e;
             }
 
             $template_file = $this->url0.'-preview.inc';

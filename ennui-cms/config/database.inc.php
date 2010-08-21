@@ -11,7 +11,7 @@ $_CONSTANTS['DB_NAME'] = 'ecms_new-db';
 //$_CONSTANTS['DB_NAME'] = 'DB1985000';
 
 // Assign a custom prefix for all database tables to avoid conflicts
-$_CONSTANTS['DB_PREFIX'] = 'ecms_';
+$_CONSTANTS['DB_PREFIX'] = 'ennui-cms_';
 
 // Assign a default character set and collation for the database
 $_CONSTANTS['DEFAULT_CHARACTER_SET'] = "utf8";

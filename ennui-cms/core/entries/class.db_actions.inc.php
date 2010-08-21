@@ -15,10 +15,6 @@
 class DB_Actions extends DB_Connect
 {
 
-//------------------------------------------------------------------------------
-// CLASS CONSTANTS
-//------------------------------------------------------------------------------
-
     /**
      * An array to store any loaded entries
      *
@@ -27,10 +23,6 @@ class DB_Actions extends DB_Connect
     public $entries = array();
 
     protected $entry_limit = MAX_ENTRIES_PER_PAGE;
-
-//------------------------------------------------------------------------------
-// CLASS CONSTANTS
-//------------------------------------------------------------------------------
 
     /**
      * A string containing all the fields available in the entry database
@@ -42,16 +34,6 @@ class DB_Actions extends DB_Connect
     const ENTRY_FIELDS = "
                     `entry_id`,`page_id`,`title`,`entry`,`excerpt`,`slug`,
                     `tags`,`extra`,`author`,`created`";
-
-//------------------------------------------------------------------------------
-// PUBLIC METHODS
-//------------------------------------------------------------------------------
-
-
-
-//------------------------------------------------------------------------------
-// PROTECTED METHODS
-//------------------------------------------------------------------------------
 
     /**
      * Calls the parent constructor to create a PDO object
@@ -357,7 +339,7 @@ class DB_Actions extends DB_Connect
      * @param int $limit
      * @return array    A multi-dimensional array of entries
      */
-    protected function getAllEntries($offset=0, $ord="`created` DESC")
+    protected function getAllEntries( $offset=0, $ord="`created` DESC" )
     {
         // Prepare the statement and execute it
         $sql = "SELECT" . self::ENTRY_FIELDS . "
@@ -369,6 +351,8 @@ class DB_Actions extends DB_Connect
                     )
                 ORDER BY $ord
                 LIMIT $offset, $this->entry_limit";
+
+        FB::log($sql);
 
         // Check for a cached file
         $cache = Utilities::checkCache($sql.$this->url0);
@@ -572,10 +556,6 @@ class DB_Actions extends DB_Connect
             </ul>\n";
     }
 
-//------------------------------------------------------------------------------
-// PRIVATE METHODS
-//------------------------------------------------------------------------------
-
     private function loadEntryArray($stmt)
     {
         $stmt->execute();
@@ -597,10 +577,6 @@ class DB_Actions extends DB_Connect
     {
         Error::logException($e);
     }
-
-//------------------------------------------------------------------------------
-// STATIC METHODS
-//------------------------------------------------------------------------------
 
     /**
      * Creates the database tables necessary for the CMS to function

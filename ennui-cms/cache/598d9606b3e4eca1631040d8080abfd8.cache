@@ -1,1 +1,0 @@
-a:1:{i:0;O:5:"Entry":10:{s:8:"entry_id";s:1:"1";s:7:"page_id";s:1:"1";s:5:"title";s:10:"Test Entry";s:5:"entry";s:28:"<p>This is a test entry.</p>";s:7:"excerpt";s:47:"<p>Testing the new ECMS database structure.</p>";s:4:"slug";s:10:"test-entry";s:4:"tags";s:20:"test, entry, testing";s:5:"extra";s:0:"";s:6:"author";s:15:"Jason Lengstorf";s:7:"created";s:10:"1279564860";}}

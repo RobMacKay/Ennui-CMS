@@ -1,14 +1,14 @@
 <!--//
 
 // This variable is the serialized divs in the admin gallery
-var order = null,
+var $order = null,
     tinymcefile = '/assets/js/tiny_mce/tiny_mce.js',
     processfile = '/assets/inc/update.inc.php',
     uploadifyfile = '/assets/inc/uploadify.inc.php';
 
 $.ajaxSetup({
-		"type" : "POST",
-		"url" : processfile,
+        "type" : "POST",
+        "url" : processfile,
         "error" : function(e) { alert(e); }
 });
 
@@ -38,205 +38,221 @@ $(".ecms-gallery").live("click", function(e){
 
 });
 
-function showedit(page,option,entry_id,token) {
-	var params = "page=" + page
-            + "&action=" + option
-            + "&entry_id=" + entry_id
-            + "&token=" + token;
-	$.fancybox.showActivity();
+function showedit(page,option,id) {
+    var params = "page=" + page + "&action=" + option + "&id=" + id;
+//    $.fancybox.showActivity();
 
-	$.ajax({
-		data: params,
-		success: function(response)
-			{
-				//$('#'+page).html(response).height('auto');
-				$.fancybox({
-					'content': response,
-					'width': 700,
-					'height': 'auto',
-					'scrolling': 'no',
-					'autoDimensions': false,
-					'overlayOpacity': 0.6,
-					'overlayColor': '#000',
-					'transitionIn': 'elastic',
-					'transitionOut': 'elastic',
-					'speedIn': 500,
-					'speedOut': 400,
-					'easingIn': 'easeInQuad',
-					'easingOut': 'easeOutBounce'
-				});
-				$('input.nl_preview')
-					.bind("click", function(){return newsletterPreview("newsletter");});
-				setTimeout("textEdit();", 500);
-			}
-	});
+    $.ajax({
+        data: params,
+        success: function(response)
+            {
+                $('<div>')
+                    .addClass("thumbbox-overlay")
+                    .css({"opacity":"0"})
+                    .bind("click", function(){
+                            $(".thumbbox-overlay, .thumbbox-main")
+                                .fadeOut(300, function(){ $(this).remove(); });
+                        })
+                    .appendTo('body')
+                    .fadeTo(300, .5),
+                $('<div>')
+                    .addClass("thumbbox-main")
+                    .css({
+                        "top":$(window).scrollTop()+60+"px",
+                        "width":"650px",
+                        "height":"auto",
+                        "margin-left":"-325px"
+                    })
+                    .html('<div class="thumbbox-main-modal">'+response+'</div>')
+                    .appendTo("body");
+                $("<a>")
+                    .addClass("thumbbox-close-btn")
+                    .attr("href","#")
+                    .bind("click", function(){
+                            $(".thumbbox-overlay, .thumbbox-main")
+                                .fadeOut(300, function(){ $(this).remove(); });
+                            return false;
+                        })
+                    .html("&#215;")
+                    .appendTo('.thumbbox-main');
+                $(".thumbbox-main-modal input,.thumbbox-main-modal textarea")
+                    .bind("click", function(e){e.stopPropagation();})
+                setTimeout("textEdit();", 500);
+            }
+    });
 }
 
 function reorderEntry(page, pos, direction, id) {
-	var params = "page="
-		+ page
-		+ "&action=reorderEntry&pos="
-		+ pos
-		+ "&id="
-		+ id
-		+ "&direction="
-		+ direction;
+    var params = "page="
+        + page
+        + "&action=reorderEntry&pos="
+        + pos
+        + "&id="
+        + id
+        + "&direction="
+        + direction;
 
-	$.ajax({
-		data: params,
-		success: function()
-			{
-				document.location = "/"+page;
-			}
-	});
+    $.ajax({
+        data: params,
+        success: function()
+            {
+                document.location = "/"+page;
+            }
+    });
 }
 
 function galleryEdit(page, id, dir) {
-	var folder = dir+page+id,
-		params = "page=" + page + "&id=" + id + "&action=galleryEdit";
+    var folder = dir+page+id,
+        params = "page=" + page + "&id=" + id + "&action=galleryEdit";
 
-	$.ajax({
-		data: params,
-		success: function(response)
-			{
-				$('#'+page).html(response);
-	            setTimeout("galleryLoading('"+dir+"', '"+page+"', '"+id+"')", 500);
-			}
-	});
+    $.ajax({
+        data: params,
+        success: function(response)
+            {
+                $('#'+page).html(response);
+                setTimeout("galleryLoading('"+dir+"', '"+page+"', '"+id+"')", 500);
+            }
+    });
 }
 
 function galleryLoading(dir, page, id)
 {
-	// Create a "Sort" button
-	var $sort_btn = '<a href="#" id="sortbtn">Sort</a>';
+    // Create a "Sort" button
+    var $sort_btn = '<a href="#" id="sortbtn">Sort</a>';
 
-	galleryUpload(dir, page, id);
-	$('#admin_gal').append($sort_btn).sortable({
-    	update: function(){
-			order = $(this).sortable('serialize');
-		}
-	});
+    galleryUpload(dir, page, id);
+    $('#admin_gal').append($sort_btn).sortable({
+        update: function(){
+            $order = $(this).sortable('serialize');
+        }
+    });
 
-	$('#sortbtn').bind('click', function(){
-		$.ajax({
-			data: "page="+page+"&id="+id+"&action=galleryOrder&"+order,
-			success: function(msg){
-				$("#"+page).html(msg);
-			}
-		});
-		return false;
-	});
+    $('#sortbtn').bind('click', function(){
+        $.ajax({
+            data: "page="+page+"&id="+id+"&action=galleryOrder&"+$order,
+            success: function(msg){
+                $("#"+page).html(msg);
+            }
+        });
+        return false;
+    });
 }
 
 function addPhotoCaption(page, album_id, image_id, image_cap) {
-	var params = "page=" + page
-			+ "&album_id=" + album_id
-			+ "&image_id=" + image_id
-			+ "&image_cap=" + image_cap
-			+ "&action=galleryAddCaption";
+    var params = "page=" + page
+            + "&album_id=" + album_id
+            + "&image_id=" + image_id
+            + "&image_cap=" + image_cap
+            + "&action=galleryAddCaption";
 
-	$.ajax({
-		data: params,
-		success: function(response)
-			{
-				$('#'+page).html(response);
-		    	setTimeout("galleryUpload('"+page+album_id+"')",500);
-			}
-	});
+    $.ajax({
+        data: params,
+        success: function(response)
+            {
+                $('#'+page).html(response);
+                setTimeout("galleryUpload('"+page+album_id+"')",500);
+            }
+    });
 }
 
 function deletePhoto(page, id, img) {
-	var params = "page="+page+"&id="+id+"&image="+img+"&action=galleryDeletePhoto";
+    var params = "page="+page+"&id="+id+"&image="+img+"&action=galleryDeletePhoto";
 
-	$.ajax({
-		data: params,
-		success: function(response)
-			{
-				$('#'+page).html(response);
-		    	setTimeout("galleryUpload('"+page+id+"')",500);
-			}
-	});
+    $.ajax({
+        data: params,
+        success: function(response)
+            {
+                $('#'+page).html(response);
+                setTimeout("galleryUpload('"+page+id+"')",500);
+            }
+    });
 }
 
 function textEdit() {
-	$('textarea#body').tinymce({
-		script_url : tinymcefile,
-		theme : "advanced",
-		plugins : "safari,iespell,inlinepopups,spellchecker,paste,advimage,media",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_buttons1 : "pasteword,|,bold,italic,underline,blockquote,|,"
-			+ "justifyleft,justifycenter,justifyright,|,"
-			+ "bullist,numlist,outdent,indent,|,link,unlink,image,media,code",
-		theme_advanced_buttons2 : "",
-		theme_advanced_buttons3 : "",
-		relative_urls : false
-	});
+    $('textarea#body').tinymce({
+        script_url : tinymcefile,
+        theme : "advanced",
+        plugins : "safari,iespell,inlinepopups,spellchecker,paste,advimage,media",
+        theme_advanced_blockformats : "p,h2,h3,blockquote,code",
+        style_formats : [
+            {title : 'H2 Title', block : 'h2'},
+            {title : 'H3 Title', block : 'h3'}
+        ],
+        theme_advanced_toolbar_location : "top",
+        theme_advanced_toolbar_align : "left",
+        theme_advanced_buttons1 : "pasteword,|,bold,italic,underline,blockquote,|,"
+            + "justifyleft,justifycenter,justifyright,|,"
+            + "bullist,numlist,outdent,indent,|,link,unlink,image,media,code,"
+            + "|,forecolor,backcolor,|,formatselect",
+        theme_advanced_buttons2 : "",
+        theme_advanced_buttons3 : "",
+        relative_urls : false
+    });
 }
 
 function galleryUpload(dir, page, id)
 {
-	$("#fileUpload").fileUpload({
-		'uploader': '/assets/swf/uploader.swf',
-		'cancelImg': '/assets/images/cancel.png',
-		'script': uploadifyfile,
-		'folder': '/'+dir+page+id,
-		'fileDesc': 'Image Files',
-		'buttonText': 'Select Photos',
-		'fileExt': '*.jpg;*.jpeg;*.gif;*.png',
-		'multi': true,
-		'auto': true,
-		'wmode': 'transparent',
-		'onAllComplete': function() { galleryEdit(page, id, dir); }
-	});
+    $("#fileUpload").fileUpload({
+        'uploader': '/assets/swf/uploader.swf',
+        'cancelImg': '/assets/images/cancel.png',
+        'script': uploadifyfile,
+        'folder': '/'+dir+page+id,
+        'fileDesc': 'Image Files',
+        'buttonText': 'Select Photos',
+        'fileExt': '*.jpg;*.jpeg;*.gif;*.png',
+        'multi': true,
+        'auto': true,
+        'wmode': 'transparent',
+        'onAllComplete': function() { galleryEdit(page, id, dir); }
+    });
 }
 
 function newsletterPreview(page)
 {
-	var $overlay = $('<div>')
-			.addClass("nl_preview-overlay")
-			.bind("click", function(){
-				$(".nl_preview-overlay, .nl_preview-main")
-					.fadeOut(300, function(){ $(this).remove(); });
-			})
-			.css({"opacity":"0"}),
-		$close = $("<a>")
-			.addClass("nl_preview-close-btn")
-			.attr("href","#")
-			.bind("click", function(){
-					$(".nl_preview-overlay, .nl_preview-main")
-						.fadeOut(300, function(){ $(this).remove(); });
-					return false;
-				})
-			.html("&#215;"),
-		$preview = $('<div>')
-			.addClass("nl_preview-main")
-			.css({
-				"opacity":"0",
-				"top":$(window).scrollTop()+25+"px"
-			})
-			.html($close),
-		$subject = $("input[name=title]").val(),
-		$body = $("textarea#body").html(),
-		params = "page=" + page + "&action=nl_preview&subject=" 
-			+ $subject + "&body=" + $body;
+    var $overlay = $('<div>')
+            .addClass("nl_preview-overlay")
+            .bind("click", function(){
+                $(".nl_preview-overlay, .nl_preview-main")
+                    .fadeOut(300, function(){ $(this).remove(); });
+            })
+            .css({"opacity":"0"}),
+        $close = $("<a>")
+            .addClass("nl_preview-close-btn")
+            .attr("href","#")
+            .bind("click", function(){
+                    $(".nl_preview-overlay, .nl_preview-main")
+                        .fadeOut(300, function(){ $(this).remove(); });
+                    return false;
+                })
+            .html("&#215;"),
+        $preview = $('<div>')
+            .addClass("nl_preview-main")
+            .css({
+                "opacity":"0",
+                "top":$(window).scrollTop()+25+"px"
+            })
+            .html($close),
+        $subject = $("input[name=title]").val(),
+        $body = $("textarea#body").html(),
+        params = "page=" + page + "&action=nl_preview&subject="
+            + $subject + "&body=" + $body;
 
-	$.ajax({
-		data: params,
-		success: function(response){
-				$preview.append(response);
-			}
-	
-	});
+    $.ajax({
+        data: params,
+        success: function(response){
+                $preview.append(response);
+            }
 
-	$overlay
-		.appendTo('html')
-		.fadeTo(300, .5);
-	$preview
-		.appendTo('html')
-		.fadeTo(300, 1);
+    });
 
-	return false;
+    $overlay
+        .appendTo('html')
+        .fadeTo(300, .5);
+    $preview
+        .appendTo('html')
+        .fadeTo(300, 1);
+
+    return false;
 }
 
 //-->

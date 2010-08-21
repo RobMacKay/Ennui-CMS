@@ -21,7 +21,7 @@ class Test extends Single
      * @param int $id the ID of the entry to be edited
      * @return string HTML markup to display the editing form
      */
-    public function displayAdmin($id)
+    public function displayAdmin( $id )
     {
         try
         {

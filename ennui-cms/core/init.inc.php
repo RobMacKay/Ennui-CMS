@@ -20,7 +20,7 @@ include_once CMS_PATH . 'config/admin.inc.php';
 // Include utility classes
 include_once CMS_PATH . 'core/utils/class.utilities.inc.php';
 include_once CMS_PATH . 'core/utils/class.error.inc.php';
-include_once CMS_PATH . 'core/utils/class.validate.inc.php';
+include_once CMS_PATH . 'core/utils/class.siv.inc.php';
 
 // Include database classes
 include_once CMS_PATH . 'core/entries/class.db_connect.inc.php';
@@ -66,7 +66,7 @@ else
 }
 
 // Check for a valid session
-if ( !Utilities::checkSession() )
+if ( !AdminUtilities::checkSession() )
 {
     FB::log("Session found.");
 }
@@ -120,6 +120,15 @@ catch ( Exception $e )
     Error::logException($e);
 }
 
+// Load the page title
+$title = $obj->getPageTitle($menuPage);
+
+// Load main content
+$content = $obj->displayPublic();
+
+// Load the meta description
+$description = $obj->getPageDescription();
+
 // Define an autoload function for classes
 function __autoload($classname)
 {
@@ -147,12 +156,3 @@ function __autoload($classname)
     require_once $path;
     FB::log($path, "Class File Location");
 }
-
-// Load the page title
-$title = $obj->getPageTitle($menuPage);
-
-// Load main content
-$content = $obj->displayPublic();
-
-// Load the meta description
-$description = $obj->getPageDescription();
