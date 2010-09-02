@@ -121,42 +121,38 @@ class ImageControl
     }
 
     /**
-     * Resizes and resamples an image already stored on the server
+     * Resizes/resamples an image already stored on the server
      *
-     * @param string $image  path to the image on the server
+     * @param string $image    path to the image on the server
      * @param bool $thumb    whether or not a thumbnail should be made
-     * @param bool $rename   whether or not the file should be renamed
+     * @param bool $rename    whether or not the file should be renamed
      *
      * @return string        the path to the new, processed image
      */
     public function processStoredImage($image, $thumb=FALSE, $rename=FALSE)
     {
-        // Use exif_imagetype() whenever available for better performance
-        if ( function_exists('exif_imagetype') )
+        /*
+         * exif_imagetype() not available on all platforms but is much quicker.
+         * This check prevents possible errors.
+         */
+        if(function_exists('exif_imagetype'))
         {
             $type = exif_imagetype($image);
-        }
-        else
-        {
+        } else {
             $info = getimagesize($image);
             $type = $info[2];
         }
-
-        // Load information about the image
         $imgInfo = $this->getImageInfo($type);
 
-        // Verify that the thumb directory has been created
+        /*
+         * Verify that the thumb directory has been created
+         */
         $this->thumb = $thumb;
         $this->checkDir();
 
-        // Process the image and store the file path in a variable
-        $fullpath = $this->doProcessing($image, $imgInfo);
-        if ( $fullpath!==FALSE )
-        {
+        if(($fullpath=$this->doProcessing($image, $imgInfo)) !== false) {
             return $fullpath;
-        }
-        else
-        {
+        } else {
             throw new Exception('Error processing the file.<br />\n');
         }
     }
@@ -164,7 +160,7 @@ class ImageControl
     /**
      * Accesses methods to find dimensions and resize the image
      *
-     * @param string $fullpath   the path to the image on the server
+     * @param string $fullpath    the path to the image on the server
      * @param array  $imgInfo    array of information about the image
      *
      * @return string            the path to the processed image
@@ -172,13 +168,10 @@ class ImageControl
     private function doProcessing($fullpath, $imgInfo)
     {
         $dims = $this->getNewDimensions($fullpath);
-        if ( $loc = $this->doImageResize($fullpath, $dims, $imgInfo) )
-        {
+        if($loc = $this->doImageResize($fullpath, $dims, $imgInfo)) {
             return $loc;
-        }
-        else
-        {
-            return FALSE;
+        } else {
+            return false;
         }
     }
 
@@ -233,109 +226,87 @@ class ImageControl
      */
     private function getNewDimensions($img)
     {
-        // If no image is supplied, throw an exception
-        if(!$img)
-        {
+        if(!$img) {
             throw new Exception('No image supplied');
-        }
-        else
-        {
-            // Get the dimensions of the original image
-            $img_arr = getimagesize($img);
+        } else {
 
-            // Determine the long and short sides of the image
-            $img_l = max(array($img_arr[0], $img_arr[1]));
-            $img_s = min(array($img_arr[0], $img_arr[1]));
-
-            // Determine long and short sides of the max image size
-            $max_l = max($this->max_dims);
-            $max_s = min($this->max_dims);
+            /*
+             * Get the dimensions of the original image
+             */
+            list($src_w,$src_h) = getimagesize($img);
 
             /*
              * If the image is bigger than our max values, calculate
              * new dimensions that keep the aspect ratio intact
              */
-            if( $img_l>$max_l || $img_s>$max_s )
-            {
+            if($src_w>$this->max_dims[0] || $src_h>$this->max_dims[1]) {
+
                 // Squares off the image if set to TRUE
                 if ( $this->thumb===TRUE )
                 {
-                    // Square off for thumbnails
-                    $thumb_scale = max(array($max_s/$img_s, $max_l/$img_l));
+                    $new[0] = $this->max_dims[0];
+                    $new[1] = $this->max_dims[1];
 
-                    // Determine new dimensions if the image is too big
-                    if ( $img_l>$max_l || $img_s>$max_s )
+                    // Determine the scale
+                    $scale = min(
+                            $this->max_dims[0]/$src_w,
+                            $this->max_dims[1]/$src_h
+                        );
+
+					if ( $src_w>$src_h )
                     {
-                        $new_w = round($img_arr[0]*$thumb_scale);
-                        $new_h = round($img_arr[1]*$thumb_scale);
-                    }
+                        $to_x = round(($src_w-$src_h)/2);
+						$to_y = 0;
+						$src_w = $src_h;
+					}
                     else
                     {
-                        $new_w = $img_arr[0];
-                        $new_h = $img_arr[1];
-                    }
-
-                    // Figure out which image side is longer
-                    $thumb_l = max(array($new_w, $new_h));
-                    $thumb_s = min(array($new_w, $new_h));
-
-                    // How far to crop from the top or left to square off image
-                    $offset = round(($thumb_l-$thumb_s)/2);
-
-                    // For landscape orientation
-                    if ( $new_w>$new_h )
-                    {
-                        $to_x = $offset;
-                        $to_y = 0;
-                        $new_w = $new_h;
-                    }
-
-                    // For portait orientation
-                    else
-                    {
-                        $to_x = 0;
-                        $to_y = $offset;
-                        $new_h = $new_w;
-                    }
+						$to_x = 0;
+						$to_y = round(($src_h-$src_w)/2);
+						$src_h = $src_w;
+					}
                 }
 
                 // Non-thumbnail resizing
                 else
                 {
-                    // Get the image scale for resizing
-                    $scale = min(array($max_s/$img_s, $max_l/$img_l));
+                    // Determine the scale
+                    $scale = min(
+                            $this->max_dims[0]/$src_w,
+                            $this->max_dims[1]/$src_h
+                        );
 
-                    // Determine new sizes
-                    $new_w = $img_arr[0]*$scale;
-                    $new_h = $img_arr[1]*$scale;
-
-                    // Since the image doesn't need cropping, set offsets to 0
+                    // Determines the short side for a later double-check
+                    $dblchk = $src_w>$src_h ? 1 : 0;
                     $to_x = 0;
                     $to_y = 0;
+
+                    // Gets the new scaled dimensions
+                    $new = array(
+                            round($scale*$src_w),
+                            round($scale*$src_h)
+                        );
+
+                    /*
+                     * Double-checks to make sure image fits within the
+                     * boundaries and processes it again if not
+                     */
+                    if ( $new[$dblchk]>$this->max_dims[$dblchk] )
+                    {
+                        $scale = $this->max_dims[$dblchk]/$new[$dblchk];
+                        $new = array(
+                                round($scale*$new[0]),
+                                round($scale*$new[1])
+                            );
+                    }
                 }
 
                 // Sets the array to return
-                return array(
-                        $new_w, // New width
-                        $new_h, // New height
-                        $img_arr[0], // Original width
-                        $img_arr[1], // Original height
-                        $to_x, // X offset (how much to crop from left)
-                        $to_y // Y offset (how much to crop from top)
-                    );
+                return array($new[0], $new[1], $src_w, $src_h, $to_x, $to_y);
             }
-
-            // If the image isn't bigger than the max dims, don't resize
             else
             {
-                return array(
-                        $img_arr[0], // New width (no change)
-                        $img_arr[1], // New height (no change)
-                        $img_arr[0], // Original width
-                        $img_arr[1], // Original height
-                        0, // X offset
-                        0 // Y offset
-                    );
+                return array($src_w, $src_h, $src_w, $src_h, 0, 0);
             }
         }
     }
@@ -390,14 +361,17 @@ class ImageControl
             imagesavealpha($new_img, true);
         }
 
-        // Resamples the image, then free the resources used for the original
+        /*
+         * Resamples the image, then free the resources used for the original
+         */
         if(imagecopyresampled($new_img, $src_img, 0, 0, $dims[4], $dims[5], $dims[0], $dims[1], $dims[2], $dims[3])) {
             imagedestroy($src_img);
 
-            // Runs the filtering function if a filter was specified
-            if ( isset($this->filter)
-                    && $filtered=$this->applyFilter($new_img) )
-            {
+            /*
+             * Runs the filtering function if a filter was specified
+             */
+            if(isset($this->filter)
+                && $filtered=$this->applyFilter($new_img)) {
                 $new_img = $filtered;
             }
 
@@ -426,16 +400,16 @@ class ImageControl
      */
     private function applyFilter($im)
     {
-        if ( function_exists('imagefilter') )
-        {
-            list($a1, $a2, $a3, $a4) = $this->filter_args;
-            if ( $im && imagefilter($im, $this->filter, $a1, $a2, $a3, $a4) )
-            {
+        if(function_exists('imagefilter')) {
+            list($arg1, $arg2, $arg3, $arg4) = $this->filter_args;
+            if($im && imagefilter($im, $this->filter, $arg1, $arg2, $arg3, $arg4)) {
                 return $im;
+            } else {
+                return false;
             }
+        } else {
+            return false;
         }
-
-        return FALSE;
     }
 
     /**
@@ -450,7 +424,7 @@ class ImageControl
      */
     private function renameFile($name, $ext, $rename)
     {
-        return $rename===TRUE ? time() . '_' . uniqid() . $ext : $name;
+        return ($rename===TRUE) ? time().'_'.mt_rand(1000,9999).$ext : $name;
     }
 
     /**
@@ -462,12 +436,8 @@ class ImageControl
     {
         $dir = ($this->thumb===TRUE) ? $this->dir.'thumbs/' : $this->dir;
         $dir = ($this->preview===TRUE) ? $this->dir.'preview/' : $dir;
-
-        // If the directory doesn't exist, create it
-        if ( !is_dir($dir) && strlen($dir)>0 )
-        {
-              mkdir($dir, 0755, TRUE)
-                      or die("Directory '$dir' could not be created.<br />");
+        if (!is_dir($dir)&&strlen($dir)>0) {
+              mkdir($dir,0777,true) or die("'$dir' could not be created.<br />");
         }
     }
 }
