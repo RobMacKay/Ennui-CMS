@@ -41,6 +41,10 @@ if ( isset($_POST['page']) )
         exit;
     }
 
+    if ( $_POST['action'] == 'blog_search' ) {
+        $header = "Location: ../". htmlentities($_POST['page'], ENT_QUOTES) ."/search/".urlencode($_POST['search_string']);
+    }
+
     if ( $_POST['action'] == 'galleryEdit' )
     {
         echo $obj->displayGalleryAdmin($id);

@@ -84,15 +84,19 @@ class Page extends AdminUtilities
         {
             $entry_title = ucwords(str_replace("-", " ", $this->url2));
             $entry = ucwords(str_replace("-", " ", $this->url1))
-                    . ": " .$entry_title;
+                    . ": " . $entry_title . " " . $sep;
+        }
+        elseif( !empty($this->url1) )
+        {
+            $arr = $this->getEntryByUrl($this->url1);
+            $entry = isset($arr[0]['title']) ? $arr[0]['title'] . " " . $sep : NULL;
         }
         else
         {
-            $arr = $this->getEntryByUrl($this->url1);
-            $entry = isset($arr[0]['title']) ? $arr[0]['title'] : NULL;
+            $entry = NULL;
         }
 
-        return "$entry $sep $page $sep $title";
+        return "$entry $page $sep $title";
     }
 
     protected function getEntryCategories($entries)

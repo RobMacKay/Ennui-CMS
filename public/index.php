@@ -85,6 +85,11 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
             <div id="<?php echo $sidebar->url0 ?>"><?php echo $sidebar->displayPublic(); ?>
 
             </div>
+            <div class="recent-blogs">
+                <h2>Latest Blogs</h2>
+<?php echo Blog::displayPosts(); ?>
+
+            </div><!-- end .recent-blogs -->
         </aside>
         <div class="clearfix"></div><!-- end .clearfix -->
     </div><!-- end #content -->

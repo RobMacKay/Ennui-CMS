@@ -109,6 +109,44 @@ class Utilities
         else return NULL;
     }
 
+    /**
+     * Checks for an image and returns thumbnail, preview, and full-size URLs
+     *
+     * The entry object is passed by reference, so no return value is necessary
+     *
+     * @param object $e
+     */
+    public static function imageOptions(&$e)
+    {
+        // Get the file path
+        $filepath = dirname($_SERVER['SCRIPT_FILENAME'])."/".$e['img'];
+
+        // Make sure the image path is absolute
+        $imagepath = substr($e['img'], 0, 1)!=="/" ? "/".$e['img'] : $e['img'];
+
+        // If the image exists, set up image URLs
+        if( !empty($imagepath) && file_exists($filepath) && is_file($filepath) )
+        {
+            // Extract the file basename
+            $bn = basename($imagepath);
+
+            // Display the latest two galleries
+            $e['image'] = $imagepath;
+            $e['preview'] = str_replace($bn, 'preview/'.$bn, $imagepath);
+            $e['thumb'] = str_replace($bn, 'thumbs/'.$bn, $imagepath);
+            $e['caption'] = isset($e['imgcap']) ? $e['imgcap'] : $e['title'];
+        }
+
+        // Otherwise, return default image URLs
+        else
+        {
+            $e['image'] = '/assets/images/no-image.jpg';
+            $e['preview'] = '/assets/images/no-image.jpg';
+            $e['thumb'] = '/assets/images/no-image-thumb.jpg';
+            $e['caption'] = 'No image';
+        }
+    }
+
     static function buildMenu($url_array, $menu_array, $is_sub=FALSE, $subid=NULL)
     {
         $attr = !$is_sub ? ' id="menu"' : ' class="submenu ' . $subid . '"';
@@ -570,7 +608,8 @@ class Utilities
         {
             $pattern = array('/[^\w\s]+/', '/\s+/');
             $replace = array('', '-');
-            return preg_replace($pattern, $replace, trim(strtolower($string)));
+            $string = trim(strtolower(html_entity_decode($string, ENT_QUOTES)));
+            return preg_replace($pattern, $replace, $string);
         }
         else { return NULL; }
     }

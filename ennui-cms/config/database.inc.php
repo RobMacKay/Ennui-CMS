@@ -25,5 +25,3 @@ $_CONSTANTS['DEFAULT_COLLATION'] = "utf8_unicode_ci";
  * overwrites of data.
  */
 $_CONSTANTS['CREATE_DB'] = TRUE;
-
-?>

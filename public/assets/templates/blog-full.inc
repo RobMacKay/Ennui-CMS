@@ -38,16 +38,32 @@
         </div>
         <!-- POST METADATA -->
         <p class="meta">
-                <span class="date">{date} by {author}</span>
-                <span class="tags">{tags}</span>
-                <span class="comments">{comment-count} {comment-text}</span>
-                <!--<span class="fb">Become a Fan</span>
-                <span class="tweet_this">Tweet this!</span>-->
+            <span class="date">{date} by {author}</span>
+
+            <a href="/{page}/{url}#add-comment"
+               class="comments">Post a Comment</a>
+
+            <span class="tags">It was tagged with {tags}</span>
+
+            <!-- Tweet Button -->
+            <script src="http://platform.twitter.com/widgets.js"
+                    type="text/javascript"></script>
+            <span class="tweet_this">
+                <a href="http://twitter.com/share?via=ennuidesign&amp;url={encoded-url}&amp;text={encoded-title}&count=none"
+                   class="twitter-share-button">Tweet</a>
+            </span>
+            <!-- end Tweet Button -->
+
+            <!-- Facebook Like Button -->
+            <span class="fb">
+                <iframe src="http://www.facebook.com/plugins/like.php?href={encoded-url}&amp;layout=button_count&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=21"
+                        scrolling="no" frameborder="0"
+                        style="border:none; width:430px; height:40px;"
+                        allowTransparency="true"></iframe>
+            </span>
+            <!-- end Facebook Like Button -->
         </p>
     </div><!-- end .blog-post -->
 </div><!-- end #blog -->
 {comments}
 {/loop}
-
-// Footer
-<a href="{backlink}">&laquo; back to previous page</a>

@@ -1,14 +1,14 @@
 <?php
 /**
  *  Class ImageControl
- * 
+ *
  * Description:
  *         A set of controls to easily upload, move, and resize images. Works with
  *         JPG, GIF, and PNG files (preserves alpha transparency with PNG files).
- * 
+ *
  * Source:
  *         http://ennuidesign.com/projects/ImageControl/
- * 
+ *
  * Usage:
  *         <code>
  *         $myClass = new ImageControl(400, 325);
@@ -241,54 +241,62 @@ class ImageControl
              */
             if($src_w>$this->max_dims[0] || $src_h>$this->max_dims[1]) {
 
-                /*
-                 * Squares off the image if set to TRUE
-                 */
+                // Squares off the image if set to TRUE
                 if ( $this->thumb===TRUE )
                 {
                     $new[0] = $this->max_dims[0];
                     $new[1] = $this->max_dims[1];
-					if($src_w>$src_h) {
-                        $to_x = round($this->max_dims[0]/$src_h*($src_w-$this->max_dims[0])/2);
+
+                    // Get the X and Y offsets
+                    if ( $src_w>$src_h )
+                    {
+                        $to_x = round(($src_w-$src_h)/2);
 						$to_y = 0;
 						$src_w = $src_h;
-					} else {
+					}
+                    else
+                    {
 						$to_x = 0;
-						$to_y = round($this->max_dims[0]/$src_w*($src_h-$this->max_dims[0])/2);
+						$to_y = round(($src_h-$src_w)/2);
 						$src_h = $src_w;
 					}
                 }
 
-                /*
-                 * Non-thumbnail resizing
-                 */
-                else {
-                    if($src_w > $src_h) {
-                        $scale = $this->max_dims[0]/$src_w;
-                        $dblchk = 1; // Identifies the short side
-                    } else {
-                        $scale = $this->max_dims[1]/$src_h;
-                        $dblchk = 0; // Identifies the short side
-                    }
-                    $new[0] = round($scale*$src_w);
-                    $new[1] = round($scale*$src_h);
+                // Non-thumbnail resizing
+                else
+                {
+                    // Determine the scale
+                    $scale = min(
+                            $this->max_dims[0]/$src_w,
+                            $this->max_dims[1]/$src_h
+                        );
+
+                    // Determines the short side for a later double-check
+                    $dblchk = $src_w>$src_h ? 1 : 0;
+                    $to_x = 0;
+                    $to_y = 0;
+
+                    // Gets the new scaled dimensions
+                    $new = array(
+                            round($scale*$src_w),
+                            round($scale*$src_h)
+                        );
 
                     /*
                      * Double-checks to make sure image fits within the
                      * boundaries and processes it again if not
                      */
-                    if($new[$dblchk]>$this->max_dims[$dblchk]) {
+                    if ( $new[$dblchk]>$this->max_dims[$dblchk] )
+                    {
                         $scale = $this->max_dims[$dblchk]/$new[$dblchk];
-                        $new[0] = round($scale*$new[0]);
-                        $new[1] = round($scale*$new[1]);
+                        $new = array(
+                                round($scale*$new[0]),
+                                round($scale*$new[1])
+                            );
                     }
-                    $to_x = 0;
-                    $to_y = 0;
                 }
 
-                /*
-                 * Sets the array to return
-                 */
+                // Sets the array to return
                 return array($new[0], $new[1], $src_w, $src_h, $to_x, $to_y);
             }
             else
@@ -428,5 +436,3 @@ class ImageControl
         }
     }
 }
-
-?>

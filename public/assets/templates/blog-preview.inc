@@ -42,10 +42,10 @@
         <!-- POST METADATA -->
         <p class="meta">
                 <span class="date">{date} by {author}</span>
-                <span class="tags">{tags}</span>
-                <span class="comments">{comment-count} {comment-text}</span>
-                <!--<span class="fb">Become a Fan</span>
-                <span class="tweet_this">Tweet this!</span>-->
+                <span class="comments">
+                    <a href="/{page}/{url}#comments">{comment-count} {comment-text}</a>
+                </span><br />
+                <span class="tags">This entry was tagged with {tags}</span>
         </p>
         <!-- end sharing options -->
     </li>

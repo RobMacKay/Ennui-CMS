@@ -169,6 +169,8 @@ class Blog extends Page
                 }
 
                 $e['url'] = !empty($e['data6']) ? $e['data6'] : urlencode($e['title']);
+                $e['encoded-url'] = urlencode($e['site-url'].$e['page'].'/'.$e['url']);
+                $e['encoded-title'] = urlencode($e['title']);
                 $e['permalink'] = SITE_URL . $this->url0 . "/" . $e['url'];
 
                 $e['tags'] = $this->_formatTags($e['data2']);
@@ -404,5 +406,22 @@ class Blog extends Page
 			FB::log($e);
             throw new Exception ( "Couldn't load popular entries." );
 		}
+	}
+
+	static function displaySearchBox($page='blog')
+	{
+		$page = htmlentities($page, ENT_QUOTES);
+		return "
+                    <form method=\"post\"
+                          action=\"/inc/engine.ennui.update.inc.php\">
+                        <fieldset>
+                            <input type=\"text\" name=\"search_string\" />
+                            <input type=\"hidden\" name=\"page\"
+                                   value=\"$page\" />
+                            <input type=\"hidden\" name=\"action\"
+                                   value=\"blog_search\" />
+                            <input type=\"submit\" value=\"Search\" />
+                        </fieldset>
+                    </form>\n";
 	}
 }

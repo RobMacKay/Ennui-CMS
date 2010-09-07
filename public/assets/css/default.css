@@ -419,11 +419,207 @@ input,select,textarea {
 
 /*
  ******************************************************************************
+ * COMMENT DISPLAY
+ ******************************************************************************
+ */
+#comments {
+    margin: 0;
+    padding: 0;
+}
+
+#comments h2 {
+	margin: 0;
+}
+
+#comments ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#comments li {
+    margin: 0;
+    padding: 24px 15px;
+}
+
+#comments li:nth-child(even) {
+    background: #EEE;
+}
+
+.nopost {
+	margin: 0;
+	padding: 0;
+	color: #333;
+	font-style: italic;
+}
+
+.user_info {
+	float: left;
+	width: 90px;
+	margin: 0 0 0px;
+	padding: 5px;
+	text-align: center;
+	font-size: 11px;
+	overflow: hidden;
+}
+
+.user_info a {
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+.user_info img {
+	display: block;
+	margin: 0 auto;
+	border: 1px solid #000;
+}
+
+.comment {
+	display: block;
+	margin: 0 0 2px 100px;
+	padding: 10px;
+	overflow: visible;
+}
+
+.comment_date {
+    clear: left;
+    margin: 0;
+    padding: 2px 8px 0;
+    font-size: 10px;
+    text-transform: uppercase;
+    text-align: right;
+    border-top: 1px dotted #000;
+}
+
+.comment_date a {
+    font-size: 10px;
+}
+
+
+
+/*
+ ******************************************************************************
+ * COMMENT FORM
+ ******************************************************************************
+ */
+#comments h3 {
+	clear: left;
+	margin-top: 60px;
+	border-bottom: 1px dotted #80A3B7;
+	line-height: 24px;
+}
+
+.get_gravatar {
+	margin: 0 15px;
+	text-align: right;
+	font-size: 10px;
+	font-style: italic;
+}
+
+#add-comment {
+	padding: 30px 0;
+}
+
+#add-comment legend {
+    padding: 0;
+    margin: 0 0 15px;
+}
+
+.c_errortext {
+	color: #F00;
+}
+
+#add-comment label {
+	display: block;
+	font-size: 11px;
+	text-transform: uppercase;
+	font-weight: bold;
+}
+
+#add-comment input[type=text],#add-comment input[type=submit],#add-comment textarea {
+	display: block;
+	width: 66%;
+	margin: 0 0 15px;
+	padding: 5px;
+	background: #FFF;
+	border: 1px solid #578;
+	color: #014;
+	-moz-box-shadow: inset 3px 4px 12px rgba(0, 0, 0, .3);
+	-webkit-box-shadow: inset 3px 4px 12px rgba(0, 0, 0, .3);
+	box-shadow: inset 3px 4px 12px rgba(0, 0, 0, .3);
+	-moz-border-radius: 0 6px 6px;
+	-webkit-border-radius: 0 6px 6px;
+	border-radius: 0 6px 6px;
+}
+
+#add-comment input[type=text] {
+	width: 66%;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+#add-comment input[type=submit] {
+	width: auto;
+	margin-left: 2%;
+	padding: 4px 6px 5px;
+	font-size: 14px;
+	color: #FFF;
+	text-transform: uppercase;
+	background: #049;
+	border: 1px solid #578;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	-moz-box-shadow: inset -2px -3px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
+	/* Safari doesn't support inset */
+	-webkit-box-shadow: 1px 2px 6px rgba(0, 0, 0, .5);
+	-webkit-box-shadow: inset -1px -2px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
+	box-shadow: inset -1px -2px 6px rgba(0, 0, 0, .5),
+		1px 2px 6px rgba(0, 0, 0, .5);
+}
+
+#add-comment textarea {
+	width: 96%;
+	font-size: 12px;
+}
+
+input#cmnt_subscribe,#add-comment label[for=cmnt_subscribe] {
+	display: inline;
+    margin: 0 0 15px 4px
+}
+
+.err {
+	background: #FF0;
+}
+
+/*
+ ******************************************************************************
  * SIDEBAR STYLE
  ******************************************************************************
  */
 aside {
     width: 210px;
+}
+
+aside ul {
+    border-top: 1px dotted #014;
+}
+
+aside li {
+    padding: 8px;
+    border-bottom: 1px dotted #014;
+    text-transform: uppercase;
+}
+
+aside li a:link,aside li a:visited,aside li a:active,aside li a:hover {
+    color: #014;
+    text-decoration: none;
+}
+
+aside li a:active,aside li a:hover {
+    text-decoration: underline;
 }
 
 /*
