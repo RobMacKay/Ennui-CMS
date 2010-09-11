@@ -1,10 +1,20 @@
-<FilesMatch "\.(ico|pdf|flv|jpe?g|png|gif|js|css|swf)(\.gz)?$">
-Header set Expires "Thu, 15 Apr 2012 20:00:00 GMT"
+# Cache certain file types until the apocalypse
+<FilesMatch "\.(html?|gif|j(pe?g|s)|p(ng|df)|css|ico|s(wf|vg)|mp[34]|(wo|ti)ff|ttf|otf|eot|galery\.php)(\.gz)?$">
+Header set Expires "Fri, 21 Dec 2012 00:00:00 GMT"
 Header unset ETag
 FileETag None
 </FilesMatch>
 
+# Make sure no trailing slashes appear in URLs for SEO
+RedirectMatch 301 ^/(.*)/$ http://ennuicms.com/$1
+
 RewriteEngine on
 RewriteBase /
 Options -MultiViews +FollowSymLinks
-RewriteRule !\.(gif|jpe?g|png|css|ico|swf|js|pdf|mp3|mp4|woff|tff|otf|svg|eot)$ index.php [NC]
+
+# Remove the "www" for SEO
+RewriteCond %{HTTP_HOST} ^www.ennuicms.com [NC]
+RewriteRule ^(.*)$ http://ennuicms.com/$1 [L,R=301]
+
+# Send all requests through index.php unless a file is requested
+RewriteRule !\.(html?|gif|j(pe?g|s)|p(ng|df)|css|ico|s(wf|vg)|mp[34]|(wo|ti)ff|ttf|otf|eot|galery\.php)$ index.php [NC]

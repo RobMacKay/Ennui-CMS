@@ -3,7 +3,7 @@
 /*
  * The default page for the site to load (i.e. the "home" page)
  */
-$_CONSTANTS['DEFAULT_PAGE'] = 'home';
+$_CONSTANTS['DEFAULT_PAGE'] = 'about';
 
 /*
  * The default template to use
@@ -81,8 +81,8 @@ $menuPages = array(
         'display' => 'Blog',
         'type' => 'blog'
     ),
-    'services' => array(
-        'display' => 'Services',
+    'features' => array(
+        'display' => 'Features',
         'type' => 'multi'
     ),
     'photos' => array(
@@ -93,11 +93,6 @@ $menuPages = array(
         'display' => 'Contact',
         'type' => 'contact'
     ),
-    'home' => array(
-        'display' => 'Home',
-        'type' => 'single',
-        'hide' => TRUE
-    ),
     'sidebar' => array(
         'display' => 'Sidebar',
         'type' => 'single',
@@ -105,5 +100,3 @@ $menuPages = array(
         'showFull' => FALSE
     )
 );
-
-?>

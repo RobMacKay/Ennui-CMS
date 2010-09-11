@@ -6,6 +6,8 @@
     // Initializes the core functionality of the CMS
     require_once CMS_PATH . 'core/init.inc.php';
 
+    FB::info("Developers: FirePHP is included in the core for easy debugging!");
+
     // Initialize classes used in the sidebar or in widgets
     $sidebar = new Single($dbo, array('sidebar'));
 
@@ -38,7 +40,7 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
     <link rel="stylesheet" type="text/css" media="screen,projection"
           href="/assets/css/admin.css" />
     <link rel="stylesheet" type="text/css" media="screen"
-          href="/assets/js/fancybox/jquery.fancybox-1.3.1.css" />
+          href="/assets/js/thumbbox/css/jquery.ennui.thumbbox.css" />
     <link rel="stylesheet" type="text/css" media="screen,projection"
           href="/assets/css/uploadify.css" />
 <?php endif ?>
@@ -89,9 +91,9 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
                 <h2>Latest Blogs</h2>
 <?php echo Blog::displayPosts(); ?>
 
+                <a href="/blog/category/recent" class="see-all">See All</a>
             </div><!-- end .recent-blogs -->
         </aside>
-        <div class="clearfix"></div><!-- end .clearfix -->
     </div><!-- end #content -->
 
     <footer>
@@ -111,6 +113,8 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
         google.load("jquery", "1");
         google.load("jqueryui", "1");
     </script>
+    <script type="text/javascript"
+            src="/assets/js/thumbbox/jquery.ennui.thumbbox.js"></script>
 <?php
     // If the user is logged in, load JavaScript for the admin controls
     if($obj->url0=="admin" || isset($_SESSION['user'])
@@ -122,8 +126,6 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
             src="/assets/js/tiny_mce/jquery.tinymce.js"></script>
     <script type="text/javascript"
             src="/assets/js/jquery.easing.js"></script>
-    <script type="text/javascript"
-            src="/assets/js/fancybox/jquery.fancybox-1.3.1.pack.js"></script>
     <script type="text/javascript"
             src="/assets/js/ennui.admin.js"></script>
     <script type="text/javascript"
@@ -156,8 +158,7 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
 ?>
 
 
-</html>
-<?php
+</html><?php
     // Clean the buffer
     $cache = ob_get_clean();
 

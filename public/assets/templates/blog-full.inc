@@ -31,9 +31,14 @@
     <div class="post"><!-- begin .blog-post -->
 
         <!-- POST TITLE -->
-        <h2><a href="#">Feast -> Fast</a></h2>
+        <h2>{title}</h2>
         <!-- POST CONTENT -->
         <div class="content">
+            <div class="entry-image">
+                <img src="{image}"
+                     alt="{caption}" />
+                <p class="cap">{caption}</p>
+            </div><!-- .entry-image -->
             {body}
         </div>
         <!-- POST METADATA -->

@@ -1,6 +1,10 @@
     <form id="add-comment"  method="post" action="{form-action}">
         <fieldset>
             <legend>Post a Comment</legend>
+            <p class="get_gravatar">
+                Want to show your face?
+                <a href="http://gravatar.com" rel="external">Get a gravatar!</a>
+            </p>
             <label for="cmnt_name">Name (required)</label>
             <input type="text" id="cmnt_name" name="cmnt_name"
                 value="{name}" class="commentInput{text-err}" />
@@ -28,7 +32,3 @@
                 value="Post Comment" />
         </fieldset>
     </form>
-    <p class="get_gravatar">
-        Want to show your face?
-        <a href="http://gravatar.com" rel="external">Get a gravatar!</a>
-    </p>

@@ -203,6 +203,7 @@ class Page extends AdminUtilities
                 id, page, title, subhead, body, img, imgcap, data1, data2,
                 data3, data4, data5, data6, data7, data8, author, created
                 FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
+                WHERE page = ?
                 AND LOWER(data2) LIKE ?
                 ORDER BY created DESC
                 LIMIT $offset, $limit";
@@ -370,7 +371,6 @@ class Page extends AdminUtilities
                 FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
                 WHERE page=?
                 AND data2 LIKE ?";
-        FB::log($sql);
         try
         {
             $stmt = $this->mysqli->prepare($sql);
@@ -438,7 +438,6 @@ class Page extends AdminUtilities
             $link = "$url1/$url2";
             $num = empty($this->url3) ? 1 : $this->url3;
             $c = $this->getEntryCountByCategory();
-            FB::log($c, "Entry count");
         }
 
         $span = 6; // How many pages shown adjacent to current page

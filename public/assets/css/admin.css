@@ -80,6 +80,12 @@
 	display: block;
 }
 
+#data5,label[for=data5] {
+    display: inline-block;
+    width: auto;
+    margin: 0 4px 15px;
+}
+
 /*
  ******************************************************************************
  * EDIT LINKS
@@ -103,6 +109,10 @@
 
 .admintopopts a {
 	color: #99F;
+}
+
+.admintopopts form {
+    display: inline;
 }
 
 .adminsimpleoptions {

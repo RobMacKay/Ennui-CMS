@@ -152,21 +152,7 @@ class Blog extends Page
                 $e['date'] = date('F d, Y', $e['created']);
 
                 // Image options
-                if ( !empty($e['img']) )
-                {
-                    // Display the latest two galleries
-                    $e['image-url'] = $e['img'];
-                    $e['preview-url'] = str_replace(IMG_SAVE_DIR, IMG_SAVE_DIR.'preview/', $e['img']);
-                    $e['thumb-url'] = str_replace(IMG_SAVE_DIR, IMG_SAVE_DIR.'thumbs/', $e['img']);
-                    $e['image-caption'] = isset($e['imgcap']) ? $e['imgcap'] : $e['title'];
-                }
-                else
-                {
-                    $e['image-url'] = '/assets/images/no-image.jpg';
-                    $e['preview-url'] = '/assets/images/no-image.jpg';
-                    $e['thumb-url'] = '/assets/images/no-image-thumb.jpg';
-                    $e['image-caption'] = "No image supplied for this entry!";
-                }
+                Utilities::imageOptions($e);
 
                 $e['url'] = !empty($e['data6']) ? $e['data6'] : urlencode($e['title']);
                 $e['encoded-url'] = urlencode($e['site-url'].$e['page'].'/'.$e['url']);
