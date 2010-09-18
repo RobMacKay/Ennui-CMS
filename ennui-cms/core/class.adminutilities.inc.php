@@ -418,32 +418,26 @@ ADMIN_OPTIONS;
                 CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`".DB_PREFIX."entryMgr`
                 (
                     `id`        INT UNSIGNED NOT NULL PRIMARY KEY auto_increment,
-                    `page`        VARCHAR(30) NOT NULL,
-                    `title`        VARCHAR(75) DEFAULT NULL,
-                    `subhead`    VARCHAR(75) DEFAULT NULL,
-                    `body`        TEXT DEFAULT NULL,
-                    `img`        VARCHAR(75) DEFAULT NULL,
-                    `imgcap`    VARCHAR(75) DEFAULT NULL,
-                    `data1`        VARCHAR(150) DEFAULT NULL,
-                    `data2`        VARCHAR(150) DEFAULT NULL,
-                    `data3`        VARCHAR(150) DEFAULT NULL,
-                    `data4`        VARCHAR(150) DEFAULT NULL,
-                    `data5`        VARCHAR(150) DEFAULT NULL,
-                    `data6`        VARCHAR(150) DEFAULT NULL,
-                    `data7`        VARCHAR(150) DEFAULT NULL,
-                    `data8`        VARCHAR(150) DEFAULT NULL,
-                    `author`    VARCHAR(40) DEFAULT '".SITE_CONTACT_NAME."',
-                    `created`    INT(12),
-                    INDEX(page),
-                    INDEX(created),
-                    INDEX(title)
-                ) ENGINE=MYISAM CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";
-                CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`".DB_PREFIX."imgCap`
-                (
-                    `photo_id`    VARCHAR(20) UNIQUE NOT NULL,
-                    `album_id`    INT NOT NULL,
-                    `photo_cap`    VARCHAR(150) DEFAULT NULL,
-                    INDEX(album_id)
+                    `page`      VARCHAR(64) NOT NULL,
+                    `title`     VARCHAR(255) DEFAULT NULL,
+                    `subhead`   VARCHAR(75) DEFAULT NULL,
+                    `body`      TEXT DEFAULT NULL,
+                    `img`       VARCHAR(128) DEFAULT NULL,
+                    `imgcap`    VARCHAR(128) DEFAULT NULL,
+                    `data1`     VARCHAR(255) DEFAULT NULL,
+                    `data2`     VARCHAR(255) DEFAULT NULL,
+                    `data3`     VARCHAR(255) DEFAULT NULL,
+                    `data4`     VARCHAR(255) DEFAULT NULL,
+                    `data5`     VARCHAR(255) DEFAULT NULL,
+                    `data6`     VARCHAR(255) DEFAULT NULL,
+                    `data7`     VARCHAR(255) DEFAULT NULL,
+                    `data8`     VARCHAR(255) DEFAULT NULL,
+                    `author`    VARCHAR(64) DEFAULT '".SITE_CONTACT_NAME."',
+                    `created`   INT(12),
+                    INDEX(`page`),
+                    INDEX(`created`),
+                    INDEX(`title`),
+                    FULLTEXT KEY `search` (`title`,`body`,`data2`)
                 ) ENGINE=MYISAM CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";
                 CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`".DB_PREFIX."adminMgr`
                 (
@@ -456,46 +450,50 @@ ADMIN_OPTIONS;
                     INDEX(admin_v)
                 ) ENGINE=MYISAM CHARACTER SET ".DEFAULT_CHARACTER_SET." COLLATE ".DEFAULT_COLLATION.";
                 INSERT INTO `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                    (`id`, `page`, `title`, `subhead`, `body`, `img`, `imgcap`,
-                        `data1`, `data2`, `data3`, `data4`, `data5`, `data6`,
-                        `data7`, `data8`, `author`, `created`)
+                (
+                    `page`, `title`, `body`, `img`, `imgcap`,
+                    `data2`, `data6`, `author`, `created`
+                )
                 VALUES
-                    (1, '".DEFAULT_PAGE."', 'Welcome to the Ennui CMS!', NULL,
-                        '<p>You have successfully installed the Ennui CMS.</p>"
-                        . "\r\n<p>To get started:</p>\r\n<ul>\r\n<li>"
-                        . "<a href=\"/admin\">Log in</a> using the username "
-                        . "and password you set up in the config files</li>\r\n"
-                        . "<li>Edit this entry to contain the content for your "
-                        . "site''s home page</li>\r\n<li>Add content to the "
-                        . "rest of the pages on your site</li>\r\n</ul>\r\n"
-                        . "<h2>HTML Element Style Test (h2)</h2>\r\n"
-                        . "<blockquote>\r\n<p>This is a blockquote. Putamus "
-                        . "lectores litterarum dynamicus facilisi dolore. "
-                        . "Facilisi qui zzril legunt nibh in. Nostrud nonummy "
-                        . "sequitur autem consequat ut. Assum tincidunt "
-                        . "vulputate gothica molestie veniam.</p>\r\n"
-                        . "</blockquote>\r\n<h3>H3 Element</h3>\r\n<p>Sed "
-                        . "consequat tempor ex formas dignissim. Lobortis "
-                        . "anteposuerit consectetuer consequat ullamcorper "
-                        . "dolore. Dolore imperdiet amet iis sed iriure. "
-                        . "Luptatum adipiscing lorem augue diam te. Cum autem "
-                        . "claritas tempor sed augue.</p>\r\n<h4>H4 Element"
-                        . "</h4>\r\n<ol>\r\n<li>This is an ordered list</li>"
-                        . "\r\n<li>Typi at doming usus lectores parum.</li>"
-                        . "\r\n<li>Parum quod legentis qui nonummy mirum. Nunc "
-                        . "quis consequat in seacula consectetuer.</li>\r\n"
-                        . "</ol>\r\n<h5>H5 Element</h5>\r\n<p>Parum quod "
-                        . "legentis qui nonummy mirum. Nunc quis consequat in "
-                        . "seacula consectetuer. Est humanitatis eros duis qui "
-                        . "quarta. Enim quod in aliquip placerat insitam. "
-                        . "Putamus consequat hendrerit demonstraverunt "
-                        . "eleifend claram. Videntur molestie typi hendrerit "
-                        . "duis qui.</p>\r\n<h6>H6 Element</h6>\r\n<p>Mazim ut "
-                        . "euismod formas amet in. Ex blandit nulla tincidunt "
-                        . "wisi consequat. Typi illum ad luptatum "
-                        . "Investigationes legentis.</p>', NULL, NULL, NULL,
-                        NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                        'Jason Lengstorf', 1261511658)
+                (
+                    '".DEFAULT_PAGE."', 'Welcome to the ECMS!',
+                    '<p>You have successfully installed the "
+                    . "<a href=\"http://ennuicms.com/\">ECMS</a>.</p>"
+                    . "\r\n<p>To get started:</p>\r\n<ul>\r\n<li>"
+                    . "<a href=\"/admin\">Log in</a> using the username "
+                    . "and password you set up in the config files</li>\r\n"
+                    . "<li>Edit this entry to contain the content for your "
+                    . "site''s home page</li>\r\n<li>Add content to the "
+                    . "rest of the pages on your site</li>\r\n</ul>\r\n"
+                    . "<h2>HTML Element Style Test (h2)</h2>\r\n"
+                    . "<blockquote>\r\n<p>This is a blockquote. Putamus "
+                    . "lectores litterarum dynamicus facilisi dolore. "
+                    . "Facilisi qui zzril legunt nibh in. Nostrud nonummy "
+                    . "sequitur autem consequat ut. Assum tincidunt "
+                    . "vulputate gothica molestie veniam.</p>\r\n"
+                    . "</blockquote>\r\n<h3>H3 Element</h3>\r\n<p>Sed "
+                    . "consequat tempor ex formas dignissim. Lobortis "
+                    . "anteposuerit consectetuer consequat ullamcorper "
+                    . "dolore. Dolore imperdiet amet iis sed iriure. "
+                    . "Luptatum adipiscing lorem augue diam te. Cum autem "
+                    . "claritas tempor sed augue.</p>\r\n<h4>H4 Element"
+                    . "</h4>\r\n<ol>\r\n<li>This is an ordered list</li>"
+                    . "\r\n<li>Typi at doming usus lectores parum.</li>"
+                    . "\r\n<li>Parum quod legentis qui nonummy mirum. Nunc "
+                    . "quis consequat in seacula consectetuer.</li>\r\n"
+                    . "</ol>\r\n<h5>H5 Element</h5>\r\n<p>Parum quod "
+                    . "legentis qui nonummy mirum. Nunc quis consequat in "
+                    . "seacula consectetuer. Est humanitatis eros duis qui "
+                    . "quarta. Enim quod in aliquip placerat insitam. "
+                    . "Putamus consequat hendrerit demonstraverunt "
+                    . "eleifend claram. Videntur molestie typi hendrerit "
+                    . "duis qui.</p>\r\n<h6>H6 Element</h6>\r\n<p>Mazim ut "
+                    . "euismod formas amet in. Ex blandit nulla tincidunt "
+                    . "wisi consequat. Typi illum ad luptatum "
+                    . "Investigationes legentis.</p>',
+                    'blog, entry, testing', 'welcome-to-the-ecms',
+                    'Ennui Design', " . time() . "
+                )
                 ON DUPLICATE KEY UPDATE `created`=".time().";";
 
         if ( DEV_PASS!='' )

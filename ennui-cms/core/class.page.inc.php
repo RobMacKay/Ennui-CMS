@@ -2,7 +2,7 @@
 
 /**
  * Generic functions for page interactions.
- * 
+ *
  * This class handles database interaction and file uploads for most publicly
  * displayed pages built on the EnnuiCMS platform.
  *
@@ -213,16 +213,18 @@ class Page extends AdminUtilities
         return $this->loadEntryArray($stmt);
     }
 
-    protected function getEntriesBySearch($search, $limit=MAX_ENTRIES_PER_PAGE, $offset=0)
+    protected function getEntriesBySearch($search, $page='blog', $limit=MAX_ENTRIES_PER_PAGE, $offset=0)
     {
         // Prepare the statement and execute it
         $sql = "SELECT
-					MATCH (`body`) AGAINST (?) AS Relevance,
+					MATCH (`title`, `body`, `data2`) AGAINST (?) AS Relevance,
 					id, page, title, subhead, body, img, imgcap, data1, data2,
                     data3, data4, data5, data6, data7, data8, author, created
                 FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
-                WHERE title LIKE ?
-                OR MATCH (`body`) AGAINST (? IN BOOLEAN MODE)
+                WHERE `title` LIKE ?
+                AND `page`=?
+                OR MATCH (`title`, `body`, `data2`) AGAINST (? IN BOOLEAN MODE)
+                AND `page`=?
 				ORDER  BY Relevance DESC
 				LIMIT $offset, $limit";
 		try
@@ -240,7 +242,7 @@ class Page extends AdminUtilities
             {
                 throw new Exception($this->mysqli->error);
             }
-            $stmt->bind_param("sss", $query, $like, $key_search);
+            $stmt->bind_param("sssss", $query, $like, $page, $key_search, $page);
             return $this->loadEntryArray($stmt, TRUE);
         }
         catch ( Exception $e )
@@ -388,7 +390,7 @@ class Page extends AdminUtilities
         return $c;
     }
 
-    protected function getEntryCountBySearch($search)
+    protected function getEntryCountBySearch($search, $page)
     {
         $query = htmlentities($search, ENT_QUOTES);
         $keys = explode(' ', $query);
@@ -403,11 +405,13 @@ class Page extends AdminUtilities
                     COUNT(title) AS theCount
                 FROM `".DB_NAME."`.`".DB_PREFIX."entryMgr`
                 WHERE title LIKE ?
-                OR MATCH (`body`) AGAINST (? IN BOOLEAN MODE)";
+                AND page=?
+                OR MATCH (`title`, `body`, `data2`) AGAINST (? IN BOOLEAN MODE)
+                AND page=?";
         try
         {
             $stmt = $this->mysqli->prepare($sql);
-            $stmt->bind_param("ss", $param1, $param2);
+            $stmt->bind_param("ssss", $param1, $page, $param2, $page);
             $stmt->execute();
             $stmt->bind_result($c);
             $stmt->fetch();
@@ -426,9 +430,9 @@ class Page extends AdminUtilities
         if ( $this->url0=="search" )
         {
             $page = 'search';
-            $link = $this->url1;
-            $num = empty($this->url2) ? 1 : $this->url2;
-            $c = $this->getEntryCountBySearch($link);
+            $link = $this->url1 . '/' . $this->url2;
+            $num = empty($this->url3) ? 1 : $this->url3;
+            $c = $this->getEntryCountBySearch($this->url2, $this->url1);
         }
         else
         {

@@ -16,23 +16,24 @@ class Search extends Page
 {
     public function displayPublic()
     {
-        if ( !empty($this->url1) )
+        if ( !empty($this->url1) && !empty($this->url2) )
         {
             // The page of entries to display
-            $url2 = isset($this->url2) ? $this->url2 : 1;
+            $url3 = isset($this->url3) ? $this->url3 : 1;
 
             // What entry to use as the starting point
-            $start_num = BLOG_PREVIEW_NUM*$url2-BLOG_PREVIEW_NUM;
-            if($start_num< 0)
+            $start_num = BLOG_PREVIEW_NUM*$url3-BLOG_PREVIEW_NUM;
+            if( $start_num<0 )
             {
                 $start_num = 0;
             }
 
             // Sanitize the search string
-            $search = htmlentities(urldecode(trim($this->url1)), ENT_QUOTES);
+            $page = htmlentities(urldecode(trim($this->url1)), ENT_QUOTES);
+            $search = htmlentities(urldecode(trim($this->url2)), ENT_QUOTES);
 
             // Load the entries that match the search
-            $entries = $this->getEntriesBySearch($search, BLOG_PREVIEW_NUM, $start_num);
+            $entries = $this->getEntriesBySearch($search, $page, BLOG_PREVIEW_NUM, $start_num);
 
             return $this->displayResults($entries);
         }
@@ -72,6 +73,9 @@ class Search extends Page
                     $e['thumb'] = '/assets/images/no-image-thumb.jpg';
                 }
 
+                $e['comment-count'] = comments::getCommentCount($e['id']);
+                $e['comment-text'] = $e['comment-count']==1 ? "comment" : "comments";
+
                 $e['url'] = !empty($e['data6']) ? $e['data6'] : urlencode($e['title']);
                 $e['admin'] = $this->admin_simple_options($this->url0, $e['id']);
 
@@ -91,9 +95,10 @@ class Search extends Page
             $template_file = 'default.inc';
         }
 
-        $extra['header']['title'] = 'Search Results for "' 
-                . urldecode($this->url1) . '" (' 
-                . $this->getEntryCountBySearch($this->url1) . ' entries found)';
+        $extra['header']['title'] = 'Search Results for "'
+                . urldecode($this->url2) . '" ('
+                . $this->getEntryCountBySearch($this->url2, $this->url1)
+                . ' entries found)';
 
         $extra['footer']['pagination'] = $this->paginateEntries();
 
@@ -107,7 +112,7 @@ class Search extends Page
         return $entry;
     }
 
-	public static function displaySearchBox()
+	public static function displaySearchBox($page="blog", $submit_text="Search")
 	{
 		$form_action = FORM_ACTION;
 		return "
@@ -115,13 +120,15 @@ class Search extends Page
                       action=\"$form_action\">
                     <fieldset>
                         <input type=\"text\" name=\"search_string\"
-                               id=\"search-string\" />
-                        <input type=\"hidden\" name=\"page\"
-                               value=\"search\" />
+                               id=\"search-string\" class=\"textfield\" />
+                        <input type=\"submit\" value=\"$submit_text\"
+                               id=\"search-submit\" class=\"button\" />
                         <input type=\"hidden\" name=\"action\"
                                value=\"entry_search\" />
-                        <input type=\"submit\" value=\"Search\"
-                               id=\"search-submit\" />
+                        <input type=\"hidden\" name=\"page\"
+                               value=\"search\" />
+                        <input type=\"hidden\" name=\"search-page\"
+                               value=\"$page\" />
                     </fieldset>
                 </form>";
 	}

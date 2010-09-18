@@ -1,17 +1,15 @@
 <?php
 
-FB::log("The update file was loaded.");
-
-if ( isset($_POST['page']) )
+if( isset($_POST['page']) )
 {
     // Make sure the posted page exists
     $p = strtolower($_POST['page']);
-    if ( $p=='admin' )
+    if( $p==='admin' || $p==='search' )
     {
-        $class = 'admin';
+        $class = $p;
     }
 
-    else if ( isset($p) )
+    else if( !empty($p) )
     {
         $class = Utilities::getPageType($menuPages, $p);
         if ( $class === FALSE )
@@ -41,8 +39,10 @@ if ( isset($_POST['page']) )
         exit;
     }
 
-    if ( $_POST['action'] == 'blog_search' ) {
-        $header = "Location: ../". htmlentities($_POST['page'], ENT_QUOTES) ."/search/".urlencode($_POST['search_string']);
+    if ( $_POST['action'] == 'entry_search' )
+    {
+        $header = "Location: /search/" . urlencode($_POST['search-page']) . "/"
+                . urlencode($_POST['search_string']);
     }
 
     if ( $_POST['action'] == 'galleryEdit' )
@@ -209,5 +209,3 @@ else if ( $_GET['action'] == 'logout' )
 else { $header = "Location: /"; }
 
 header($header);
-
-?>

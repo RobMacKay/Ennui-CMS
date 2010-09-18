@@ -14,9 +14,8 @@
  */
 .ennui_form {
 	text-align: left;
-	margin: 0px auto;
-	margin-bottom: 30px;
-	padding: 10px;
+	margin: 0 auto;
+	padding: 10px 10px 0;
 	width: 90%;
 	border: 0;
 }
@@ -32,46 +31,56 @@
 .ennui_form label {
 	display: block;
 	font-size: 11px;
-	text-transform: uppercase;
+	color: #333;
 	font-weight: bold;
+	margin:0 0 5px;
 }
 
-.ennui_form input:not([type=hidden]) {
+.ennui_form input:not([type=submit]) {
 	display: block;
-	width: 66%;
+	width: 33%;
+	font-size: 14px;
 	margin: 0 0 15px;
-	padding: 5px;
+	padding: 10px 20px;
 	background: #FFF;
-	border: 1px solid #222;
+	border: 1px solid #CBC9C5;
 	color: #111;
-	-moz-box-shadow: inset 3px 4px 12px rgba(0, 0, 0, .3);
-	-webkit-box-shadow: inset 3px 4px 12px rgba(0, 0, 0, .3);
-	box-shadow: inset 3px 4px 12px rgba(0, 0, 0, .3);
-	-moz-border-radius: 0 6px 6px;
-	-webkit-border-radius: 0 6px 6px;
-	border-radius: 0 6px 6px;
+	-moz-box-shadow: inset 1px 3px 6px rgba(0, 0, 0, .15);
+	-webkit-box-shadow: inset 1px 3px 6px rgba(0, 0, 0, .15);
+	box-shadow: inset 1px 3px 6px rgba(0, 0, 0, .15);
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	border-radius: 20px;
 }
 
 .ennui_form input[type=submit] {
-	width: auto;
-	margin-left: 2%;
-	padding: 4px 6px 3px;
-	font-size: 14px;
+	/* Fancy CSS3 background style */
+	background-image: -moz-linear-gradient(top, #A5CA4B 0%, #96AF53 100%);
+    background-image: -webkit-gradient(	linear,
+										left top, left bottom,
+										from(#A5CA4B),
+										to(#96AF53));
+	/* End of fancy CSS3 background style */
+	/* IE Gradient */
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled='true',
+        startColorstr=#A5CA4B,
+        endColorstr=#96AF53,
+        GradientType=0);
+    /* End of IE Gradient */
+	font: bold 14px Georgia, "Times New Roman", Times, serif;
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+	filter: dropshadow(color=#7F000000, offx=1, offy=1);
 	color: #FFF;
-	text-transform: uppercase;
-	background: #AAA;
-	border: 1px solid #888;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	border-radius: 6px;
-	-moz-box-shadow: inset -2px -3px 6px rgba(0, 0, 0, .5),
-		1px 2px 6px rgba(0, 0, 0, .5);
+	width: auto;
+	padding: 8px 20px;
+	border: 1px solid #98A764;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	border-radius: 20px;
+	-moz-box-shadow: inset 0 1px 0 #C1E172;
 	/* Safari doesn't support inset */
-	-webkit-box-shadow: 1px 2px 6px rgba(0, 0, 0, .5);
-	-webkit-box-shadow: inset -1px -2px 6px rgba(0, 0, 0, .5),
-		1px 2px 6px rgba(0, 0, 0, .5);
-	box-shadow: inset -1px -2px 6px rgba(0, 0, 0, .5),
-		1px 2px 6px rgba(0, 0, 0, .5);
+	-webkit-box-shadow: inset 0 1px 0 #C1E172;
+	box-shadow: inset 0 1px 0 #C1E172;
 }
 
 .ennui_form textarea {
@@ -107,12 +116,12 @@
 	text-align: center;
 }
 
-.admintopopts a {
-	color: #99F;
-}
-
 .admintopopts form {
     display: inline;
+}
+
+.admintopopts a {
+	color: #99F;
 }
 
 .adminsimpleoptions {

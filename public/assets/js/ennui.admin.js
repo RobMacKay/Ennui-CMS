@@ -140,19 +140,25 @@ function deletePhoto(page, id, img) {
 }
 
 function textEdit() {
-	$('textarea#body').tinymce({
-		script_url : tinymcefile,
-		theme : "advanced",
-		plugins : "safari,iespell,inlinepopups,spellchecker,paste,advimage,media",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_buttons1 : "pasteword,|,bold,italic,underline,blockquote,|,"
-			+ "justifyleft,justifycenter,justifyright,|,"
-			+ "bullist,numlist,outdent,indent,|,link,unlink,image,media,code",
-		theme_advanced_buttons2 : "",
-		theme_advanced_buttons3 : "",
-		relative_urls : false
-	});
+    $('textarea#body').tinymce({
+        script_url : tinymcefile,
+        theme : "advanced",
+        plugins : "safari,iespell,inlinepopups,spellchecker,paste,advimage,media",
+        theme_advanced_blockformats : "p,h2,h3,blockquote,code",
+        style_formats : [
+            {title : 'H2 Title', block : 'h2'},
+            {title : 'H3 Title', block : 'h3'}
+        ],
+        theme_advanced_toolbar_location : "top",
+        theme_advanced_toolbar_align : "left",
+        theme_advanced_buttons1 : "pasteword,|,bold,italic,underline,blockquote,|,"
+            + "justifyleft,justifycenter,justifyright,|,"
+            + "bullist,numlist,outdent,indent,|,link,unlink,image,media,code,"
+            + "|,forecolor,backcolor,|,formatselect",
+        theme_advanced_buttons2 : "",
+        theme_advanced_buttons3 : "",
+        relative_urls : false
+    });
 }
 
 function galleryUpload(dir, page, id)

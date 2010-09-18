@@ -312,3 +312,5 @@ selected = -1;
 </body>
 </html>
 
+<?php
+exit;

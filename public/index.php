@@ -84,6 +84,10 @@ if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/assets/css/$obj->url0.css"
 
         </section><!-- end .entrydisplay -->
         <aside>
+            <div id="search">
+<?php echo Search::displaySearchBox(); ?>
+
+            </div><!-- end #search -->
             <div id="<?php echo $sidebar->url0 ?>"><?php echo $sidebar->displayPublic(); ?>
 
             </div>
