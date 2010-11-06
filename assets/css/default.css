@@ -1,0 +1,744 @@
+/**
+ * Determines base styles for the site
+ *
+ * This stylesheet contains the overall font and layout rules for the site.
+ * Rules within this stylesheet should affect every page of the site. If a rule
+ * only applies to a particular page, it should probably go in the
+ * page-specific stylesheet instead.
+ *
+ * @author    Jason Lengstorf
+ * @copyright    2009 Ennui Design
+ * @license    http://www.opensource.org/licenses/mit-license.html MIT License
+*/
+
+/*
+ ******************************************************************************
+ * GENERAL RESET
+ ******************************************************************************
+*/
+html,body,div,h1,h2,h3,h4,h5,h6,p,ul,ol,li,span,a,form,fieldset,legend,input,
+textarea,select,img,object,table,tr,td,article,section,nav,video,aside {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    text-align: left;
+    background: transparent;
+}
+
+ul,ol {
+    list-style: none;
+}
+
+/*
+ ******************************************************************************
+ * FONT SETTINGS
+ ******************************************************************************
+*/
+
+/*
+ * Alte Haas Grotesk is used with the written permission of the designer
+ * Font designed by Yann Le Coroller
+*/
+@font-face {
+    font-family: 'Alte Haas Grotesk Bold';
+    src: url(AlteHaasGroteskBold.eot);
+    src: local('Alte Haas Grotesk Bold'),
+        url(AlteHaasGroteskBold.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Alte Haas Grotesk Regular';
+    src: url(AlteHaasGroteskRegular.eot);
+    src: local('Alte Haas Grotesk Regular'), local('Alte Haas Grotesk'),
+        url(AlteHaasGroteskRegular.ttf) format('truetype');
+}
+
+a:link,a:visited,a:active,a:hover {
+    color: #00F;
+}
+
+h1,h2,h3,h4,h5,h6,p,input,textarea,select,label,ul,li,a,span,legend {
+    line-height: 18px;
+}
+
+h1,h1 a,h2,h2 a,h3,h3 a,h4,h5,h6,p,legend,#menu li a {
+    font-family: 'Alte Haas Grotesk Bold', helvetica, arial, sans-serif;
+    margin-bottom: 18px;
+    letter-spacing: -.05em;
+}
+
+h2,h2 a:link,h2 a:visited,h2 a:active,h2 a:hover,h3,h3 a:link,h3 a:visited,
+h3 a:active,h3 a:hover,h4,h5,h6,legend {
+    margin: 18px 0 9px;
+    text-shadow: 1px 2px 3px rgba(0,0,0,.2);
+    color: #111;
+}
+
+p,input,textarea,select,label,li {
+    font-family: 'Alte Haas Grotesk Regular', helvetica, arial, sans-serif;
+    font-size: 12px;
+    letter-spacing: .04em;
+    color: #333;
+}
+
+h2,h2 a:link,h2 a:visited,h2 a:active,h2 a:hover {
+    font-size: 30px;
+    line-height: 36px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+h3,h4,h5,h6,aside h2 {
+    letter-spacing: .05em;
+}
+
+h3,h3 a:link,h3 a:visited,h3 a:active,h3 a:hover,legend,aside h2 {
+    font-size: 24px;
+    line-height: 36px;
+}
+
+h3 a {
+    text-decoration: none;
+}
+
+h4,aside h3 {
+    font-size: 18px;
+    line-height: 36px;
+}
+
+h5 {
+    font-size: 14px;
+}
+
+h6 {
+    font-size: 12px;
+}
+
+/*
+ ******************************************************************************
+ * GENERAL LAYOUT BOX MODEL
+ ******************************************************************************
+*/
+html {
+    background: #333;
+}
+
+body {
+    display: block;
+    width: 960px;
+    margin: 0 auto;
+    padding: 0;
+    background: #FFF;
+    border: 2px solid #000;
+    border-top: 0;
+    border-bottom: 0;
+
+    /* CSS3 Effects for browsers that can handle it */
+    -moz-box-shadow: 0 0 20px #000;
+    -webkit-box-shadow: 0 0 20px #000;
+    box-shadow: 0 0 20px #000;
+}
+
+div,section,header,aside {
+    display: block;
+    position: relative;
+}
+
+header {
+    position: relative;
+    height: 50px;
+    margin: 0 30px;
+    z-index: 2;
+    border-bottom: 2px solid #DDD;
+}
+
+#header_title {
+    position: absolute;
+    top: 10px;
+    left: 0px;
+    width: 400px;
+    height: 41px;
+    overflow: hidden;
+}
+
+#header_title a {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 36px;
+    line-height: 45px;
+    text-decoration: none;
+    color: #111;
+}
+
+#content {
+    padding: 0;
+    background-color: transparent;
+    text-align: center;
+}
+
+/*
+ ******************************************************************************
+ * MENU STYLE
+ ******************************************************************************
+*/
+nav {
+    position: absolute;
+    top: 25px;
+    right: 0px;
+    height: auto;
+    z-index: 2;
+}
+
+nav li {
+    display: inline-block;
+    padding: 0 8px;
+    text-transform: uppercase;
+}
+
+nav a:link,nav a:visited {
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+nav a:hover,nav li.selected a, nav li.parent a {
+    color: #111;
+    text-decoration: none;
+    border-bottom: 5px solid #111;
+}
+
+.submenu {
+    display: none;
+}
+
+nav li:hover .submenu,nav li.selected .submenu,nav li.parent .submenu {
+    display: block;
+    position: absolute;
+    top: 22px;
+    right: -6px;
+    width: 566px;
+    padding: 2px 0;
+    text-align: center;
+}
+
+nav .submenu li {
+    padding: 3px 4px 1px;
+    color: #FFF;
+}
+
+nav .submenu a {
+    color: #FFF;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+nav .submenu li.selected a,nav .submenu li:hover a {
+    color: #FFF;
+}
+
+/*
+ ******************************************************************************
+ * CONTENT STYLE
+ ******************************************************************************
+*/
+.entrydisplay,aside {
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 16px 18px;
+    padding: 36px 36px 24px;
+}
+
+.entrydisplay {
+    width: 510px;
+}
+
+.entrydisplay ul,.entrydisplay ol {
+    margin: 0 40px 18px;
+}
+
+.entrydisplay ul {
+    list-style: disc;
+}
+
+.entrydisplay ol {
+    list-style: decimal;
+}
+
+.entrydisplay li {
+    margin-bottom: 9px;
+    margin-left: 18px;
+}
+
+blockquote {
+    position: relative;
+    margin: 0 20px 18px;
+    padding: 15px 15px 1px 45px;
+    background-color: #DDD;
+    border: 1px solid #333;
+}
+
+blockquote p {
+    font: italic 12px/18px georgia, times, serif;
+}
+
+blockquote p:before {
+    content: '\201C';
+    font-size: 72px;
+    line-height: 72px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #AAA;
+}
+
+input,select,textarea {
+    border: 1px solid #000;
+    padding: 2px;
+    background: #FFF;
+}
+
+.clearfix {
+    display: block;
+    clear: both;
+}
+
+/*
+ ******************************************************************************
+ * PHOTO THUMBNAIL DISPLAY
+ ******************************************************************************
+*/
+ul.thumbbox {
+    border: 4px solid #111;
+    width: 328px;
+    margin: 0 auto;
+    padding: 0;
+    overflow: hidden;
+}
+
+.thumbbox li {
+    height: 80px;
+    margin: 0;
+    padding: 0;
+    display: block;
+    float: left;
+    border: 1px solid #DDD;
+}
+
+.thumbbox li img {
+    width: 80px;
+}
+
+#photos .adminsimpleoptions {
+    clear: both;
+}
+
+/*
+ ******************************************************************************
+ * PAGINATION
+ ******************************************************************************
+*/
+#pagination {
+    display: block;
+    clear: left;
+    text-align: right;
+}
+
+#pagination li {
+    display: inline-block;
+    vertical-align: top;
+    width: 20px;
+    margin: 0;
+    text-align: center;
+    font-size: 12px;
+    -moz-border-radius: 3px;
+}
+
+#pagination li a,#pagination li.off {
+    display: inline-block;
+    width: 20px;
+    padding: 1px 0 2px 1px;
+    color: #111;
+    text-decoration: none;
+    text-align: center;
+}
+
+#pagination li.selected {
+    background: #333;
+}
+
+#pagination li:hover {
+    background: #DDD;
+}
+
+#pagination li:hover a,#pagination li.selected:hover a {
+    color: #111;
+}
+
+#pagination li.selected a {
+    color: #DDD;
+}
+
+/*
+ ******************************************************************************
+ * BLOG ENTRY - PREVIEW DISPLAY
+ ******************************************************************************
+*/
+#entries {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+li.post {
+    display: block;
+    margin: 0 0 30px;
+    padding: 0 15px 15px;
+}
+
+li.post img.blog_img {
+    float: left;
+    width: 200px;
+    margin: 10px 10px 10px 0;
+    border: 2px solid #DDD;
+}
+
+.post h2 {
+    margin-top: 0;
+}
+
+.comment-count {
+    position: absolute;
+    left: 20px;
+    top: 59px;
+    width: 61px;
+    color: #FFF;
+    font-size: 9px;
+    letter-spacing: -.04em;
+    text-align: center;
+}
+
+.comment-count a:link,.comment-count a:visited,.comment-count a:active,
+.comment-count a:hover {
+    display: block;
+    margin: 0 0 -4px;
+    text-align: center;
+    font-size: 18px;
+    line-height: 18px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #FFF;
+}
+
+.readmore {
+    display: block;
+    clear: left;
+    text-align: right;
+    font-size: 11px;
+}
+
+/*
+ ******************************************************************************
+ * BLOG ENTRY - FULL DISPLAY
+ ******************************************************************************
+*/
+.entry-image {
+    display: block;
+    margin: 0 auto 15px;
+    width: 484px;
+    text-align: center;
+}
+
+.entry-image img {
+    display: inline;
+    max-width: 480px;
+    border: 2px solid #DDD;
+}
+
+.entry-image .cap {
+    font-size: 10px;
+    font-style: italic;
+    text-align: right;
+    margin: 0;
+    padding: 0;
+}
+
+.meta,.meta a {
+    font-size: 10px;
+    text-align: right;
+    color: #333;
+    border-top: 2px solid #DDD;
+    text-transform: uppercase;
+    clear: left;
+}
+
+.meta a {
+    border: 0;
+}
+
+.date {
+    float: left;
+}
+
+.tags {
+    display: block;
+    text-align: right;
+}
+
+.tweet,.fb {
+    display: inline-block;
+    vertical-align: top;
+}
+
+/*
+ ******************************************************************************
+ * COMMENT DISPLAY
+ ******************************************************************************
+*/
+#comments {
+    margin: 0;
+    padding: 0;
+}
+
+#comments h2 {
+    margin: 0;
+}
+
+#comments ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#comments li {
+    margin: 0;
+    padding: 24px 15px;
+}
+
+#comments li:nth-child(even) {
+    background: #EEE;
+}
+
+.nopost {
+    margin: 0;
+    padding: 0;
+    color: #333;
+    font-style: italic;
+}
+
+.user_info {
+    float: left;
+    width: 90px;
+    margin: 0 0 0px;
+    padding: 5px;
+    text-align: center;
+    font: 12px/14px 'alte haas grotesk bold', helvetica, sans-serif;
+    overflow: hidden;
+}
+
+.user_info a {
+    text-decoration: underline;
+    color: #333;
+}
+
+.user_info img {
+    display: block;
+    margin: 0 auto;
+    border: 1px solid #000;
+}
+
+.comment {
+    display: block;
+    margin: 0 0 2px 100px;
+    padding: 10px;
+    overflow: visible;
+}
+
+.comment_date {
+    clear: left;
+    margin: 0;
+    padding: 2px 8px 0;
+    font-size: 10px;
+    text-transform: uppercase;
+    text-align: right;
+    border-top: 1px dotted #000;
+}
+
+.comment_date a {
+    font-size: 10px;
+}
+
+
+
+/*
+ ******************************************************************************
+ * COMMENT FORM
+ ******************************************************************************
+*/
+#comments h3 {
+    clear: left;
+    margin-top: 60px;
+    border-bottom: 1px dotted #80A3B7;
+    line-height: 24px;
+}
+
+#add-comment {
+    position: relative;
+    padding: 30px 0;
+}
+
+#add-comment legend {
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin: 0 0 15px;
+    border-bottom: 2px solid #DDD;
+}
+
+.get_gravatar {
+    position: absolute;
+    top: 44px;
+    right: 0;
+    margin: 0 4px 0 15px;
+    text-align: right;
+    font-size: 10px;
+    font-style: italic;
+}
+
+.c_errortext {
+    color: #F00;
+}
+
+#add-comment label {
+    display: block;
+    font: 10px/13px 'alte haas grotesk bold', helvetica, sans-serif;
+    text-transform: uppercase;
+}
+
+#add-comment input[type=text],#add-comment input[type=submit],#add-comment textarea {
+    display: block;
+    width: 66%;
+    margin: 0 0 15px;
+    padding: 3px;
+    border: 1px solid #333;
+    color: #111;
+}
+
+#add-comment input[type=text] {
+    width: 66%;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+#add-comment input[type=submit] {
+    width: auto;
+    margin-left: 1%;
+    padding: 4px 6px 5px;
+    font: 14px/14px 'alte haas grotesk bold', helvetica, sans-serif;
+    color: #FFF;
+    text-transform: uppercase;
+    background: #333;
+    border: 1px solid #111;
+}
+
+#add-comment textarea {
+    width: 96%;
+    font-size: 12px;
+}
+
+input#cmnt_subscribe,#add-comment label[for=cmnt_subscribe] {
+    display: inline;
+    margin: 0 0 15px 4px
+}
+
+.err {
+    background: #FF0;
+}
+
+/*
+ ******************************************************************************
+ * SIDEBAR STYLE
+ ******************************************************************************
+*/
+aside {
+    width: 210px;
+}
+
+aside ul {
+    border-top: 2px solid #DDD;
+}
+
+aside li {
+    padding: 8px;
+    border-bottom: 2px solid #DDD;
+    text-transform: uppercase;
+}
+
+aside li a:link,aside li a:visited,aside li a:active,aside li a:hover {
+    color: #111;
+    text-decoration: none;
+}
+
+aside li a:active,aside li a:hover {
+    text-decoration: underline;
+}
+
+.see-all:link,.see-all:visited,.see-all:active,.see-all:hover {
+    display: block;
+    text-align: right;
+    text-decoration: none;
+    margin: 2px;
+    text-transform: lowercase;
+    font: 11px/13px 'alte haas grotesk regular', helvetica, sans-serif;
+    color: #333;
+}
+
+.see-all:active,.see-all:hover {
+    text-decoration: underline;
+}
+
+#sidebar-flickr {
+    text-align: center;
+    border: 0;
+    margin-bottom: 30px;
+}
+
+#sidebar-flickr li {
+    display: inline-block;
+    margin: 0 0 -5px;
+    padding: 0;
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+    border: 0;
+}
+
+#sidebar-flickr img {
+    width: 100%;
+}
+
+/*
+ ******************************************************************************
+ * FOOTER STYLE
+ ******************************************************************************
+*/
+footer {
+    display: block;
+    margin: 0;
+    padding: 30px 15px 0;
+}
+
+.credits {
+    padding-bottom: 8px;
+    text-align: center;
+    font-size: 11px;
+    line-height: 12px;
+    color: #333;
+}
+
+.credits a {
+    color: #333;
+    text-decoration: underline;
+}

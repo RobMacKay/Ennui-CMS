@@ -1,6 +1,0 @@
-[2010-07-19 12:48:41] /Applications/XAMPP/xamppfiles/htdocs/Ennui-CMS/ennui-cms/core/class.form.inc.php:52 - Error with message "Var $config must be an array." was thrown from Form::input (/Applications/XAMPP/xamppfiles/htdocs/Ennui-CMS/public/test.php:17) with arguments: ('email', 'Email Address', 'test@example.org')
-
-[2010-07-19 12:48:58] /Applications/XAMPP/xamppfiles/htdocs/Ennui-CMS/ennui-cms/core/class.input.inc.php:30 - Error with message "The value passed in $config must be an array." was thrown from Form::input (/Applications/XAMPP/xamppfiles/htdocs/Ennui-CMS/public/test.php:17) with arguments: ('email', 'Email Address', 'test@example.org')
-
-[2010-07-19 03:16:45] /Applications/XAMPP/xamppfiles/htdocs/Ennui-CMS/ennui-cms/core/class.form.inc.php:36 - Error with message "Var $config must be an array." was thrown from Test::displayAdmin (/Applications/XAMPP/xamppfiles/htdocs/Ennui-CMS/public/test.php:26) with arguments: ('1')
-
